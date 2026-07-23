@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Failing Tests First: The Feedback Loop Is the Ceiling — Week 5 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 5</a> · Objective M27</span>
+  </div>
+</header>
+
+<main>
+  <h1>Failing Tests First: The Feedback Loop Is the Ceiling</h1>
+  <p class="lede">Plan-first told the agent where to go; test-first tells it when it has arrived. This lesson teaches the red&ndash;green loop as an agent-direction technique — write one failing test, watch it fail, implement to green — and the argument underneath it: the quality of an agent's output is capped by the quality of the feedback it can read.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M27 · TDD</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A5</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Direct Claude to write failing tests first, confirm they fail, then implement to green — and explain why feedback-loop quality is the ceiling on agent output.</p>
+  </div>
+
+  <h2>1 · The ceiling argument</h2>
+  <p>Start with the claim in the objective's second half, because it explains everything in the first half. Anthropic's best-practices guide: &ldquo;Claude stops when the work looks done. Without a check it can run, &lsquo;looks done&rsquo; is the only signal available, and you become the verification loop: every mistake waits for you to notice it.&rdquo; Give Claude a check that returns pass or fail, and &ldquo;the loop closes on its own.&rdquo;</p>
+  <p>Put that as a general law: an agent iterates against whatever feedback signal it has. If the signal is &ldquo;the code looks plausible,&rdquo; output quality tops out at <em>plausible</em>. If the signal is a real test suite exercising real behavior, quality tops out at <em>passes real tests</em>. The agent cannot outperform its own feedback — which is why Pocock, whose TDD material grounds this lesson, treats disciplined red&ndash;green as the most consistent lever on agent output quality: the test is what gives the agent eyes. Improve the loop and every session inherits the improvement; leave it weak and no amount of prompting compensates.</p>
+
+  <h2>2 · The loop: red, green, refactor — one behavior at a time</h2>
+  <p>Pocock's /tdd skill runs the classic cycle with the phases stated as hard rules:</p>
+  <ul>
+    <li><strong>RED:</strong> &ldquo;Write ONE test that fails. Just one.&rdquo;</li>
+    <li><strong>GREEN:</strong> &ldquo;Write minimal code to pass that test only. Nothing speculative.&rdquo;</li>
+    <li><strong>REFACTOR:</strong> &ldquo;After all tests pass, clean up duplications and simplify.&rdquo;</li>
+  </ul>
+  <p>Then repeat for the next behavior, &ldquo;each cycle informed by what the last one taught you.&rdquo; In a session, directing this looks like:</p>
+  <div class="code-label">Directing the loop (one cycle)</div>
+  <pre>1. "Write one failing test: creating a deck persists it across reload.
+    Run it and show me the failure."          ← red, with evidence
+2. Read the failure. Is it failing for the RIGHT reason
+   (missing behavior), not a typo or import error?
+3. "Now write the minimal code to make that test pass.
+    Run the suite and show the output."       ← green, with evidence
+4. "Any duplication to clean up? Keep the suite green."  ← refactor
+5. Next behavior → back to 1.</pre>
+  <div class="callout warn">
+    <span class="label">Why &ldquo;confirm they fail&rdquo; is in the objective</span>
+    <p>A test you never saw fail proves nothing — it might pass against an empty implementation, test nothing, or not run at all. The failing run is the test's own test. And it's what makes the loop agent-proof: &ldquo;if a test fails first, the LLM can't fake it, it has to write real implementation.&rdquo; Skipping the red run reopens the door that TDD closed.</p>
+  </div>
+
+  <h2>3 · Why not write all the tests up front?</h2>
+  <p>The tempting shortcut — have Claude generate the full test file first, then implement — is the one the skill explicitly rejects. Tests &ldquo;written in bulk test imagined behavior, not observed behavior&rdquo;: they are &ldquo;tests of <em>imagined</em> behaviour — they check the shape of things and go numb to real changes.&rdquo; You'll recognize the vocabulary from Week 4: batching tests is <em>horizontal slicing</em>, and the fix is the same — vertical slices, &ldquo;one test, then just enough code to pass it, then the next test.&rdquo; Because you just wrote the code, you know exactly which behavior matters next; in the skill's phrase, &ldquo;you never outrun your headlights.&rdquo;</p>
+  <p>Two rules from the skill keep the signal honest:</p>
+  <ul>
+    <li><strong>Test through the public API.</strong> A good test &ldquo;exercises real code paths through the public API, so renaming an internal function never breaks it.&rdquo; The tell for the bad kind: your test breaks when you refactor, but the behavior hasn't changed — that test was coupled to implementation, and its red is a lie.</li>
+    <li><strong>Expected values come from an independent source of truth</strong> — &ldquo;a known-good literal, a worked example, the spec.&rdquo; If the agent computes the expected value with the same logic being tested, the test can only confirm the code agrees with itself.</li>
+  </ul>
+  <div class="callout note">
+    <span class="label">The ceiling, restated with the pieces in place</span>
+    <p>Weak loop: tests written in bulk from imagined behavior, expected values derived from the implementation, red runs never observed — the agent iterates happily against a signal that can't say no. Strong loop: one real failing test at a time, public-API paths, independent expected values — every green transition is information. Same model, same prompts; the difference in output quality is entirely the loop. That's what &ldquo;the ceiling&rdquo; means, and why A5 grades the process.</p>
+  </div>
+
+  <h2>4 · Where this sits in the week's workflow</h2>
+  <p>The pieces you've built compose in order: the <a href="m25a-explore-and-plan.html">plan</a> says which behaviors the issue needs; each behavior becomes a red&ndash;green cycle; the green suite is the evidence <a href="m25b-code-and-commit.html">M25b</a> taught you to demand before commit. A5 encodes the sequence for both of your issues: &ldquo;have Claude plan first and approve the plan; require failing tests before implementation; confirm green; open one PR per issue.&rdquo; Pocock's phase-gated tdd skill (in <a href="https://github.com/mattpocock/skills">mattpocock/skills</a>, which you met in Week 4) packages the loop so the agent can't skip a gate — you're welcome to use it for A5, but be able to run the loop by hand first.</p>
+
+  <section class="handson">
+    <h2>Hands-on: one full red&ndash;green cycle on your A5 issue</h2>
+    <label class="check"><input type="checkbox"><span>Picked one acceptance criterion from an A5 issue and phrased it as a single observable behavior.</span></label>
+    <label class="check"><input type="checkbox"><span>Directed Claude: one failing test for that behavior — and made it run the test and paste the failure output.</span></label>
+    <label class="check"><input type="checkbox"><span>Read the failure and confirmed it fails for the right reason (missing behavior, not a broken import or typo).</span></label>
+    <label class="check"><input type="checkbox"><span>Checked the test's honesty: exercises the public API, expected value from the spec or a known-good literal — not derived from the implementation.</span></label>
+    <label class="check"><input type="checkbox"><span>Directed minimal implementation, confirmed the suite ran green with pasted output, and asked for a refactor pass that kept it green.</span></label>
+    <label class="check"><input type="checkbox"><span>Wrote two sentences in your A5 notes explaining the ceiling argument in your own words — this is the Meeting 5 discussion prep.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. Claude writes the test and the implementation in one turn, then reports the test passes. The suite is green. What's wrong?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — green is green</button></li>
+        <li><button data-opt="b">The test was never observed failing, so nothing established that it can fail — it might pass against any implementation, and the &ldquo;can't fake it&rdquo; property of red-first is exactly what got skipped</button></li>
+        <li><button data-opt="c">The test should have been written after the implementation</button></li>
+        <li><button data-opt="d">One turn is too fast for real work</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> The red run is the test's own test: it proves the test detects the behavior's absence. Without it, green is compatible with a vacuous test — the signal can't say no, which caps the loop's value at zero. A trusts a signal that was never calibrated. C inverts the discipline. D judges by effort, not by what the evidence establishes.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">2. To &ldquo;save cycles,&rdquo; a classmate has Claude generate all fourteen tests for the issue up front, then implement until everything passes. Per Pocock's material, the predictable cost is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">None — this is standard TDD</button></li>
+        <li><button data-opt="b">Slower CI, since fourteen tests run every cycle</button></li>
+        <li><button data-opt="c">Merge conflicts in the test file</button></li>
+        <li><button data-opt="d">The batch tests imagined behavior rather than observed behavior — they check the shape of things, go numb to real changes, and none of the later cycles get informed by what earlier ones taught</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> This is the horizontal-slicing failure, in the skill's own words. The loop's value isn't &ldquo;tests exist&rdquo; — it's that each cycle's discovery feeds the next test, which batching forfeits by fixing all fourteen before the first discovery. A mistakes test-first-in-time for TDD's actual unit (one behavior per cycle). B and C are real but trivial next to a test suite that can't detect real regressions.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">3. A test computes its expected value by calling the same date-formatting helper the code under test uses, and asserts they match. The suite is green. What's the diagnosis?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">The expected value isn't independent — the test can only confirm the code agrees with itself, so a bug in the helper passes; the fix is a known-good literal or a worked example from the spec</button></li>
+        <li><button data-opt="b">Fine — reusing helpers is DRY</button></li>
+        <li><button data-opt="c">The problem is style: literals in tests are unprofessional</button></li>
+        <li><button data-opt="d">The test is too fast to be trustworthy</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The skill's rule exists for this case: &ldquo;expected values come from an independent source of truth — a known-good literal, a worked example, the spec.&rdquo; A self-referential expected value makes the feedback signal circular — green means &ldquo;consistent,&rdquo; not &ldquo;correct.&rdquo; B applies a production-code virtue where it destroys the test's independence. D isn't a diagnostic criterion at all.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">4. A classmate asks: &ldquo;Why does everyone say feedback-loop quality is the <em>ceiling</em> on agent output? Surely a smarter model just writes better code.&rdquo; The course's answer:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Smarter models don't need tests</button></li>
+        <li><button data-opt="b">It's a metaphor — there's no real limit</button></li>
+        <li><button data-opt="c">An agent iterates until its available signal says done: with &ldquo;looks done&rdquo; as the only signal, quality stops at plausible regardless of model strength, while a strong check lets the same model keep correcting until the work is actually right — the signal, not the model, sets what &ldquo;done&rdquo; can mean</button></li>
+        <li><button data-opt="d">Because tests are the only feedback that exists</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> This is the best-practices logic: Claude stops when the work looks done, and the check is what upgrades &ldquo;looks done&rdquo; into &ldquo;is done.&rdquo; A stronger model raises what's reachable <em>under</em> the ceiling; only a better signal raises the ceiling. A gets the dependency backwards — autonomy increases the need for checks. D is false (builds, linters, screenshots, fixtures all count — tests are just the sharpest for logic), and B dissolves the one claim the objective asks you to be able to defend.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://www.aihero.dev/skill-test-driven-development-claude-code">Pocock — My Skill Makes Claude Code GREAT at TDD (aihero.dev)</a> — the RED/GREEN/REFACTOR rules, &ldquo;can't fake it,&rdquo; imagined-vs-observed behavior (primary grounding)</li>
+      <li><a href="https://www.aihero.dev/skills-tdd">Pocock — The /tdd Skill (aihero.dev)</a> — vertical test slicing, public-API paths, independent sources of truth, &ldquo;never outrun your headlights&rdquo;</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices, &ldquo;Give Claude a way to verify its work&rdquo;</a> — the looks-done problem and the self-closing loop that ground the ceiling argument</li>
+      <li><a href="https://github.com/mattpocock/skills">mattpocock/skills</a> — the phase-gated tdd skill, if you want the loop enforced rather than hand-run</li>
+      <li>Companion: <a href="https://www.aihero.dev/real-world-feature-build-with-claude-code">Pocock — Real-World Feature Build with Claude Code (aihero.dev)</a> — watch the implementation segments for the loop running on a real feature, including failures worth learning from</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m26-permission-modes.html"><span class="dir">Previous · M26</span>Choose the Right Permission Mode</a>
+    <a class="next" href="m28-fresh-session-per-issue.html"><span class="dir">Next · M28</span>One Issue, One Fresh Session, One PR</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 5 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

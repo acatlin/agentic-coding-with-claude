@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Choose the Right Permission Mode — Week 5 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 5</a> · Objective M26</span>
+  </div>
+</header>
+
+<main>
+  <h1>Choose the Right Permission Mode</h1>
+  <p class="lede">Every session runs in a permission mode, whether you chose one or not. The mode decides how often Claude pauses to ask — and therefore whether you're reviewing each action as it happens or reviewing the result afterward. This lesson teaches the modes as a dial, and the skill the quiz and A5 actually test: matching the mode to the task and defending the choice.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M26 · Execution</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Quiz 5 · Assignment A5</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Configure permission modes appropriately for a task (default approvals vs. accept-edits vs. plan-only) and justify the choice.</p>
+  </div>
+
+  <h2>1 · What a permission mode is</h2>
+  <p>When Claude wants to edit a file, run a shell command, or make a network request, it pauses and asks. Permission modes control how often that pause happens. The docs frame the trade-off exactly as this course's Week 1 &ldquo;whose decision&rdquo; lesson would predict: &ldquo;Pick more oversight for sensitive work, or fewer interruptions when you trust the direction.&rdquo;</p>
+  <p>The failure mode of maximum oversight is worth naming, because it's the docs naming it: with a prompt for everything, &ldquo;after the tenth approval you're not really reviewing anymore, you're just clicking through.&rdquo; A mode that asks too often doesn't give you more control — it gives you the feeling of control while training you to stop reading.</p>
+
+  <h2>2 · The modes</h2>
+  <p>What each mode lets run <em>without asking</em>, from the permission-modes doc:</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Mode</th><th>What runs without asking</th><th>Best for</th></tr>
+    <tr><td><code>default</code> (labeled <strong>Manual</strong>)</td><td>Reads only</td><td>Getting started, sensitive work</td></tr>
+    <tr><td><code>acceptEdits</code></td><td>Reads, file edits, and common filesystem commands (<code>mkdir</code>, <code>touch</code>, <code>mv</code>, <code>cp</code>&hellip;)</td><td>Iterating on code you're reviewing</td></tr>
+    <tr><td><code>plan</code></td><td>Reads only — and Claude <em>won't edit at all</em> until you approve a plan</td><td>Exploring a codebase before changing it</td></tr>
+    <tr><td><code>auto</code></td><td>Everything, with background safety checks by a classifier model</td><td>Long tasks, reducing prompt fatigue</td></tr>
+    <tr><td><code>dontAsk</code></td><td>Only pre-approved tools; everything else is auto-denied</td><td>Locked-down CI and scripts</td></tr>
+    <tr><td><code>bypassPermissions</code></td><td>Everything, no checks</td><td>Isolated containers and VMs only</td></tr>
+  </table>
+  </div>
+  <p>Switching is a keystroke: <code>Shift+Tab</code> cycles <code>default</code> → <code>acceptEdits</code> → <code>plan</code> mid-session, and the status bar always shows where you are (<code>⏸ plan mode on</code>, <code>⏵⏵ accept edits on</code>). You can also start a session in a mode (<code>claude --permission-mode acceptEdits</code>) or set a project default in <code>.claude/settings.json</code>.</p>
+  <p>Distinctions the quiz cares about:</p>
+  <ul>
+    <li><strong>default vs. acceptEdits</strong> is <em>when you review edits</em>: inline as each happens, or &ldquo;in your editor or via <code>git diff</code> after the fact.&rdquo; Accept-edits only auto-approves inside your working directory; other Bash commands still prompt.</li>
+    <li><strong>plan is not just &ldquo;default with reads&rdquo;</strong> — it's a hard gate. Edits stay blocked until a plan is approved, which is why M25a's workflow runs on it.</li>
+    <li><strong>auto is not bypass.</strong> Auto sends actions through a classifier that blocks scope escalation, unrecognized infrastructure, and hostile-content-driven actions — and it treats boundaries you state in conversation (&ldquo;don't push&rdquo;) as block signals. But the docs are blunt: it &ldquo;reduces permission prompts but does not guarantee safety.&rdquo;</li>
+    <li><strong>bypassPermissions is for sandboxes.</strong> &ldquo;Only use this mode in isolated environments like containers, VMs&hellip; where Claude Code cannot damage your host system.&rdquo; It offers &ldquo;no protection against prompt injection.&rdquo;</li>
+  </ul>
+  <div class="callout note">
+    <span class="label">Protected paths — the floor under every mode</span>
+    <p>In every mode except <code>bypassPermissions</code>, writes to a small set of protected paths (<code>.git</code>, <code>.claude</code>, shell rc files, <code>.mcp.json</code>&hellip;) are never auto-approved — guarding repository state and Claude's own configuration even when you've loosened everything else. Allow-rules in settings don't override this.</p>
+  </div>
+
+  <h2>3 · Applying it: mode follows task and trust</h2>
+  <p>The Apply skill is a two-question decision: <em>What's the worst uncaught action this task could take?</em> and <em>Where will I actually review — inline, at the diff, or at the PR?</em> Worked through the week's own workflow:</p>
+  <ul>
+    <li><strong>Explore/Plan phases (M25a):</strong> <code>plan</code> — you want reading and thinking, with edits structurally impossible until the plan gate.</li>
+    <li><strong>Implementing an approved plan you'll diff-review:</strong> <code>acceptEdits</code> — per-edit prompts add nothing when your real review is the diff; the plan already bounded the scope. (The plan-approval dialog offers exactly this switch.)</li>
+    <li><strong>Touching unfamiliar, risky, or production-adjacent code:</strong> <code>default</code>/Manual — inline review is the point, and the prompts are few enough to stay meaningful.</li>
+    <li><strong>A long, well-specified task you'll leave running:</strong> <code>auto</code> — prompt fatigue is the enemy, and the classifier plus your stated boundaries hold the edges. Verification proportional to how little you watched (M25b's evidence habit) picks up the slack.</li>
+  </ul>
+  <p>&ldquo;Justify the choice&rdquo; means saying that out loud: <em>&ldquo;acceptEdits, because the plan is approved, the blast radius is this branch's working directory, and I review the diff before commit.&rdquo;</em> A mode you can't justify is a mode you picked by habit.</p>
+
+  <section class="handson">
+    <h2>Hands-on: drive the dial</h2>
+    <label class="check"><input type="checkbox"><span>In a scratch session, cycled <code>Shift+Tab</code> through all three modes and watched the status-bar badge change each time.</span></label>
+    <label class="check"><input type="checkbox"><span>In <code>acceptEdits</code>, had Claude create and edit a scratch file (no prompts) — then asked for a command outside the auto-approved set and confirmed it still prompted.</span></label>
+    <label class="check"><input type="checkbox"><span>In <code>plan</code> mode, asked for a small change and confirmed no edit happened — only a plan and the approval dialog.</span></label>
+    <label class="check"><input type="checkbox"><span>Asked Claude to append a line to <code>.claude/settings.json</code> and observed the protected-path prompt fire even in a permissive mode.</span></label>
+    <label class="check"><input type="checkbox"><span>For each of your two A5 issues, wrote a one-sentence mode plan per phase (plan → ? → commit) with a justification naming the risk and your review point — this goes in your A5 notes.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. You've approved a solid plan for a tracer-bullet issue in your own small project, and you'll review the full diff before committing. You choose acceptEdits over default. Which justification is the strong one?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;acceptEdits is faster, and speed is always the priority&rdquo;</button></li>
+        <li><button data-opt="b">&ldquo;default would stop Claude from editing at all&rdquo;</button></li>
+        <li><button data-opt="c">&ldquo;The plan already bounded the scope, auto-approval only covers edits in my working directory, and my real review happens at the diff — per-edit prompts would just be clicking through&rdquo;</button></li>
+        <li><button data-opt="d">&ldquo;The classifier will catch anything dangerous&rdquo;</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> It names the risk bound (plan + working directory), the review point (the diff), and the cost of the alternative (approvals you'd stop reading — the documented tenth-approval effect). A justifies any loosening of anything. B is false: default prompts for edits, it doesn't block them. D describes auto mode, which isn't the mode chosen — a justification has to match the configuration.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">2. What actually distinguishes plan mode from default mode, given that both auto-approve &ldquo;reads only&rdquo;?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">In default mode an edit prompts for approval; in plan mode edits are blocked outright until you approve a plan — one reviews actions, the other gates the transition to acting at all</button></li>
+        <li><button data-opt="b">Nothing — they're aliases</button></li>
+        <li><button data-opt="c">Plan mode also blocks file reads</button></li>
+        <li><button data-opt="d">Plan mode is only available at session startup</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The table rows look identical because both list &ldquo;reads only,&rdquo; but the semantics differ: default asks per edit; plan mode &ldquo;tells Claude to research and propose changes without making them&rdquo; — the approval object is a plan, not an edit. C is backwards (reading is what plan mode is for). D is false: Shift+Tab or /plan enters it any time.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. A classmate runs an overnight unattended task on their laptop with bypassPermissions &ldquo;because auto mode kept pausing to ask.&rdquo; Evaluate.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Fine — unattended tasks require bypassing permissions</button></li>
+        <li><button data-opt="b">Fine — bypassPermissions and auto are equivalent in risk</button></li>
+        <li><button data-opt="c">Wrong tool but harmless, since protected paths still hold</button></li>
+        <li><button data-opt="d">Bad trade: bypass removes exactly the checks (classifier review, protected paths, prompt-injection resistance) that made unattended running tolerable, and the docs reserve it for isolated containers/VMs where Claude can't damage the host</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> Auto's pauses were the safety mechanism working — the fix for excessive blocks is trusting infrastructure or narrowing the task, not deleting the checker. B is exactly the distinction the docs draw (classifier vs. nothing). C is false: bypassPermissions is the one mode where protected-path writes go through. A confuses &ldquo;no human present&rdquo; with &ldquo;no checks needed&rdquo; — the opposite of verification-proportional-to-supervision.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">4. In auto mode you tell Claude: &ldquo;don't push until I've reviewed.&rdquo; Later in the session, Claude judges the work review-ready and tries to push. What does the documented behavior say happens?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">The push runs — auto mode approves everything routine</button></li>
+        <li><button data-opt="b">The classifier blocks it: boundaries stated in conversation are block signals, and they stay in force until you lift them — Claude's own judgment that the condition was met doesn't count</button></li>
+        <li><button data-opt="c">The push runs if the tests are green</button></li>
+        <li><button data-opt="d">Auto mode exits and the session ends</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Near-verbatim from the docs: &ldquo;A boundary stays in force until you lift it in a later message. Claude's own judgment that a condition was met does not lift it.&rdquo; That's the design point — the human's stated boundary outranks the agent's self-assessment. A and C both let the agent grade its own gate. D invents a mechanism; blocks fall back to prompting only after repeated denials.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/permission-modes">code.claude.com — Choose a permission mode</a> — the mode table, Shift+Tab cycle, acceptEdits scope, auto-mode classifier and conversational boundaries, bypassPermissions warnings, protected paths (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices, &ldquo;Configure permissions&rdquo;</a> — the clicking-through failure mode; auto mode, allowlists, and sandboxing as the three ways to reduce interruptions</li>
+      <li>Companion: <a href="https://anthropic.skilljar.com/claude-code-in-action">Anthropic Academy — Claude Code in Action</a> (login required) — the <em>Configure</em> module covers permission configuration hands-on; watch for how it pairs each loosening step with a matching verification habit</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m25b-code-and-commit.html"><span class="dir">Previous · M25</span>Code Against the Plan, Then Commit</a>
+    <a class="next" href="m27-tdd-feedback-loop.html"><span class="dir">Next · M27</span>Failing Tests First: The Feedback Loop</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 5 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

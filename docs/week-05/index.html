@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 5 — Execution: Plan-First &amp; Test-First · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb">Week 5 hub</span>
+  </div>
+</header>
+
+<main>
+  <h1>Week 5 — Execution: Plan-First &amp; Test-First</h1>
+  <p class="lede">Specs and backlog in hand, this is the week the agent writes production code — under two disciplines that keep you in charge of what gets written. Plan-first: Claude reads, plans, and implements only after you approve. Test-first: one failing test at a time, because the feedback loop's quality is the ceiling on the agent's output. Around them: permission modes matched to the task, one fresh session per issue, and the judgment of when to grab the wheel.</p>
+
+  <p><strong>Estimated total time:</strong> 4.0&ndash;5.0 hours (readings/videos + quiz + assignment + meeting). These pages cover the same ground as the assigned readings — use them as your primary lesson text, and the linked sources to go deeper.</p>
+
+  <h2>This week's learning pages</h2>
+  <p>Six mastery objectives, seven lessons (M25 spans two; mechanics M30 comes before judgment M29), in recommended order:</p>
+
+  <ul class="card-grid">
+    <li class="card">
+      <div class="meta"><span class="chip">M25</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m25a-explore-and-plan.html">Explore and Plan Before You Code</a>
+      <p>Why jumping straight to code solves the wrong problem, plan mode as the enforcement, steering exploration, and the plan-approval gate with its four options.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M25</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m25b-code-and-commit.html">Code Against the Plan, Then Commit</a>
+      <p>Implementation anchored to the approved plan, checks that close the loop, evidence over assertions, adversarial review, and the commit-and-PR handoff.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M26</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m26-permission-modes.html">Choose the Right Permission Mode</a>
+      <p>The mode table from default to bypassPermissions, Shift+Tab, protected paths, auto mode's classifier — and justifying the mode by risk and review point.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M27</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m27-tdd-feedback-loop.html">Failing Tests First: The Feedback Loop Is the Ceiling</a>
+      <p>Red&ndash;green&ndash;refactor as agent direction: one failing test, observed red, minimal green — and why the feedback signal caps output quality regardless of model.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M28</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m28-fresh-session-per-issue.html">One Issue, One Fresh Session, One PR</a>
+      <p>The operating procedure for A5: fresh session seeded with CLAUDE.md + issue body, the full workflow chain, one PR with a closing keyword, worktrees for parallel runs.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M30</span><span class="chip bloom">Understand</span></div>
+      <a class="title" href="m30-course-corrections.html">Course-Correcting a Running Agent</a>
+      <p>The mid-run toolkit — Esc, redirect, rewind, &ldquo;undo that,&rdquo; /clear — what each changes, checkpoint limits, and how during-the-run differs from post-hoc review.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M29</span><span class="chip bloom">Evaluate</span></div>
+      <a class="title" href="m29-interrupt-or-let-finish.html">Interrupt, or Let It Finish?</a>
+      <p>The judgment call: direction errors vs. unfinished middles, criteria for each lean, the plan gate as the cheapest interrupt, and three worked calls from one session.</p>
+    </li>
+  </ul>
+
+  <div class="callout note">
+    <span class="label">Suggested path</span>
+    <p>Read <a href="m25a-explore-and-plan.html">M25a</a> and <a href="m25b-code-and-commit.html">M25b</a> together — their hands-on exercises are one workflow split at the approval gate. <a href="m26-permission-modes.html">M26</a> and <a href="m27-tdd-feedback-loop.html">M27</a> each add one discipline to that workflow; do M27's single red&ndash;green cycle before starting A5 in earnest. <a href="m28-fresh-session-per-issue.html">M28</a> <em>is</em> A5's procedure — its checklist is the assignment's first issue. Finish with <a href="m30-course-corrections.html">M30</a> then <a href="m29-interrupt-or-let-finish.html">M29</a> (mechanics before judgment); both feed the quiz and Meeting 5's discussion.</p>
+  </div>
+
+  <h2>How this week is assessed</h2>
+  <ul>
+    <li><strong>Quiz 5</strong> (25 MCQs): Explore&ndash;Plan&ndash;Code&ndash;Commit; permission modes and when each fits; red&ndash;green TDD with an agent; interrupt/redirect vs. post-hoc review. Every lesson's self-check is written in the quiz's application-over-recall style.</li>
+    <li><strong>Assignment A5</strong> (15 pts): implement two issues, each in its own fresh session seeded with CLAUDE.md and the issue body. For each: have Claude plan first and approve the plan; require failing tests before implementation; confirm green; open one PR per issue. Submit both PR links with a note on where you intervened.</li>
+    <li><strong>Meeting 5:</strong> discussion of interrupt-vs-let-finish judgment (M29) — bring your intervention notes; expect &ldquo;make the call&rdquo; scenarios applied to your own sessions.</li>
+  </ul>
+
+  <h2>Assigned sources for Week 5</h2>
+  <p>The lessons above are grounded in these; read or watch the originals to go deeper.</p>
+  <ul>
+    <li><a href="https://code.claude.com/docs/en/common-workflows">code.claude.com — Common workflows</a> and <a href="https://code.claude.com/docs/en/permission-modes">Permission modes</a> (including <a href="https://code.claude.com/docs/en/permission-modes#analyze-before-you-edit-with-plan-mode">plan mode</a>) — the workflow recipes and the full mode reference</li>
+    <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices</a> — the assigned Anthropic reading on Explore&ndash;Plan&ndash;Code&ndash;Commit, verification, course-correction, and permissions (the former anthropic.com best-practices article now lives at this URL)</li>
+    <li><a href="https://www.aihero.dev/skill-test-driven-development-claude-code">aihero.dev — My Skill Makes Claude Code GREAT at TDD</a> and <a href="https://www.aihero.dev/skills-tdd">The /tdd Skill</a> — the TDD feedback-loop material (Pocock iterates fast; these are the current posts as of build time)</li>
+    <li><a href="https://code.claude.com/docs/en/checkpointing">code.claude.com — Checkpointing</a> and <a href="https://code.claude.com/docs/en/ultraplan">Ultraplan</a> — rewind mechanics and the approve-with-comments plan review (supporting reads for M30/M29)</li>
+    <li>Companion: <a href="https://anthropic.skilljar.com/claude-code-in-action">Anthropic Academy — Claude Code in Action</a> (login required) — the <em>Configure</em> module pairs with M26</li>
+    <li>Companion video: <a href="https://www.aihero.dev/real-world-feature-build-with-claude-code">Pocock — Real-World Feature Build with Claude Code</a> — watch the implementation and QA-loop segments: the explore-plan rhythm, loops running red to green, and the moments he intervenes vs. waits</li>
+  </ul>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 5 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+</body>
+</html>

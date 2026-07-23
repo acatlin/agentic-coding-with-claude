@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explore and Plan Before You Code — Week 5 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 5</a> · Objective M25</span>
+  </div>
+</header>
+
+<main>
+  <h1>Explore and Plan Before You Code</h1>
+  <p class="lede">Weeks 3 and 4 got you a spec and a backlog. This week you execute — and the first discipline of execution is refusing to let the agent type code on line one. This lesson covers the first half of the recommended four-phase workflow: have Claude read the relevant code, then produce a plan you approve before a single file changes.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M25 · Execution</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A5</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Apply the Explore&ndash;Plan&ndash;Code&ndash;Commit workflow: have Claude read relevant code, produce a plan, then implement only after plan approval.</p>
+  </div>
+
+  <h2>1 · Why not just start coding?</h2>
+  <p>Anthropic's best-practices guide states the failure mode in one line: &ldquo;Letting Claude jump straight to coding can produce code that solves the wrong problem.&rdquo; An agent that starts implementing immediately commits to its first interpretation of your request — before it has seen how your codebase actually handles sessions, or state, or errors. The fix is structural, not motivational: <strong>separate research and planning from implementation</strong>, so the wrong interpretation gets caught while it's still words in a plan, not code in your files.</p>
+  <p>The recommended workflow has four named phases — <strong>Explore, Plan, Code, Commit</strong>. This page covers the two phases that happen before any edit; <a href="m25b-code-and-commit.html">M25b</a> covers the two after.</p>
+
+  <h2>2 · The mechanism: plan mode</h2>
+  <p>The workflow's first two phases run in <strong>plan mode</strong>, which you met in <a href="../week-02/m11a-plan-mode.html">Week 2 (M11a)</a>. In plan mode, &ldquo;Claude reads files, runs shell commands to explore, and writes a plan, but does not edit your source.&rdquo; Edits stay blocked until you approve the plan — the mode is the enforcement, not your vigilance.</p>
+  <p>Three ways in:</p>
+  <div class="code-label">Entering plan mode</div>
+  <pre>claude --permission-mode plan    # start the session in plan mode
+Shift+Tab                        # cycle default → acceptEdits → plan mid-session
+/plan &lt;prompt&gt;                   # plan mode for a single prompt</pre>
+  <p>The status bar shows <code>⏸ plan mode on</code> while it's active. Pressing <code>Shift+Tab</code> again leaves plan mode without approving anything.</p>
+
+  <h2>3 · Phase 1: Explore</h2>
+  <p>In the Explore phase you point Claude at the code the task touches and have it build understanding — reading files and answering questions, changing nothing. The best-practices guide's example, for adding OAuth to an app:</p>
+  <div class="code-label">Explore prompt (plan mode)</div>
+  <pre>read /src/auth and understand how we handle sessions and login.
+also look at how we manage environment variables for secrets.</pre>
+  <p>Notice what the prompt does: it names the directory, and it names the <em>concerns</em> (sessions, login, secrets) the coming change depends on. You are steering the exploration toward what the plan will need, not asking for a general tour.</p>
+  <div class="callout note">
+    <span class="label">Exploration costs context — delegate it</span>
+    <p>Every file Claude reads lands in the context window you learned to protect in <a href="../week-02/m07-smart-zone.html">Week 2</a>. For broad exploration, the docs recommend subagents: &ldquo;use a subagent to investigate how our auth system handles token refresh.&rdquo; The subagent reads files in its own context window and reports a summary — only the findings occupy yours, leaving the smart zone for planning and implementation.</p>
+  </div>
+
+  <h2>4 · Phase 2: Plan, then approve</h2>
+  <p>With the exploration done, ask for a concrete plan:</p>
+  <div class="code-label">Plan prompt (plan mode)</div>
+  <pre>I want to add Google OAuth. What files need to change?
+What's the session flow? Create a plan.</pre>
+  <p>When the plan is ready, Claude presents it and asks how to proceed. This dialog is the workflow's gate — the objective's phrase <em>&ldquo;implement only after plan approval&rdquo;</em> lives here. Your options:</p>
+  <ul>
+    <li><strong>Yes, and use auto mode</strong> (or <strong>Yes, auto-accept edits</strong>) — approve and let implementation run with few or no per-edit prompts.</li>
+    <li><strong>Yes, manually approve edits</strong> — approve the plan but review each edit individually.</li>
+    <li><strong>No, keep planning</strong> — stay in plan mode and tell Claude what to change. This is where you push back: a vague step, a file it shouldn't touch, a missing test.</li>
+    <li><strong>No, refine with Ultraplan</strong> — send the plan to a browser-based review surface (more on this in <a href="m29-interrupt-or-let-finish.html">M29</a>).</li>
+  </ul>
+  <p>Approving a plan exits plan mode and switches the session to the mode the option describes — the approval is also the mode change. And before approving, you can press <code>Ctrl+G</code> to open the plan in your own text editor and edit it directly; your edited version is what Claude proceeds from.</p>
+  <p>Treat the plan the way Week 3 taught you to treat a PRD: it's a destination marker you actually read. A plan you approve without reading is a gate that isn't there — and Assignment A5 asks you to report where you intervened, which starts with what you changed at this gate.</p>
+
+  <h2>5 · When to skip all this</h2>
+  <p>The docs are explicit that planning is overhead, and overhead needs to pay for itself: &ldquo;For tasks where the scope is clear and the fix is small (like fixing a typo, adding a log line, or renaming a variable) ask Claude to do it directly.&rdquo; Planning earns its cost &ldquo;when you're uncertain about the approach, when the change modifies multiple files, or when you're unfamiliar with the code being modified.&rdquo;</p>
+  <div class="callout tip">
+    <span class="label">The one-sentence test</span>
+    <p>&ldquo;If you could describe the diff in one sentence, skip the plan.&rdquo; Your Week 4 tracer-bullet issues will mostly fail that test — they cross every layer, which is exactly why A5 requires the plan gate for each one.</p>
+  </div>
+
+  <section class="handson">
+    <h2>Hands-on: run Explore and Plan on a real issue</h2>
+    <p>Do this against one of your A5 issues (don't implement yet — that's M25b):</p>
+    <label class="check"><input type="checkbox"><span>Started a fresh session in plan mode (<code>claude --permission-mode plan</code>) and confirmed the <code>⏸ plan mode on</code> badge.</span></label>
+    <label class="check"><input type="checkbox"><span>Gave an Explore prompt that names the files/directories the issue touches and the concerns the change depends on.</span></label>
+    <label class="check"><input type="checkbox"><span>Asked one follow-up question about something the exploration surfaced that you didn't already know.</span></label>
+    <label class="check"><input type="checkbox"><span>Asked for a plan naming which files change and how the issue's acceptance criteria will be verified.</span></label>
+    <label class="check"><input type="checkbox"><span>Read the whole plan and challenged at least one step via <strong>No, keep planning</strong> — or edited it directly with <code>Ctrl+G</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>Noted your intervention (what you changed and why) for A5's &ldquo;where you intervened&rdquo; write-up, then stopped before approving — resume in M25b.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. A classmate types &ldquo;add Google OAuth to the app&rdquo; as their first prompt in default mode and lets Claude run. Twenty minutes later the diff reimplements a session store the codebase already had. Which workflow failure is this?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Code phase failure — Claude wrote buggy code</button></li>
+        <li><button data-opt="b">Commit phase failure — the work wasn't committed incrementally</button></li>
+        <li><button data-opt="c">Explore phase skipped — Claude committed to an interpretation before reading how the codebase already handles sessions, exactly the &ldquo;solves the wrong problem&rdquo; failure the workflow exists to prevent</button></li>
+        <li><button data-opt="d">No failure — duplicated code is a style issue to fix in review</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The code may even be internally correct — the problem is it solves the wrong problem, because nothing forced Claude to read the existing session handling first. A and B mislocate the failure downstream of where it happened. D understates it: a wrong-problem diff costs a full redo, which is why the fix is structural (explore, then plan, then a gate) rather than &ldquo;review harder afterward.&rdquo;</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. During Explore, you want Claude to survey a large unfamiliar subsystem, but you're worried about the reads flooding your context window. The docs-endorsed move is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Read everything anyway — more context always helps the plan</button></li>
+        <li><button data-opt="b">Delegate the exploration to a subagent, which reads files in its own context window and reports back a summary, so only the findings occupy your session</button></li>
+        <li><button data-opt="c">Skip exploration and plan from the file names alone</button></li>
+        <li><button data-opt="d">Run /compact after every few file reads</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> This is the subagent pattern the docs recommend precisely for investigation — exploration happens off-context, findings come back small. A is the Week 2 lesson in reverse: raw file contents crowd the smart zone where planning quality lives. C trades context pollution for the wrong-problem failure. D fights the symptom while the cause (reading in-context) continues.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Claude presents its plan. Step 4 says &ldquo;update the relevant components.&rdquo; You're not sure which components it means. What does the workflow say to do?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Approve — vagueness in a plan is fine, it firms up during coding</button></li>
+        <li><button data-opt="b">Approve with manual edit review, and catch any wrong component as it's edited</button></li>
+        <li><button data-opt="c">Exit plan mode and re-prompt from scratch</button></li>
+        <li><button data-opt="d">Choose &ldquo;No, keep planning&rdquo; and make Claude name the components — or press Ctrl+G and pin them down in the plan yourself — before any approval</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The plan gate exists to catch wrong interpretations while they're still words; a step you can't verify is one you can't have approved in any meaningful sense. B moves the catch to mid-implementation, where redirecting costs more (M29's topic). A is the gate-that-isn't-there. C throws away good exploration context for no reason — &ldquo;keep planning&rdquo; iterates in place.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Which task is the best candidate for skipping the Explore&ndash;Plan phases entirely?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;Rename the misspelled variable recieved_at to received_at in models.py&rdquo;</button></li>
+        <li><button data-opt="b">Your A5 tracer-bullet issue: &ldquo;user can create a deck and it survives reload&rdquo;</button></li>
+        <li><button data-opt="c">&ldquo;Migrate our session handling from cookies to JWTs&rdquo;</button></li>
+        <li><button data-opt="d">A bug fix in a subsystem you've never read</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> It passes the one-sentence test — you just described the diff. B crosses every layer by construction (that's what a tracer bullet is), C is a multi-file architectural change, and D fails the &ldquo;unfamiliar code&rdquo; criterion; all three are the documented cases where planning pays. The point of the exception is calibration: the workflow is a tool with a cost, not a ritual.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices, &ldquo;Explore first, then plan, then code&rdquo;</a> — the four-phase workflow, example prompts, the skip-the-plan criteria (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/common-workflows">code.claude.com — Common workflows</a> — &ldquo;Plan before editing,&rdquo; the Shift+Tab cycle, delegating research to subagents</li>
+      <li><a href="https://code.claude.com/docs/en/permission-modes#analyze-before-you-edit-with-plan-mode">code.claude.com — Permission modes, plan mode</a> — what plan mode blocks, the four approval options, Ctrl+G plan editing</li>
+      <li>Companion: <a href="https://www.aihero.dev/real-world-feature-build-with-claude-code">Pocock — Real-World Feature Build with Claude Code (aihero.dev)</a> — watch the implementation segments for the explore-and-plan rhythm on a production React Router codebase</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="index.html"><span class="dir">Week 5 hub</span>Execution: Plan-First &amp; Test-First</a>
+    <a class="next" href="m25b-code-and-commit.html"><span class="dir">Next · M25</span>Code Against the Plan, Then Commit</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 5 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

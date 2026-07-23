@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Against the Plan, Then Commit — Week 5 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 5</a> · Objective M25</span>
+  </div>
+</header>
+
+<main>
+  <h1>Code Against the Plan, Then Commit</h1>
+  <p class="lede">You approved a plan in M25a. Now the second half of the workflow: implementation that verifies itself against the plan as it goes, evidence instead of assertions, and a commit-and-PR step that hands the work to review. The plan you approved is the contract; this lesson is about holding the implementation to it.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M25 · Execution</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A5</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Apply the Explore&ndash;Plan&ndash;Code&ndash;Commit workflow: have Claude read relevant code, produce a plan, then implement only after plan approval.</p>
+  </div>
+
+  <h2>1 · Phase 3: Code — implement, verifying against the plan</h2>
+  <p>Approving the plan exits plan mode; Claude can now edit. The best-practices guide's example prompt for this phase does three things at once:</p>
+  <div class="code-label">Implement prompt (default or accept-edits mode)</div>
+  <pre>implement the OAuth flow from your plan. write tests for the
+callback handler, run the test suite and fix any failures.</pre>
+  <p>It anchors the work to <em>the approved plan</em> (&ldquo;from your plan&rdquo;), it demands tests, and it demands the suite actually run. That last part is the load-bearing one. The guide's central warning: &ldquo;Claude stops when the work looks done. Without a check it can run, &lsquo;looks done&rsquo; is the only signal available, and you become the verification loop.&rdquo; Give Claude a check — a test suite, a build exit code, a linter, a script that diffs output against a fixture — and &ldquo;the loop closes on its own. Claude does the work, runs the check, reads the result, and iterates until the check passes.&rdquo;</p>
+  <p>This is Week 3's M18 (verifiable targets) operating at the implementation phase — and it's the bridge to <a href="m27-tdd-feedback-loop.html">M27</a>, where the check gets written <em>before</em> the code.</p>
+  <div class="callout tip">
+    <span class="label">Demand evidence, not assertions</span>
+    <p>&ldquo;Have Claude show evidence rather than asserting success: the test output, the command it ran and what it returned, or a screenshot of the result. Reviewing evidence is faster than re-running the verification yourself.&rdquo; &ldquo;Done&rdquo; in the transcript is a claim; a pasted test run is a fact.</p>
+  </div>
+
+  <h2>2 · An optional gate before commit: adversarial review</h2>
+  <p>For work you didn't watch closely, the best-practices guide recommends one more check before you call it done: a subagent that reviews the diff in a fresh context, seeing &ldquo;only the diff and the criteria you give it, not the reasoning that produced the change.&rdquo;</p>
+  <div class="code-label">Review-against-plan prompt (from the best-practices guide, adapted)</div>
+  <pre>Use a subagent to review the diff against your approved plan. Check that
+every requirement is implemented, the listed edge cases have tests, and
+nothing outside the task's scope changed. Report gaps, not style preferences.</pre>
+  <p>One calibration warning from the same guide: a reviewer told to find gaps &ldquo;will usually report some, even when the work is sound.&rdquo; Chase only findings that affect correctness or the stated requirements — the rest is optional polish, and over-reacting to it produces the over-engineered defensive code you'll learn to spot in Week 6.</p>
+
+  <h2>3 · Phase 4: Commit — and open the PR</h2>
+  <p>The final phase is one prompt: &ldquo;commit with a descriptive message and open a PR.&rdquo; Claude drafts the commit message and PR description from the work it just did — and per the common-workflows doc, you can refine it: &ldquo;enhance the PR description with more context about the security improvements.&rdquo; The docs' one instruction for this phase: &ldquo;Review Claude's generated PR before submitting.&rdquo;</p>
+  <p>Two mechanics worth knowing:</p>
+  <ul>
+    <li><strong>The session is linked to the PR.</strong> &ldquo;When you create a PR using <code>gh pr create</code>, the session is automatically linked to that PR.&rdquo; Later, <code>claude --from-pr 1234</code> reopens the session picker filtered to that PR's sessions — review feedback in Week 6 lands back in a session that remembers the work.</li>
+    <li><strong>The PR closes the issue.</strong> Week 4's closing keywords (&ldquo;Closes #7&rdquo;) belong in the PR description, so merging completes the issue → branch → PR → auto-close loop.</li>
+  </ul>
+  <div class="callout note">
+    <span class="label">Where the workflow meets Assignment A5</span>
+    <p>A5 is this whole page plus its neighbors, run twice: for each of two issues — in its own fresh session (<a href="m28-fresh-session-per-issue.html">M28</a>) — plan approved first (M25a), failing tests before implementation (<a href="m27-tdd-feedback-loop.html">M27</a>), confirmed green, then one PR per issue, submitted &ldquo;with a note on where you intervened.&rdquo; Keep notes as you go; the interventions are the graded artifact.</p>
+  </div>
+
+  <section class="handson">
+    <h2>Hands-on: finish the workflow you started in M25a</h2>
+    <label class="check"><input type="checkbox"><span>Approved the plan from M25a's exercise (after your edits) and watched the mode badge change — you are no longer in plan mode.</span></label>
+    <label class="check"><input type="checkbox"><span>Prompted implementation anchored to the plan, naming the check to run (&ldquo;implement X from your plan&hellip; run the test suite and fix any failures&rdquo;).</span></label>
+    <label class="check"><input type="checkbox"><span>Required evidence: made Claude paste the passing test output or command results rather than accepting &ldquo;done.&rdquo;</span></label>
+    <label class="check"><input type="checkbox"><span>Ran one adversarial pass: a subagent reviewing the diff against the plan, reporting gaps not style — and triaged its findings for real correctness issues.</span></label>
+    <label class="check"><input type="checkbox"><span>Prompted &ldquo;commit with a descriptive message and open a PR,&rdquo; read the draft PR description, improved it once, and confirmed it says &ldquo;Closes #&lt;issue&gt;&rdquo;.</span></label>
+    <label class="check"><input type="checkbox"><span>Added tonight's entries to your A5 intervention log: what you changed at the plan gate, during implementation, and in the PR description.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. Claude reports: &ldquo;I've implemented the OAuth flow and everything works.&rdquo; No test output appears in the transcript. Per the best-practices guide, what's the right response?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Accept it — Claude ran the code, so it knows</button></li>
+        <li><button data-opt="b">Ask for the evidence: the test run, the command and its output — because without a check Claude can run, &ldquo;looks done&rdquo; is the only signal its stopping point reflects</button></li>
+        <li><button data-opt="c">Re-run every test yourself before reading further</button></li>
+        <li><button data-opt="d">Ask Claude to rate its own confidence from 1 to 10</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> &ldquo;Works&rdquo; without evidence is exactly the &ldquo;looks done&rdquo; signal the guide warns about. C works but forfeits the point of the pattern — &ldquo;reviewing evidence is faster than re-running the verification yourself.&rdquo; D substitutes a feeling for a fact; a confident assertion is still an assertion. A makes you the verification loop's missing half without noticing.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">2. Your adversarial review subagent returns six findings: one missed acceptance criterion, and five suggestions to add defensive checks &ldquo;for robustness.&rdquo; What does the guide say to do?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Fix all six — the reviewer found them, so they're real</button></li>
+        <li><button data-opt="b">Ignore all six — reviewers always find something</button></li>
+        <li><button data-opt="c">Re-run the reviewer until it agrees with you</button></li>
+        <li><button data-opt="d">Fix the missed criterion; treat the defensive-check suggestions as optional, because a reviewer prompted to find gaps will report some even when work is sound, and chasing them all produces over-engineering</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The guide's calibration is precise: flag and fix what affects &ldquo;correctness or the stated requirements,&rdquo; treat the rest as optional. A is how review-driven over-engineering happens — extra abstraction and tests for cases that can't occur. B throws away the one real finding with the noise. C is reviewer-shopping; it optimizes for agreement, not correctness.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">3. Why does the Commit phase belong in the workflow at all, rather than being an afterthought you handle manually later?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">The PR is how the work enters review, the closing keyword completes the issue loop, and the session-PR link means Week 6's review feedback can resume a session that has the implementation context — commit-and-PR is the handoff, not cleanup</button></li>
+        <li><button data-opt="b">Because commits are required for checkpointing to work</button></li>
+        <li><button data-opt="c">Because Claude writes better code when it knows a commit is coming</button></li>
+        <li><button data-opt="d">It doesn't — the workflow is really Explore–Plan–Code</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Each mechanic — descriptive message, &ldquo;Closes #N,&rdquo; the automatic gh pr create session link — connects this session's work to the systems (review, the board, future sessions) that consume it. B is false: checkpointing tracks Claude's edits independently of git. C is unfounded. D deletes the phase that makes the other three visible to anyone but you.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">4. Mid-implementation, Claude finishes step 3 of its five-step plan and then starts refactoring an unrelated utilities file &ldquo;while we're here.&rdquo; The plan-anchored response is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Let it — free improvements are free</button></li>
+        <li><button data-opt="b">Kill the session and start over</button></li>
+        <li><button data-opt="c">Redirect: the approved plan is the scope contract, so out-of-plan work gets stopped and either dropped or filed as its own issue — the same discipline that keeps a PR reviewable as one issue's diff</button></li>
+        <li><button data-opt="d">Approve it retroactively by editing the plan</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> &ldquo;Nothing outside the task's scope changed&rdquo; is literally one of the review-prompt criteria — scope drift now is a review finding later. A buys an unreviewable mixed diff (Week 4's one-issue-per-PR lesson in reverse). B over-corrects; a redirect preserves three good steps (interrupting well is M29/M30). D makes the plan follow the drift, inverting the contract.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices</a> — the Implement and Commit steps, &ldquo;Give Claude a way to verify its work,&rdquo; evidence over assertion, the adversarial review step and its over-engineering caveat (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/common-workflows#create-pull-requests">code.claude.com — Common workflows, &ldquo;Create pull requests&rdquo;</a> — the create/refine PR prompts, the gh pr create session link and <code>claude --from-pr</code></li>
+      <li><a href="../week-04/m20-anatomy-of-an-issue.html">Week 4, M20</a> — closing keywords and the issue→branch→PR→auto-close loop this phase completes</li>
+      <li>Companion: <a href="https://www.aihero.dev/real-world-feature-build-with-claude-code">Pocock — Real-World Feature Build with Claude Code (aihero.dev)</a> — the implementation and QA-loop segments show verification-driven implementation on a real codebase</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m25a-explore-and-plan.html"><span class="dir">Previous · M25</span>Explore and Plan Before You Code</a>
+    <a class="next" href="m26-permission-modes.html"><span class="dir">Next · M26</span>Choose the Right Permission Mode</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 5 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

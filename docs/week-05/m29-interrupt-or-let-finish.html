@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interrupt, or Let It Finish? — Week 5 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 5</a> · Objective M29</span>
+  </div>
+</header>
+
+<main>
+  <h1>Interrupt, or Let It Finish?</h1>
+  <p class="lede">M30 gave you the controls; this lesson is about the trigger finger. Mid-run, something looks off. Do you hit Esc now, or let the run complete and judge the finished diff? Both answers are sometimes right — this is a judgment call with real criteria, and Meeting 5 will ask you to defend yours.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M29 · Judgment</span>
+      <span class="chip bloom">Bloom: Evaluate</span>
+      <span class="chip assessed">Assessed by: Meeting 5 discussion</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Recognize when to interrupt and redirect an agent mid-task vs. let it finish and review the diff.</p>
+  </div>
+
+  <h2>1 · The two error costs</h2>
+  <p>Every mid-run &ldquo;that looks wrong&rdquo; moment carries two possible mistakes, and they cost differently:</p>
+  <ul>
+    <li><strong>Interrupting too late.</strong> The docs' baseline: &ldquo;Correct Claude as soon as you notice it going off track&rdquo; — because a wrong <em>direction</em> compounds. Every minute after a misread spec or a wrong-file start is work that review will only sentence to rework. M30's table row: caught during, it costs a redirect; caught after, it costs everything built on it.</li>
+    <li><strong>Interrupting too often.</strong> The docs' counterweight is just as documented: &ldquo;Correcting over and over&hellip; Context is polluted with failed approaches,&rdquo; and after two failed corrections on the same issue the play is /clear and a better prompt, not a third correction. Add the M30 blind spot — a half-built implementation legitimately looks wrong; scaffolding isn't drift — and reflexive Esc-tapping becomes its own failure mode: you pay interruption cost for corrections that the run's next step would have made unnecessary.</li>
+  </ul>
+  <p>So the judgment reduces to one question: <strong>is what I'm seeing a wrong <em>direction</em>, or an unfinished <em>middle</em>?</strong> Directions compound — interrupt. Middles resolve — wait, and let the diff be judged whole.</p>
+
+  <h2>2 · Criteria that decide it</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Signal</th><th>Lean</th><th>Why</th></tr>
+    <tr><td>Claude misread the spec / is solving a different problem</td><td><strong>Interrupt now</strong></td><td>Direction error; every further step is rework</td></tr>
+    <tr><td>Wrong layer or file for a decision already made (plan, CLAUDE.md, issue)</td><td><strong>Interrupt now</strong></td><td>The contract exists; drift from it compounds (M25b's scope redirect)</td></tr>
+    <tr><td>Code looks incomplete, inelegant, or half-wired</td><td><strong>Let it finish</strong></td><td>Probably a middle; red&ndash;green loops look broken until green</td></tr>
+    <tr><td>A check will gate the result (failing test, build, M27's loop)</td><td><strong>Let it finish</strong></td><td>The loop is designed to self-correct; the signal will catch what you suspect</td></tr>
+    <tr><td>You've already corrected this twice</td><td><strong>Neither — /clear</strong></td><td>Documented rule: the context is the problem now, not the trajectory</td></tr>
+    <tr><td>You can't tell which it is</td><td><strong>Ask, don't grab</strong></td><td>Interrupt costs little (context survives): a one-line &ldquo;why this file?&rdquo; resolves direction-vs-middle without unwinding anything</td></tr>
+  </table>
+  </div>
+  <p>Two structural notes behind the table. First, <em>supervision should scale with stakes, not suspicion</em>: a task with a strong verification gate (tests, plan contract, small blast radius) earns a longer leash — the same trade that let you loosen permission modes in M26. Second, <em>letting it finish buys unbiased review</em>: the finished diff can be judged whole, even by a fresh context — the best-practices guide notes a fresh reviewer &ldquo;won't be biased toward code it just wrote,&rdquo; which is where Week 6 picks up.</p>
+
+  <h2>3 · The cheapest interrupt is at the plan</h2>
+  <p>The judgment gets easier the earlier the checkpoint, and the plan gate is the earliest one. Correcting a plan step costs a sentence; correcting its implementation costs a rewind. This is why the approval dialog's <strong>&ldquo;No, keep planning&rdquo;</strong> exists — and why the richest version of it, Ultraplan's browser review, is built entirely around <em>approve-with-comments</em>: &ldquo;highlight any passage and leave a comment for Claude to address,&rdquo; react to sections, then &ldquo;iterate as many times as needed before choosing where to execute.&rdquo; Comment-and-revise at the plan is interruption with all of the correction and none of the wasted work — spend your steering there, and the mid-implementation question comes up less at all.</p>
+
+  <h2>4 · Worked judgment: three moments from one session</h2>
+  <p>You're implementing &ldquo;user can flip a card to reveal its answer,&rdquo; plan approved, in acceptEdits.</p>
+  <p><strong>Moment 1:</strong> Claude opens <code>scheduler.ts</code> — a file the plan never mentions — and starts editing. <em>Call: interrupt.</em> This is drift from a decision already made; the plan is the scope contract, and &ldquo;why are we in scheduler.ts?&rdquo; costs one line. If there's a real reason, it should become a plan revision, not a surprise.</p>
+  <p><strong>Moment 2:</strong> The flip renders, but the card's styling is broken and an event handler is dangling. <em>Call: let it finish.</em> The plan's remaining steps cover wiring and tests; this is a middle. Judge the diff when the check is green — interrupting here reviews scaffolding.</p>
+  <p><strong>Moment 3:</strong> For the second time, you've explained that state lives in the deck store, and Claude has again introduced component-local state. <em>Call: stop correcting.</em> One more correction would be the third; the documented move is /clear and a fresh session whose prompt (or CLAUDE.md line) states the state convention up front — the failure was in the spec layer, and that's where the fix goes.</p>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+    <p>Evaluate-level: each question asks you to make the call, then compare your rationale with the model answer.</p>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. Five minutes into a run, Claude states it will store flip-state in localStorage. Your PRD — discussed at length in the grill session — put all card state in the deck store. Claude is now scaffolding the localStorage version. Make the call.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Let it finish — maybe localStorage turns out fine, and the diff will show</button></li>
+        <li><button data-opt="b">Let it finish — interrupting wastes the five minutes of work</button></li>
+        <li><button data-opt="c">Interrupt now — this is a direction error against a settled decision, every subsequent step builds on it, and the redirect costs one sentence while the post-hoc version costs the whole feature's rework</button></li>
+        <li><button data-opt="d">/clear immediately — the session is compromised</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Direction, not middle: the wrong choice is load-bearing and already decided against, so waiting converts minutes of divergence into a fully-built wrong artifact. A confuses openness with drift — the time for &ldquo;maybe localStorage&rdquo; was the grill session. B is sunk-cost logic inverted: the five minutes are gone either way; the question is whether the <em>next</em> thirty compound the error. D over-fires: one clean redirect with preserved context is exactly what Esc is for; /clear is for corrections that keep failing.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. Mid-run under M27's loop, you glance over: the implementation handles none of the edge cases, and a test is currently failing. Instinct says grab the wheel. Make the call.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Interrupt — failing tests mean it's going wrong</button></li>
+        <li><button data-opt="b">Let it run — a red test mid-loop is the loop working, edge cases arrive one cycle at a time by design, and the gate you built (green suite before commit) will catch anything that stays wrong; interrupting here reviews the middle of a process whose end you've already instrumented</button></li>
+        <li><button data-opt="c">Interrupt and add all the edge cases to the current test</button></li>
+        <li><button data-opt="d">Rewind to before the failing test</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> The strongest let-it-finish case: a verification gate you trust is actively doing the supervision. Red is what the red&ndash;green cycle looks like from the outside, and &ldquo;minimal code, nothing speculative&rdquo; guarantees early cycles look incomplete. A misreads the loop's normal state as failure. C batches the tests — M27's documented anti-pattern. D unwinds correct process because it looked untidy mid-flight.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Claude presents a plan for your second A5 issue. Steps 1&ndash;4 are right; step 5 bundles an unrelated refactor. You're deciding between approving (you'll catch it in diff review) and pushing back now. Make the call.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Approve — four out of five steps is close enough</button></li>
+        <li><button data-opt="b">Reject the whole plan and re-prompt from scratch</button></li>
+        <li><button data-opt="c">Approve, then Esc when step 5 starts executing</button></li>
+        <li><button data-opt="d">&ldquo;No, keep planning&rdquo; (or comment on the step): have step 5 dropped or filed as its own issue — the plan gate is the cheapest interruption point that exists, and steering words now beats unwinding code later</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> Same judgment as question 1, moved one gate earlier — which only strengthens it: at the plan, correction costs a comment and zero work is discarded. That's the entire approve-with-comments idea. C is strictly worse than D — it plans an interruption it could have made free, and relies on you catching the moment. A approves known scope drift into the contract that M25b then enforces. B discards four good steps; revision, not rejection, is what &ldquo;keep planning&rdquo; is for.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. A classmate's policy: &ldquo;I watch every tool call and Esc the moment anything looks unfamiliar. It's my code; constant intervention is just diligence.&rdquo; Evaluate the policy.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Over-triggered: it can't distinguish middles from directions, so it pays interruption cost on scaffolding that the next step would resolve, accumulates corrections toward the polluted-context state, and substitutes constant suspicion for the cheaper instruments — a plan contract, a test gate, and diff review — that make selective interruption safe</button></li>
+        <li><button data-opt="b">Correct: more oversight is always safer</button></li>
+        <li><button data-opt="c">Wrong only because Esc loses work</button></li>
+        <li><button data-opt="d">Wrong because one should never interrupt an agent</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The policy treats &ldquo;unfamiliar&rdquo; as &ldquo;wrong,&rdquo; but unfinished work is unfamiliar by nature — that's M30's blind-spot row. The deeper miss is instrumental: the week built gates (plan approval, red&ndash;green, evidence-before-commit) precisely so a human doesn't have to adjudicate every step live. B restates the policy; it's the tenth-approval effect from M26 in interrupt form — constant vigilance degrades into noise. C names a cost Esc doesn't have (context survives). D is the opposite over-rotation; question 1 is a mandatory interrupt.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices</a> — &ldquo;correct as soon as you notice,&rdquo; the correcting-over-and-over failure pattern and two-corrections rule, fresh-context review being unbiased (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/ultraplan">code.claude.com — Plan in the cloud with Ultraplan</a> — the approve-with-comments workflow: inline comments on plan passages, reactions, iterate-then-execute</li>
+      <li><a href="https://code.claude.com/docs/en/permission-modes#review-and-approve-a-plan">code.claude.com — Permission modes, &ldquo;Review and approve a plan&rdquo;</a> — the &ldquo;No, keep planning&rdquo; option this lesson's plan-gate argument rests on</li>
+      <li><a href="m30-course-corrections.html">M30 — Course-Correcting a Running Agent</a> — the mechanics (interrupt, rewind, /clear) whose costs this lesson's judgments weigh</li>
+      <li>Companion: <a href="https://www.aihero.dev/real-world-feature-build-with-claude-code">Pocock — Real-World Feature Build with Claude Code (aihero.dev)</a> — &ldquo;the messy parts, the QA loops, and the decisions I make along the way&rdquo;: watch for the moments he intervenes vs. lets a loop run</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m30-course-corrections.html"><span class="dir">Previous · M30</span>Course-Correcting a Running Agent</a>
+    <a class="next" href="index.html"><span class="dir">Week 5 hub</span>Execution: Plan-First &amp; Test-First</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 5 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

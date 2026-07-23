@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Course-Correcting a Running Agent — Week 5 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 5</a> · Objective M30</span>
+  </div>
+</header>
+
+<main>
+  <h1>Course-Correcting a Running Agent</h1>
+  <p class="lede">Between &ldquo;prompt sent&rdquo; and &ldquo;PR opened,&rdquo; you are not a spectator. Claude Code gives you a small set of mid-run controls — interrupt, comment, rewind, undo — that operate while the work is still happening. This lesson maps each control to what it changes, and draws the line the quiz will test: how correcting <em>during</em> a run differs from reviewing <em>after</em> it.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M30 · Foundations</span>
+      <span class="chip bloom">Bloom: Understand</span>
+      <span class="chip assessed">Assessed by: Quiz 5</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Describe how course-corrections during a run (interrupt, comment, rewind) differ from post-hoc review.</p>
+  </div>
+
+  <h2>1 · The premise: tight feedback loops beat perfect first prompts</h2>
+  <p>The best-practices guide's framing: &ldquo;The best results come from tight feedback loops. Though Claude occasionally solves problems perfectly on the first attempt, correcting it quickly generally produces better solutions faster.&rdquo; Course-correction tools exist because your prompt was a bet, and the run is where you find out how the bet is going. The guide's headline advice — &ldquo;Correct Claude as soon as you notice it going off track&rdquo; — only works if you know what each correction tool actually does.</p>
+
+  <h2>2 · The mid-run toolkit</h2>
+  <p>Four controls, from the documentation, ordered by how much they undo:</p>
+  <ul>
+    <li><strong><code>Esc</code> — interrupt.</strong> &ldquo;Stop the current response or tool call mid-turn so you can redirect. Claude keeps the work done so far.&rdquo; Nothing is reverted; the session's context is preserved. You interrupt to <em>add steering</em>: &ldquo;stop — use the existing session store in src/auth, don't write a new one.&rdquo;</li>
+    <li><strong>Comment / redirect.</strong> The message you type after interrupting (or between turns) is the correction itself. Because context is preserved, Claude carries your redirect plus everything it already learned.</li>
+    <li><strong><code>Esc</code>+<code>Esc</code> or <code>/rewind</code> — go back in time.</strong> Opens the rewind menu. &ldquo;Every user prompt creates a checkpoint&rdquo; — Claude Code snapshots files before each one — and from the menu you can <strong>restore code and conversation</strong>, <strong>restore conversation</strong> only (keep current code), or <strong>restore code</strong> only (keep the conversation). Rewind is for when the last N minutes were a wrong branch: not steering, unwinding. You met this in <a href="../week-02/m11b-rewind.html">Week 2 (M11b)</a>.</li>
+    <li><strong>&ldquo;Undo that&rdquo; — ask Claude to revert.</strong> The lightest-weight rollback: have Claude reverse its own last change as a normal instruction, when the miss is small and recent.</li>
+  </ul>
+  <p>And the escape hatch when correction itself stops working: <strong><code>/clear</code></strong>. The guide's rule of thumb — &ldquo;If you've corrected Claude more than twice on the same issue in one session, the context is cluttered with failed approaches&hellip; A clean session with a better prompt almost always outperforms a long session with accumulated corrections.&rdquo; A third correction is evidence the problem is upstream, in the prompt or spec.</p>
+  <div class="callout warn">
+    <span class="label">What rewind does not cover</span>
+    <p>Checkpoints track Claude's file-editing tools only: &ldquo;files modified by bash commands&rdquo; (an <code>rm</code>, a <code>mv</code>, a script run) &ldquo;cannot be undone through rewind,&rdquo; and external or concurrent-session changes aren't captured either. The docs' summary: checkpoints are &ldquo;local undo,&rdquo; git is &ldquo;permanent history&rdquo; — one more reason the branch-per-issue habit stays load-bearing.</p>
+  </div>
+
+  <h2>3 · During-the-run vs. after-the-run</h2>
+  <p>Post-hoc review — reading the finished diff, running /code-review, the whole of Week 6 — differs from course-correction on every axis that matters:</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th></th><th>Course-correction (during)</th><th>Post-hoc review (after)</th></tr>
+    <tr><td><strong>Object</strong></td><td>The <em>trajectory</em>: what Claude is doing and about to do</td><td>The <em>artifact</em>: the finished diff</td></tr>
+    <tr><td><strong>Timing</strong></td><td>Mid-turn, while context is live</td><td>After the turn or PR, context optional</td></tr>
+    <tr><td><strong>What it can change</strong></td><td>The path — before more work builds on a wrong step</td><td>The verdict — accept, request changes, reject</td></tr>
+    <tr><td><strong>Cost of a catch</strong></td><td>Cheap: the wrong step is minutes old, context is preserved for the redirect</td><td>Dearer: rework re-enters a session (or a fresh one) after the fact</td></tr>
+    <tr><td><strong>What it catches best</strong></td><td>Wrong direction: misread spec, wrong file, wrong approach</td><td>Wrong details: edge cases, drift, the failure modes checklists find</td></tr>
+    <tr><td><strong>Blind spot</strong></td><td>You see fragments in motion — easy to misjudge unfinished work</td><td>Whatever compounded before you looked</td></tr>
+  </table>
+  </div>
+  <p>The two are complements, not competitors. Course-correction keeps the run pointed at the right problem; review judges whether the result is right. The plan gate (M25a) is course-correction at its cheapest — redirecting words instead of code — and Week 6's diff review is post-hoc at its most systematic. When to reach for which mid-run is a judgment call, and it's the next lesson's whole subject.</p>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. You press Esc while Claude is mid-edit in the wrong file. What state is the session in?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Everything since your last prompt is reverted</button></li>
+        <li><button data-opt="b">The action stopped; all work so far and the full context are preserved — the point of interrupting is to redirect with everything Claude has learned still in place</button></li>
+        <li><button data-opt="c">The session ended; you'll need --continue</button></li>
+        <li><button data-opt="d">The current file reverted, others kept</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Per the docs: &ldquo;Stop the current response or tool call mid-turn so you can redirect. Claude keeps the work done so far.&rdquo; Interrupt is steering, not undo — that's what makes it cheap. A describes rewind, a different tool for a different situation. C confuses interrupt with exit; D invents per-file semantics neither tool has.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">2. Twenty minutes of session history turn out to rest on a wrong architectural assumption from your third prompt. The code changes since then are all wrong, but the <em>conversation</em> taught you a lot you want to keep. Which control fits?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Esc, then explain the correct architecture</button></li>
+        <li><button data-opt="b">&ldquo;Undo that&rdquo;</button></li>
+        <li><button data-opt="c">/clear and start over</button></li>
+        <li><button data-opt="d">Esc+Esc → rewind menu → restore code only, keeping the conversation — checkpoints let you unwind the files to before the wrong turn while the discussion stays</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> This is exactly why the rewind menu separates its options: &ldquo;restore code&rdquo; reverts file changes while keeping the conversation. A steers the future but leaves twenty minutes of wrong code on disk for Claude to build on. B is sized for one small recent change, not a twenty-minute branch. C throws away the conversation you explicitly wanted to keep — the strongest tool, used one notch too hard.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">3. During a session, Claude ran <code>rm old-fixtures/ -r</code> via bash. Later you rewind code to an earlier checkpoint, expecting the directory back. What happens, and why?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">The directory stays deleted — checkpoints only track Claude's file-editing tools, and bash-command changes are explicitly not restorable; recovery is git's job, which is why checkpoints are &ldquo;local undo&rdquo; and not version control</button></li>
+        <li><button data-opt="b">The directory is restored like any other change</button></li>
+        <li><button data-opt="c">Rewind refuses to run when bash commands exist in history</button></li>
+        <li><button data-opt="d">The directory is restored, but only if you choose &ldquo;restore code and conversation&rdquo;</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The limitation is verbatim in the checkpointing doc, with <code>rm</code> as its own example. Knowing a tool's coverage <em>boundary</em> is part of understanding the tool — misplaced confidence in rewind is how a &ldquo;recoverable&rdquo; mistake becomes a real one. B and D assume coverage that doesn't exist; C invents a guard the tool doesn't have.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">4. A classmate says: &ldquo;I don't bother steering mid-run — I just review the diff hard at the end. Review catches everything correction would, one pass, no interruptions.&rdquo; What does the during/after distinction say?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">They're right — review at the end strictly dominates</button></li>
+        <li><button data-opt="b">They're wrong — course-correction makes review unnecessary</button></li>
+        <li><button data-opt="c">The two catch different things at different costs: a wrong direction caught mid-run costs a redirect, while the same error found at review costs the full rework of everything built on it — but review still catches the detail-level failures a moving run hides; you need both</button></li>
+        <li><button data-opt="d">The difference is only stylistic preference</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The asymmetry is the objective's core: correction changes the trajectory while changing it is cheap; review judges the artifact after costs have compounded. But the converse also holds — unfinished work in motion hides the edge-case and drift failures that diff review (Week 6) is built to find. A and B each keep one tool and inherit its blind spot. D dissolves a distinction with concrete, costable consequences.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices, &ldquo;Course-correct early and often&rdquo;</a> — the four tools, tight feedback loops, the two-corrections-then-/clear rule (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/checkpointing">code.claude.com — Checkpointing</a> — checkpoints per prompt, the rewind menu's restore options, the bash/external limitations, &ldquo;local undo&rdquo; vs. git</li>
+      <li><a href="https://code.claude.com/docs/en/interactive-mode">code.claude.com — Interactive mode</a> — the Esc and Esc+Esc behavior, quoted exactly</li>
+      <li><a href="../week-02/m11b-rewind.html">Week 2, M11b — Rewind</a> — the checkpoint mechanics this lesson builds on</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m28-fresh-session-per-issue.html"><span class="dir">Previous · M28</span>One Issue, One Fresh Session, One PR</a>
+    <a class="next" href="m29-interrupt-or-let-finish.html"><span class="dir">Next · M29</span>Interrupt, or Let It Finish?</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 5 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>
