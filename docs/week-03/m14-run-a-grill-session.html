@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run a Grill Session — Week 3 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 3</a> · Objective M14</span>
+  </div>
+</header>
+
+<main>
+  <h1>Run a Grill Session</h1>
+  <p class="lede">Theory's over. This lesson is the Assignment A3 procedure: set up the skill (or emulate it with one pasteable prompt), hold up your half of a forty-question interview, capture decisions as they resolve, and know when you've earned the right to stop.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M14 · Specification</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A3</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Conduct a grill session in which Claude interviews the student until the design concept is shared, capturing decisions as they resolve.</p>
+  </div>
+
+  <h2>1 · Set up: install or emulate</h2>
+  <p>First, pick your course project — A3 asks you to choose it now, and it's the thing you'll be grilled about. One or two sentences is enough to start: Pocock notes you can begin with &ldquo;a fully fleshed out idea, or just a vague couple of sentences.&rdquo; Both are valid entry states; the session's job is to close the gap either way.</p>
+  <p>Then get the skill, either way A3 allows:</p>
+  <ul>
+    <li><strong>Install it.</strong> The skill lives in <a href="https://github.com/mattpocock/skills">mattpocock/skills</a>; the repo's README has current setup instructions (the skills are plain-markdown folders that go under <code>~/.claude/skills/</code>). Once installed, type <code>/grill-me</code> followed by your project idea. Skills as a mechanism are Week 7's topic — for now it's enough that a skill is a reusable prompt the agent loads on demand.</li>
+    <li><strong>Emulate it.</strong> The entire skill is six sentences — the discipline, not the packaging, is the value. Start a session and paste this, then your project idea:</li>
+  </ul>
+  <div class="code-label">The emulation prompt (verbatim from mattpocock/skills)</div>
+  <pre>Interview me relentlessly about every aspect of this plan until we
+reach a shared understanding. Walk down each branch of the design
+tree, resolving dependencies between decisions one-by-one. For each
+question, provide your recommended answer.
+
+Ask the questions one at a time, waiting for feedback on each
+question before continuing. Asking multiple questions at once is
+bewildering.
+
+If a *fact* can be found by exploring the codebase, look it up
+rather than asking me. The *decisions*, though, are mine — put each
+one to me and wait for my answer.
+
+Do not enact the plan until I confirm we have reached a shared
+understanding.
+
+My project idea: [your one-to-two sentences here]</pre>
+  <div class="callout note">
+    <span class="label">Start fresh</span>
+    <p>Run the grill in a fresh session (<code>/clear</code> first). Week 2's reason applies with extra force: the conversation this session produces <em>is</em> the design-concept asset, and you want it to contain your project's decisions — not the debris of whatever you were doing before. Since your course project starts from an empty repo, the &ldquo;facts from the codebase&rdquo; rule will rarely trigger; every question should be a real decision.</p>
+  </div>
+
+  <h2>2 · Your half of the interview</h2>
+  <p>The agent's behavior is scripted by the skill. Session quality now depends almost entirely on how you answer. Habits that separate a useful grill from 45 wasted minutes:</p>
+  <ul>
+    <li><strong>Answer one question at a time, in your own words.</strong> If Claude batches several questions, don't heroically answer them all — tell it to go back to one at a time. The skill calls batching &ldquo;bewildering&rdquo; for a reason: skimmed questions get shallow answers.</li>
+    <li><strong>Use recommended answers as accelerators, not autopilot.</strong> Accepting a right recommendation costs one word. But when a recommendation is wrong for you, <em>overriding it is the most valuable move in the session</em> — that override is precisely the preference the agent could never have inferred. If you notice you've typed &ldquo;yes&rdquo; ten times in a row without thinking, slow down: you're being aligned <em>to</em>, not aligned <em>with</em>.</li>
+    <li><strong>Push back on premises.</strong> The documented use cases include &ldquo;when pushing back on assumptions is desired.&rdquo; If a question presumes something you never decided (&ldquo;When users log in…&rdquo; — wait, is there login?), challenge the premise rather than answering inside it.</li>
+    <li><strong>Steer coverage.</strong> Relentless doesn't mean complete. If you notice a branch the interview hasn't walked — error handling, data persistence, what v1 deliberately omits — say so: &ldquo;we haven't covered X; grill me on it.&rdquo; You own the map, not just the answers.</li>
+    <li><strong>Don't let it build.</strong> If Claude drifts toward implementing (&ldquo;shall I scaffold this?&rdquo;), hold the line: the skill forbids enacting anything until you confirm shared understanding.</li>
+  </ul>
+  <p>Expect the session to run tens of questions — Pocock's real sessions run 40–100 over roughly 45 minutes. Budget the time. The boring middle stretch is where the value hides: &ldquo;walk down each branch of the design tree, resolving dependencies between decisions one-by-one&rdquo; means the seventh question about deck storage exists <em>because</em> your answer to the third question about offline use constrained it.</p>
+
+  <h2>3 · Capturing decisions as they resolve</h2>
+  <p>The objective says &ldquo;capturing decisions as they resolve&rdquo; — present tense, during the session, not archaeology afterwards. The conversation itself is the primary artifact (&ldquo;a rich conversation full of context, your actual ideas, and answers to difficult questions&rdquo;), but Week 2 taught you exactly why a conversation is a fragile place to keep anything: context fills, sessions end, <code>/clear</code> happens. Externalize as you go:</p>
+  <ul>
+    <li><strong>Checkpoint summaries.</strong> Every 10–15 questions, ask: &ldquo;List the decisions we've resolved so far, one line each.&rdquo; Read the list — a wrong entry means a misunderstanding you can fix <em>now</em>, and catching one is cheaper here than in the PRD critique at Meeting 3.</li>
+    <li><strong>A running decisions file.</strong> Have Claude append each resolved decision to a <code>DECISIONS.md</code> (or keep your own notes). This is the memento principle applied to specification: durable state outlives the window.</li>
+  </ul>
+  <p>These captured decisions are the raw material for the next lesson — the PRD is written by <em>synthesizing</em> this session, explicitly not by interviewing you a second time.</p>
+
+  <h2>4 · The stop test</h2>
+  <p>A3's completion criterion is behavioral: the session ends when <strong>Claude can restate your design concept accurately</strong>. Run it as an actual test:</p>
+  <div class="code-label">The stop test</div>
+  <pre>Restate the design concept in your own words: what are we building,
+for whom, what are the key decisions we've made, and what are we
+deliberately not building?</pre>
+  <p>Then grade the restatement like a skeptic. Anything wrong, missing, or fuzzier than your own understanding → not done; name the gap and let the interview resume on that branch. Restatement matches your mental model → confirm shared understanding out loud, and the session is over. Agreement ends a grill session; fatigue doesn't.</p>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>This is the first half of Assignment A3 — do it for real, in your course-project repo:</p>
+    <label class="check"><input type="checkbox"><span>Wrote the course project idea down in one or two sentences <em>before</em> starting (so you can later compare what the grill changed).</span></label>
+    <label class="check"><input type="checkbox"><span>Installed <code>/grill-me</code> from mattpocock/skills, or started a fresh (<code>/clear</code>) session and pasted the emulation prompt plus the idea.</span></label>
+    <label class="check"><input type="checkbox"><span>Answered at least 20 questions one at a time — and told Claude to unbatch if it asked several at once.</span></label>
+    <label class="check"><input type="checkbox"><span>Overrode at least one recommended answer and challenged at least one premise (if the session gave you no reason to, you weren't reading closely).</span></label>
+    <label class="check"><input type="checkbox"><span>Steered coverage at least once: named a branch the interview missed and had it grilled.</span></label>
+    <label class="check"><input type="checkbox"><span>Captured decisions as they resolved — checkpoint summaries every 10–15 questions, or a running <code>DECISIONS.md</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>Ran the stop test, graded the restatement, and resumed grilling until it was accurate; then confirmed shared understanding explicitly.</span></label>
+    <label class="check"><input type="checkbox"><span>Kept the session open (or the decisions file safe) — <a href="m15-write-the-prd.html">M15</a> synthesizes the PRD from exactly this material.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. Twelve questions in, Claude asks three questions in a single turn. The best response is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Answer all three carefully — more throughput per turn</button></li>
+        <li><button data-opt="b">Answer the first if you like, and tell it to return to one question at a time</button></li>
+        <li><button data-opt="c">End the session — the skill is broken</button></li>
+        <li><button data-opt="d">Skip them and ask for the restatement</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> One-at-a-time is a rule of the session because batching produces skimming and shallow answers — the exact failure the grill exists to prevent. Enforcing the skill's own rules is part of your half of the interview; abandoning the session (C) or jumping to the stop test (D) forfeits alignment over a fixable drift.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. Claude recommends &ldquo;store data in localStorage — simplest for v1,&rdquo; but you know you want users to switch devices. You're tired and tempted to type &ldquo;yes.&rdquo; What's actually at stake?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — recommendations are usually right, and you can change it later</button></li>
+        <li><button data-opt="b">Style points — graders like overrides</button></li>
+        <li><button data-opt="c">An accepted recommendation becomes a resolved decision the whole remaining design tree builds on — and this one contradicts a requirement only you know about</button></li>
+        <li><button data-opt="d">Session length — overriding adds questions</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The session resolves dependencies one-by-one, so a wrong answer here silently shapes every later storage, sync, and auth question — and the agent can't catch it, because the cross-device requirement exists only in your head until you say it. Overrides are the highest-information moves in the session precisely because they're where your knowledge exceeds the agent's inference. &ldquo;Change it later&rdquo; (A) pays the misunderstanding tax the grill exists to avoid.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. After 60 questions you're exhausted, and Claude's restatement of the design concept describes a review-scheduling behavior you never chose. You should:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Confirm shared understanding — 60 questions is more than the assignment needs</button></li>
+        <li><button data-opt="b">Fix the restatement text yourself and paste it back as confirmed</button></li>
+        <li><button data-opt="c">Start the whole session over in a fresh window</button></li>
+        <li><button data-opt="d">Name the wrong item and let the interview resume on that branch until the restatement comes back accurate</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The stop condition is accuracy, not effort — a restatement error is the test doing its job, revealing a branch that resolved wrongly (or never resolved). A ships a known misalignment into your PRD; B corrects the <em>text</em> without correcting the <em>agent's model</em>, which is what &ldquo;shared&rdquo; means; C throws away 59 questions of good alignment over one bad branch.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Why does the objective say to capture decisions <em>as they resolve</em>, rather than exporting them once at the end?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Checkpoint capture catches misrecorded decisions while they're one sentence to fix, and externalizes state that a filled context or ended session would otherwise lose</button></li>
+        <li><button data-opt="b">Because the skill deletes the conversation when the session ends</button></li>
+        <li><button data-opt="c">Because end-of-session summaries are forbidden by the skill text</button></li>
+        <li><button data-opt="d">To make the session count as two assignments</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Both halves matter: reading a checkpoint summary is a mini stop-test (a wrong line is a live misunderstanding, cheapest to fix now), and the memento principle says durable decisions belong in files, not in a window that fills and clears. Nothing auto-deletes (B) and end summaries are fine (C) — they're just riskier as the <em>only</em> capture, because a 100-question session's early decisions may already be fuzzy by then.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://github.com/mattpocock/skills">mattpocock/skills (GitHub)</a> — the skill text quoted verbatim and installation home (primary grounding)</li>
+      <li><a href="https://www.aihero.dev/my-grill-me-skill-has-gone-viral">Pocock — My &lsquo;Grill Me&rsquo; Skill Went Viral (aihero.dev)</a> — session length, vague-or-fleshed-out entry states, the recommended-answer mechanic</li>
+      <li><a href="https://www.aihero.dev/skills-grill-me">Pocock — The /grill-me Skill (aihero.dev)</a> — when to use it; pushing back on assumptions</li>
+      <li>Course syllabus, Assignment A3 — the install-or-emulate option and the restate-accurately completion criterion</li>
+      <li>Companion: <a href="https://www.aihero.dev/real-world-feature-build-with-claude-code">Pocock — Real-World Feature Build with Claude Code (aihero.dev)</a> — the assigned video; in the grill segment, watch for how he answers (accept vs. override) and how the design concept sharpens across the session</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m13-why-grill-first.html"><span class="dir">Previous · M13</span>Why Grill First</a>
+    <a class="next" href="m15-write-the-prd.html"><span class="dir">Next · M15</span>Write the PRD</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 3 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

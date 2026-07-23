@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Write the PRD — Week 3 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 3</a> · Objective M15</span>
+  </div>
+</header>
+
+<main>
+  <h1>Write the PRD</h1>
+  <p class="lede">The grill session left you and the agent aligned; now you write it down. One to two pages that mark the destination — goals, non-goals, user stories, constraints, acceptance criteria. This is the document A3 grades and your peers critique at Meeting 3.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M15 · Specification</span>
+      <span class="chip bloom">Bloom: Create</span>
+      <span class="chip assessed">Assessed by: Assignment A3</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Write a 1–2 page PRD treating it as a destination marker (not a compiler input): goals, non-goals, user stories, constraints, acceptance criteria.</p>
+  </div>
+
+  <h2>1 · Synthesis, not a second interview</h2>
+  <p>Write the PRD immediately after the grill session, in the same context. The reasoning is Week 2's plan-mode logic again: the conversation you just had <em>is</em> the well-contexted state a good synthesis needs. Pocock's PRD-writing skill (he calls the document a spec — &ldquo;you may know this document as a PRD&rdquo;) is explicit about the division of labor:</p>
+  <div class="callout note">
+    <span class="label">From Pocock's to-spec skill</span>
+    <p>&ldquo;It does not interview you again. By the time you reach for it, the alignment work is done — to-spec synthesises what is already known rather than asking a fresh round of questions.&rdquo;</p>
+  </div>
+  <p>So the workflow is: grill (M14) → &ldquo;now write the PRD from what we've agreed, using this template&rdquo; → <em>you edit</em>. Having Claude draft it is legitimate — every idea in the draft is yours, because it came out of your grill answers. What you can't delegate is the read-through: the Create objective grades a document you own line by line, and Meeting 3 will ask <em>you</em> to defend it. If the draft contains a decision you don't recognize, that's a misalignment that survived the stop test — fix it now.</p>
+
+  <h2>2 · The five sections</h2>
+  <p>A3 fixes the template: goals, non-goals, user stories, constraints, acceptance criteria. (Pocock's own template differs cosmetically — problem statement, solution, stories, implementation and testing decisions, out of scope — the course template covers the same ground and gives Meeting 3 comparable documents to critique.)</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Section</th><th>What belongs there</th><th>Running example (flashcard app)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Goals</strong></td><td>What the project does and for whom, from the user's perspective. Three to six bullets; each one something the finished product will demonstrably do.</td><td>&ldquo;A student can create decks of question/answer cards and review them on a spaced schedule.&rdquo;</td></tr>
+        <tr><td><strong>Non-goals</strong></td><td>What you are deliberately not building — the scope fence. Every &ldquo;should we…? → no&rdquo; from the grill lands here. As load-bearing as goals: this section is what an agent (or a peer critic) checks scope against.</td><td>&ldquo;No accounts, no sharing, no mobile app in v1.&rdquo;</td></tr>
+        <tr><td><strong>User stories</strong></td><td>Numbered, in the fixed form <em>&ldquo;As an &lt;actor&gt;, I want &lt;feature&gt;, so that &lt;benefit&gt;&rdquo;</em>. Pocock's template asks for an <em>extensive</em> list covering all aspects — each story a concrete, independently verifiable behavior.</td><td>&ldquo;3. As a student, I want cards I marked hard to reappear sooner, so that my weak spots get more practice.&rdquo;</td></tr>
+        <tr><td><strong>Constraints</strong></td><td>The technical and process decisions the grill settled: stack, storage, offline behavior, performance floors. Decisions, not layout — no file paths or code snippets, which &ldquo;may end up being outdated very quickly.&rdquo;</td><td>&ldquo;Plain HTML/JS, no build step; data in a local JSON file; must work offline.&rdquo;</td></tr>
+        <tr><td><strong>Acceptance criteria</strong></td><td>Checkable statements a stranger — or an agent — can verify pass/fail without asking you anything. These are <a href="m18-verifiable-targets.html">verifiable targets (M18)</a> written in prose; in Week 5 they become tests.</td><td>&ldquo;Reviewing a card and grading it &lsquo;hard&rsquo; reschedules it within 1 day; &lsquo;easy&rsquo; within 4+ days.&rdquo;</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn">
+    <span class="label">The stranger test</span>
+    <p>For every acceptance criterion ask: could someone who has never spoken to me decide, yes or no, whether this holds? &ldquo;The app should be fast and intuitive&rdquo; fails the test — <em>fast at what, measured how?</em> &ldquo;A deck of 100 cards loads and renders in under a second&rdquo; passes. Unverifiable criteria are the #1 flaw your peers will be hunting at Meeting 3 (<a href="m17-critique-a-prd.html">M17</a> trains them to).</p>
+  </div>
+
+  <h2>3 · Destination-grade, not blueprint-grade</h2>
+  <p>The objective's parenthetical — <em>destination marker, not compiler input</em> — sets the quality bar, and it's lower than your instincts say. From Pocock's AI Engineer workshop: the PRD is &ldquo;the destination document that agents can reference throughout implementation&rdquo;; &ldquo;over-optimizing the PRD may not yield significant value&rdquo;; and the format is flexible — it &ldquo;should encapsulate design concepts effectively without strict adherence to any particular format.&rdquo; The full argument is the next lesson; for the writing session, three practical consequences:</p>
+  <ul>
+    <li><strong>The 1–2 page limit is a feature.</strong> It forces you to record decisions, not designs. If a section is ballooning, you're writing implementation, which belongs to the agent (Week 1's division of labor).</li>
+    <li><strong>Stop at &ldquo;unambiguous,&rdquo; not at &ldquo;impressive.&rdquo;</strong> The document is done when a fresh agent reading it would make your decisions, not its own — additional polish past that point changes nothing about the build. Anthropic's spec guidance agrees on where the effort goes: the useful spec is <em>self-contained</em>, states what's out of scope, and ends with verification — precision of content, not production values.</li>
+    <li><strong>Write for two readers.</strong> A peer critic at Meeting 3 and an agent in Week 5 both need to act on it without you in the room. Neither can use your good intentions; both can use a numbered story with a checkable criterion.</li>
+  </ul>
+  <p>Here's what destination-grade looks like — a condensed excerpt (not a full PRD) of the running example:</p>
+  <div class="code-label">PRD.md — excerpt</div>
+  <pre># StudyStack — PRD (v1)
+
+## Goals
+- A student can create, edit, and delete decks of question/answer cards.
+- Review sessions show due cards one at a time; grading a card
+  (again / hard / easy) reschedules it on a spaced schedule.
+- All data survives closing the browser.
+
+## Non-goals (v1)
+- No accounts, no sharing, no sync between devices.
+- No images or audio on cards. Text only.
+- No statistics dashboard beyond a due-card count.
+
+## User stories
+1. As a student, I want to create a deck with a name, so that I can
+   organize cards by course.
+2. As a student, I want to add a card by typing a question and an
+   answer, so that capture is fast during lectures.
+3. As a student, I want cards I graded "again" to reappear in the
+   same session, so that I don't end on a failure.
+   …
+
+## Constraints
+- Plain HTML/CSS/JS, no build step, no backend; storage is
+  localStorage. Must work offline after first load.
+
+## Acceptance criteria
+- Creating a deck and reloading the page: the deck is still there.
+- Grading a card "easy" removes it from today's queue; "again"
+  re-queues it in the current session.
+- With no cards due, the review screen says so instead of erroring.</pre>
+
+  <h2>4 · Commit it</h2>
+  <p>A3's last step: the PRD lives in your course-project repo as <code>PRD.md</code>, committed. This isn't ceremony — committed at the repo root is where the Week 5 agent will read it from, and version history means Meeting 3 feedback becomes a visible revision rather than a mystery edit. Bring the document (screen or paper) to the meeting for the peer critique.</p>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>The second half of Assignment A3:</p>
+    <label class="check"><input type="checkbox"><span>Asked Claude — in the still-open grill session — to draft <code>PRD.md</code> from the resolved decisions, using the five-section course template.</span></label>
+    <label class="check"><input type="checkbox"><span>Read every line; found and fixed at least any decision you didn't recognize as yours.</span></label>
+    <label class="check"><input type="checkbox"><span>Numbered every user story and put each in the <em>as-a / I-want / so-that</em> form.</span></label>
+    <label class="check"><input type="checkbox"><span>Ran the stranger test on each acceptance criterion; rewrote any a stranger couldn't answer yes/no.</span></label>
+    <label class="check"><input type="checkbox"><span>Checked every story traces to a goal and contradicts no non-goal (the M17 lenses, applied to yourself first).</span></label>
+    <label class="check"><input type="checkbox"><span>Confirmed the whole document is 1–2 pages — cut implementation detail, not decisions, to get there.</span></label>
+    <label class="check"><input type="checkbox"><span>Committed <code>PRD.md</code> to the course-project repo and brought it to Meeting 3.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. You type &ldquo;now write the PRD&rdquo; and Claude replies: &ldquo;Great! First, a few questions: who is the target user? What's the core feature?&rdquo; What went wrong?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — more questions always mean more alignment</button></li>
+        <li><button data-opt="b">The PRD step is synthesis of the grill session, not a fresh interview — those questions were answered there, so either the context is gone or the instruction didn't say to use it</button></li>
+        <li><button data-opt="c">PRDs must be written by hand, never drafted by the agent</button></li>
+        <li><button data-opt="d">The questions are fine but should be batched</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> &ldquo;It does not interview you again… the alignment work is done.&rdquo; Re-asking answered questions signals the draft isn't building on the session — maybe you cleared the context (losing the asset M14 told you to protect), maybe the prompt didn't point at the decisions. Redirect: &ldquo;synthesize from the decisions we resolved above.&rdquo; C is false — drafting is delegable; owning the content isn't.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">2. Which acceptance criterion passes the stranger test?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;The review experience should feel smooth&rdquo;</button></li>
+        <li><button data-opt="b">&ldquo;Scheduling works correctly&rdquo;</button></li>
+        <li><button data-opt="c">&ldquo;The code follows best practices&rdquo;</button></li>
+        <li><button data-opt="d">&ldquo;After grading a card &lsquo;again,&rsquo; it reappears before the review session ends&rdquo;</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> A stranger can perform it: grade a card &ldquo;again,&rdquo; keep reviewing, observe whether it returns — yes or no, no interview with the author required. A and C are judgments with no measurement; B names the right area but delegates the entire definition of &ldquo;correctly&rdquo; back to whoever's asking — which, mid-build, will be the agent, deciding silently (M13's failure mode, now in document form).</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">3. Your constraints section is growing: you're adding the module layout, function names, and a code snippet for the scheduler. Why does the course (and Pocock's template) say to stop?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">File paths and snippets go stale fastest and turn the PRD misleading — record the decisions (what was chosen and why), and leave layout to the implementation</button></li>
+        <li><button data-opt="b">Code in documents is unprofessional</button></li>
+        <li><button data-opt="c">Constraints sections have a three-bullet maximum</button></li>
+        <li><button data-opt="d">The agent performs worse when given detail</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The template's stated reason: paths and snippets &ldquo;may end up being outdated very quickly.&rdquo; A destination document should be built of the slowest-rotting material available — decisions — so it stays trustworthy for its short working life (M16 takes this further). It's also the division of labor: <em>how</em> the scheduler is arranged is execution, and pinning it in the PRD spends your pages on the agent's job.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">4. A classmate's PRD has goals, stories, constraints, and criteria — but no non-goals section, &ldquo;because we listed what we ARE building, so everything else is obviously out.&rdquo; What's the strongest counter?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">None — they're right, non-goals are redundant with goals</button></li>
+        <li><button data-opt="b">Templates must be followed exactly for grading</button></li>
+        <li><button data-opt="c">&ldquo;Obviously out&rdquo; is exactly where an agent's silent assumptions live — the non-goals section records the should-we-no decisions from the grill, and without it nothing stops plausible scope (search! stats! sharing!) from creeping in</button></li>
+        <li><button data-opt="d">Non-goals exist to make the document longer, since 1 page looks thin</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Goals bound what must exist; they don't bound what an eager implementer <em>adds</em> — a flashcard app's goals are perfectly consistent with an unrequested stats dashboard. The scope fence has to be explicit because the agent fills silence with plausibility (M13), and &ldquo;plausible extra features&rdquo; is scope creep in its natural form — which is also why M17 makes an empty non-goals section a critique flag.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://github.com/mattpocock/skills">Pocock — to-spec skill (mattpocock/skills)</a> — synthesis-not-interview, the extensive numbered user-story form, no file paths/snippets, out-of-scope section (primary grounding for the workflow)</li>
+      <li>Course syllabus, Assignment A3 — the five-section template, 1–2 page length, commit requirement (primary grounding for the artifact)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — self-contained specs: name what's out of scope, end with verification; &ldquo;time spent making the spec precise pays off&rdquo;</li>
+      <li>Companion: <a href="https://www.youtube.com/watch?v=-QFHIoCo-Ko">Pocock — Full Walkthrough: Workflow for AI Coding (AI Engineer 2026, YouTube)</a> — destination-document framing and don't-over-optimize guidance (via published transcript summaries); watch the PRD segment for a spec written live from a grill session</li>
+      <li>Companion: <a href="https://www.aihero.dev/real-world-feature-build-with-claude-code">Pocock — Real-World Feature Build with Claude Code (aihero.dev)</a> — the PRD segment of the assigned video</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m14-run-a-grill-session.html"><span class="dir">Previous · M14</span>Run a Grill Session</a>
+    <a class="next" href="m16-prd-as-destination.html"><span class="dir">Next · M16</span>PRD as Destination</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 3 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

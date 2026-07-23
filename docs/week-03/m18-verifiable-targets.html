@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Give the Agent a Target — Week 3 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 3</a> · Objective M18</span>
+  </div>
+</header>
+
+<main>
+  <h1>Give the Agent a Target</h1>
+  <p class="lede">&ldquo;Claude stops when the work looks done.&rdquo; The highest-leverage upgrade to any prompt is making &ldquo;done&rdquo; checkable — a test, a build, an expected output, a screenshot to compare. This lesson is why a verifiable target beats open-ended prompting, in the official docs' own words.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M18 · Foundations</span>
+      <span class="chip bloom">Bloom: Understand</span>
+      <span class="chip assessed">Assessed by: Quiz 3</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Describe how giving Claude a verifiable target (tests, mock, expected output) improves results over open-ended prompting.</p>
+  </div>
+
+  <h2>1 · The looks-done problem</h2>
+  <p>Anthropic's best-practices guide states the mechanism precisely:</p>
+  <div class="callout note">
+    <span class="label">From the official docs</span>
+    <p>&ldquo;Claude stops when the work looks done. Without a check it can run, &lsquo;looks done&rsquo; is the only signal available, and you become the verification loop: every mistake waits for you to notice it.&rdquo;</p>
+  </div>
+  <p>Unpack the two halves. <em>&ldquo;Looks done&rdquo;</em> is a plausibility judgment — the same faculty that produces confident wrong answers in a polluted context (Week 2) is grading the work. And <em>&ldquo;you become the verification loop&rdquo;</em> is the cost model: every defect travels all the way to your review before anyone notices, and every correction costs a full human round-trip. You've already watched it happen: in Week 1's <a href="../week-01/m05-whose-decision.html">transcript</a>, Claude announced &ldquo;Done — both tests pass&rdquo; while the behavior was wrong — the tests passed because they encoded the agent's own assumption.</p>
+
+  <h2>2 · Closing the loop</h2>
+  <p>The fix: &ldquo;Give Claude something that produces a pass or fail, and the loop closes on its own. Claude does the work, runs the check, reads the result, and iterates until the check passes.&rdquo; The check is anything that returns a signal the agent can read in the conversation:</p>
+  <ul>
+    <li>a <strong>test suite</strong> (including example cases pasted right into the prompt),</li>
+    <li>a <strong>build or linter exit code</strong>,</li>
+    <li>a <strong>mock or expected output</strong> — a script that diffs the program's output against a fixture,</li>
+    <li>a <strong>browser screenshot compared against a design</strong>, for UI work.</li>
+  </ul>
+  <p>The official before/after examples are worth internalizing verbatim — the quiz asks for exactly this transformation:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Strategy</th><th>Open-ended</th><th>With a verifiable target</th></tr></thead>
+      <tbody>
+        <tr><td>Provide verification criteria</td><td>&ldquo;implement a function that validates email addresses&rdquo;</td><td>&ldquo;write a validateEmail function. example test cases: user@example.com is true, invalid is false, user@.com is false. run the tests after implementing&rdquo;</td></tr>
+        <tr><td>Verify UI changes visually</td><td>&ldquo;make the dashboard look better&rdquo;</td><td>&ldquo;[paste screenshot] implement this design. take a screenshot of the result and compare it to the original. list differences and fix them&rdquo;</td></tr>
+        <tr><td>Address root causes</td><td>&ldquo;the build is failing&rdquo;</td><td>&ldquo;the build fails with this error: [paste error]. fix it and verify the build succeeds. address the root cause, don't suppress the error&rdquo;</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>3 · Why it beats open-ended prompting</h2>
+  <p>Same task, two regimes:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>Open-ended prompt</th><th>Verifiable target</th></tr></thead>
+      <tbody>
+        <tr><td>Definition of done</td><td>&ldquo;Looks done&rdquo; — the agent's plausibility judgment</td><td>The check passes — unambiguous, external to the agent</td></tr>
+        <tr><td>Where errors surface</td><td>At your review, or in production</td><td>Inside the session, as a failing check the agent reads</td></tr>
+        <tr><td>Cost of an iteration</td><td>A human round-trip per correction</td><td>The agent iterates alone until the signal is green</td></tr>
+        <tr><td>Ambiguity resolution</td><td>Silent agent choice (M13's failure mode)</td><td>Pinned in advance by the target's examples</td></tr>
+        <tr><td>Supervision required</td><td>&ldquo;A session you watch&rdquo;</td><td>&ldquo;One you walk away from&rdquo;</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The docs compress the stakes into one line: a runnable check is &ldquo;the difference between a session you watch and one you walk away from.&rdquo; Pocock's workshop makes the same point from the TDD side: give the agent a failing test and it will &ldquo;produce code that provably solves the problem you specified&rdquo; — the test is an unambiguous success definition, eliminating the interpretation gap that open-ended prompts leave open. Notice the validateEmail example doing double duty: those three test cases don't just verify, they <em>decide</em> — <code>user@.com is false</code> settles a boundary question that an open-ended prompt would have left to the agent (three test cases are also a tiny grill session).</p>
+  <p>One discipline completes the loop: <strong>evidence over assertion</strong>. &ldquo;Have Claude show evidence rather than asserting success: the test output, the command it ran and what it returned, or a screenshot of the result.&rdquo; Reviewing evidence is faster than re-running verification yourself — and it's the only version that works for sessions you weren't watching. When an agent claims success without evidence, the Week 1 transcript is your reminder of what that claim is worth.</p>
+
+  <h2>4 · From acceptance criteria to targets</h2>
+  <p>This objective sits in Week 3 for a reason: <strong>your PRD's acceptance criteria are verifiable targets written in prose.</strong> &ldquo;Grading a card &lsquo;easy&rsquo; removes it from today's queue&rdquo; is one mechanical step from a test; &ldquo;the app should work correctly&rdquo; can never become one — which is why <a href="m17-critique-a-prd.html">M17</a> treats uncheckable criteria as the highest-value critique flag. The pipeline this course builds, week by week: grill answers → acceptance criteria (this week) → failing tests the agent codes against (Week 5, test-first execution) → checks that gate long-running sessions (Week 8). For now, the habit that starts paying immediately: <em>every prompt that asks for behavior names the check that verifies it.</em></p>
+  <div class="callout tip">
+    <span class="label">Escalation ladder (names only, for later weeks)</span>
+    <p>The docs describe four levels of gating once a check exists: ask for it <strong>in the prompt</strong> (works today, no setup) → set it as a <strong>/goal condition</strong> re-checked every turn → enforce it with a <strong>Stop hook</strong> that blocks the session from ending until the check passes → have a <strong>fresh subagent</strong> try to refute the result. Each trades setup for attention. Weeks 8–9 climb this ladder; this week you only need rung one.</p>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. Which prompt gives the agent a verifiable target?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;Write a really solid date parser — be thorough&rdquo;</button></li>
+        <li><button data-opt="b">&ldquo;Write a date parser and make sure it works before you finish&rdquo;</button></li>
+        <li><button data-opt="c">&ldquo;Write a date parser. parse('2026-07-23') → July 23 2026; parse('23/07/2026') → same; parse('tomorrow') → error. Run the tests after implementing&rdquo;</button></li>
+        <li><button data-opt="d">&ldquo;Write a date parser using best practices and add tests&rdquo;</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> It supplies pass/fail examples and orders the check run — the validateEmail pattern. B <em>gestures</em> at verification but defines neither &ldquo;works&rdquo; nor the check, so &ldquo;looks done&rdquo; still decides; D delegates the target's content to the agent, which means the tests will encode the agent's assumptions — exactly what the Week 1 transcript showed going wrong. Note C's third case is also a decision: rejecting <code>'tomorrow'</code> was pinned by you, not resolved silently.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. Claude reports: &ldquo;Refactor complete — everything passes.&rdquo; The docs-endorsed next move is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Accept it — agents don't misreport test results</button></li>
+        <li><button data-opt="b">Ask for the evidence: the command it ran and the actual output</button></li>
+        <li><button data-opt="c">Re-run the entire suite yourself, every time</button></li>
+        <li><button data-opt="d">Ask Claude if it's sure</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Evidence over assertion: &ldquo;the test output, the command it ran and what it returned.&rdquo; Reviewing evidence is explicitly framed as <em>faster than re-running verification yourself</em> (C's cost, paid on every task, is the you-as-verification-loop regime the target was supposed to end) — and A trusts the exact &ldquo;looks done&rdquo; signal this lesson exists to replace. D just requests a second assertion.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. &ldquo;Make the dashboard look better&rdquo; keeps producing designs you don't want. Applying this lesson, the fix is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Repeat the prompt with &ldquo;IMPORTANT&rdquo; in front</button></li>
+        <li><button data-opt="b">Ask for five variants and pick one</button></li>
+        <li><button data-opt="c">Describe the aesthetic in more adjectives — clean, modern, professional</button></li>
+        <li><button data-opt="d">Paste the design screenshot as the target and have Claude screenshot its result, compare, list differences, and fix them</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The official UI pattern: visual work gets a visual target, and the compare-and-fix instruction closes the loop the same way a test suite does for logic. C is more open-endedness, not less — adjectives are the ambiguity M17 taught you to flag; A and B keep you as the verification loop, just louder or five times per iteration.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Why does the course insist your PRD's acceptance criteria pass the stranger test <em>this</em> week, when tests aren't written until Week 5?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">A checkable criterion is a target in prose — it already pins decisions and becomes a failing test mechanically; an uncheckable one can never become a check, so the build falls back to &ldquo;looks done&rdquo;</button></li>
+        <li><button data-opt="b">Because Quiz 3 covers both topics</button></li>
+        <li><button data-opt="c">Strangers will be grading the assignment</button></li>
+        <li><button data-opt="d">It doesn't matter yet — criteria can be vague until tests exist</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The pipeline runs criteria → tests → gates, and its quality is set at the first stage: &ldquo;grading &lsquo;easy&rsquo; removes the card from today's queue&rdquo; converts to a failing test in one step, while &ldquo;works correctly&rdquo; converts to nothing in any number of steps. Vague-now-precise-later (D) means re-deriving the decisions in Week 5 — without the grill session context that produced them.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices, &ldquo;Give Claude a way to verify its work&rdquo;</a> — every quoted passage, the before/after table, the gating ladder, evidence over assertion (primary grounding)</li>
+      <li><a href="../week-01/m05-whose-decision.html">Week 1, M05</a> — the worked transcript where &ldquo;Done — both tests pass&rdquo; was wrong: the looks-done problem observed firsthand</li>
+      <li>Companion: <a href="https://www.youtube.com/watch?v=-QFHIoCo-Ko">Pocock — Full Walkthrough: Workflow for AI Coding (AI Engineer 2026, YouTube)</a> — &ldquo;give them a failing test and they'll produce code that provably solves the problem you specified&rdquo; (via published transcript summaries); the TDD segment previews Week 5</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m17-critique-a-prd.html"><span class="dir">Previous · M17</span>Critique a PRD</a>
+    <a class="next" href="index.html"><span class="dir">Week 3 hub</span>Specification I: Grill Sessions &amp; PRDs</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 3 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

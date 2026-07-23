@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Critique a PRD — Week 3 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 3</a> · Objective M17</span>
+  </div>
+</header>
+
+<main>
+  <h1>Critique a PRD</h1>
+  <p class="lede">Meeting 3 puts a classmate's PRD in your hands. This lesson gives you three lenses — ambiguity, missing acceptance criteria, scope creep — and a worked critique to practice on, so your feedback lands as engineering rather than opinion.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M17 · Judgment</span>
+      <span class="chip bloom">Bloom: Evaluate</span>
+      <span class="chip assessed">Assessed by: Meeting 3 exercise</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Evaluate a peer's PRD for ambiguity, missing acceptance criteria, and scope creep.</p>
+  </div>
+
+  <h2>1 · The three lenses</h2>
+  <p>Each lens is a named flaw, a reason it matters <em>specifically for an agent audience</em>, and a mechanical test you can run on any sentence.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Lens</th><th>What it is</th><th>Why it matters for agents</th><th>The test</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Ambiguity</strong></td>
+          <td>Words two readers decode differently: <em>fast, simple, intuitive, robust, correctly, etc., and so on</em></td>
+          <td>Whatever the document leaves ambiguous, the build agent resolves silently (M13's failure mode, embedded in prose)</td>
+          <td>Could two reasonable implementations both claim compliance while behaving differently? Then it's ambiguous.</td>
+        </tr>
+        <tr>
+          <td><strong>Missing acceptance criteria</strong></td>
+          <td>A story or goal with no way to know it's done — nothing checkable backs it</td>
+          <td>An uncheckable requirement gives the agent no target (<a href="m18-verifiable-targets.html">M18</a>): &ldquo;looks done&rdquo; becomes the stop signal</td>
+          <td>For each story ask: &ldquo;how would a stranger verify this, yes or no?&rdquo; No answer in the document → flag it.</td>
+        </tr>
+        <tr>
+          <td><strong>Scope creep</strong></td>
+          <td>Stories or goals beyond the stated problem; v2 features hiding in v1; content that contradicts the non-goals — or a non-goals section that's missing entirely</td>
+          <td>Every extra story multiplies build and review work, and contradictions leave the agent to pick a side silently</td>
+          <td>Trace each story to a goal; check each story and constraint against the non-goals; ask &ldquo;could v1 ship without this?&rdquo;</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>2 · A worked critique</h2>
+  <p>Below is a condensed excerpt from &ldquo;Riley's&rdquo; PRD for <em>StudyStack</em> (course-written for this exercise). Read it with the three lenses, note what you'd flag, then work the judgment questions.</p>
+  <div class="code-label">Riley's PRD.md — excerpt (flaws included)</div>
+  <pre># StudyStack — PRD (v1)
+
+## Goals
+- Make studying effortless and fun.
+- A student can create decks of question/answer cards and review
+  them on a spaced schedule.
+
+## Non-goals (v1)
+- No accounts or login.
+- No mobile app.
+
+## User stories
+1. As a student, I want to create decks and add cards, so that I
+   can organize my study material.
+2. As a student, I want the app to feel snappy, so that I stay
+   focused while reviewing.
+3. As a student, I want cards scheduled with spaced repetition,
+   so that I remember more with less time.
+4. As a student, I want to share decks with classmates, so that
+   we can study together.
+
+## Constraints
+- Plain HTML/JS, no build step. Use best practices.
+
+## Acceptance criteria
+- All features work correctly.
+- Clicking a card flips it to show the answer.</pre>
+
+  <div class="q" data-answer="b">
+    <p class="q-text">Judgment 1 — Story 2 (&ldquo;feel snappy&rdquo;). Which critique is the strongest?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">&ldquo;Delete it — performance doesn't belong in a PRD&rdquo;</button></li>
+      <li><button data-opt="b">&ldquo;Ambiguity: two implementations could both claim &lsquo;snappy.&rsquo; What operation, and what number? E.g. &lsquo;flipping a card responds in under 100&thinsp;ms&rsquo; — then it's checkable&rdquo;</button></li>
+      <li><button data-opt="c">&ldquo;Scope creep: performance is a v2 concern&rdquo;</button></li>
+      <li><button data-opt="d">&ldquo;Fine as is — everyone knows what snappy means&rdquo;</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>B.</strong> The model critique names the lens (ambiguity), demonstrates the test (two compliant-but-different implementations), and proposes the smallest fix (an operation plus a number) — turning the flag into a checkable criterion rather than a deletion. Performance is a legitimate v1 requirement (not A or C); D fails the test outright, since &ldquo;snappy&rdquo; on deck-load vs. card-flip vs. everything are different apps.</p>
+    </div>
+  </div>
+
+  <div class="q" data-answer="c">
+    <p class="q-text">Judgment 2 — Story 4 (share decks with classmates). What should a critic flag?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Ambiguity: &ldquo;share&rdquo; is vague</button></li>
+      <li><button data-opt="b">Nothing: sharing traces to the &ldquo;effortless and fun&rdquo; goal</button></li>
+      <li><button data-opt="c">Scope creep with a contradiction: sharing between users implies accounts or link infrastructure, which the non-goals rule out — either move the story to non-goals or the design concept is incoherent</button></li>
+      <li><button data-opt="d">Missing acceptance criteria only — add &ldquo;sharing works&rdquo; and keep the story</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>C.</strong> The story doesn't just exceed scope, it <em>contradicts</em> the fence: &ldquo;no accounts&rdquo; and &ldquo;share with classmates&rdquo; can't both hold without infrastructure the document never mentions — and an agent implementing this PRD would have to pick a side silently. That's the highest-severity finding on the page. A is real but secondary; B shows why vague goals are dangerous (they can &ldquo;justify&rdquo; anything); D would paper over the contradiction with an equally uncheckable criterion.</p>
+    </div>
+  </div>
+
+  <div class="q" data-answer="d">
+    <p class="q-text">Judgment 3 — The acceptance criteria section. Rank its two entries.</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Both are good: one broad, one specific — nice coverage</button></li>
+      <li><button data-opt="b">Both are bad: neither mentions spaced repetition</button></li>
+      <li><button data-opt="c">&ldquo;All features work correctly&rdquo; is the model to follow — it covers everything at once</button></li>
+      <li><button data-opt="d">&ldquo;Clicking a card flips it&rdquo; is the only real criterion (a stranger can check it); &ldquo;all features work correctly&rdquo; is zero criteria wearing a sentence — and the scheduling story (3) has no criterion at all</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>D.</strong> The card-flip line passes the stranger test: perform the click, observe the flip. &ldquo;All features work correctly&rdquo; delegates every definition of &ldquo;correctly&rdquo; back to the reader — for a build agent, that's no target at all. And the gap matters as much as the flaws: story 3 (the app's core mechanic!) is unverifiable as written, which is the &ldquo;missing acceptance criteria&rdquo; lens finding its most expensive instance. B is half-right about the gap but wrong to dismiss the flip criterion.</p>
+    </div>
+  </div>
+
+  <h2>3 · Delivering the critique</h2>
+  <p>Meeting 3's exercise is live, face to face. A protocol that keeps it useful and survivable:</p>
+  <ol>
+    <li><strong>Open with what's specified well.</strong> A tight non-goals section or a genuinely checkable criterion deserves naming — it shows the author (and you) what the standard looks like.</li>
+    <li><strong>Phrase findings as verification questions, not verdicts.</strong> &ldquo;How would we know the scheduler works?&rdquo; does more than &ldquo;your criteria are weak&rdquo; — it hands the author the stranger test instead of a grade.</li>
+    <li><strong>Every flag cites a sentence.</strong> Critique the document, not the idea. &ldquo;Story 4 vs. non-goal 1&rdquo; is checkable; &ldquo;the scope feels big&rdquo; is vibes — hold your critique to the same standard the M12 write-ups were held to.</li>
+    <li><strong>Propose the smallest fix.</strong> Replace the adjective with a number; add the one missing criterion; move the story to non-goals. Smallest-fix framing keeps the author in charge of their own design.</li>
+    <li><strong>Critique to the destination standard, not the blueprint standard.</strong> M16 applies to critics too: flag what would make the build agent or the author <em>diverge</em> — not everything that could conceivably be added. &ldquo;You could also specify…&rdquo; is how peer review pressures people into the over-polishing M16 warned against. If the document is unambiguous about its decisions, checkable, and coherent, it's done — say so.</li>
+  </ol>
+  <div class="callout tip">
+    <span class="label">Receiving it</span>
+    <p>Your PRD gets the same treatment. The productive posture: every flag caught at the meeting is one the build agent won't resolve silently next week — your critics are debugging your spec while bugs still cost sentences. Fold accepted fixes into <code>PRD.md</code> and commit, so the revision is visible history (and expect the document to still rot later; that's fine).</p>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. A constraint reads: &ldquo;Use best practices.&rdquo; Which lens, and what's the fix?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Scope creep — delete all constraints</button></li>
+        <li><button data-opt="b">Missing acceptance criteria — add &ldquo;code review confirms best practices&rdquo;</button></li>
+        <li><button data-opt="c">Ambiguity — it constrains nothing two readers would agree on; replace with the specific decisions the grill actually settled (e.g. &ldquo;no external libraries; data in localStorage&rdquo;)</button></li>
+        <li><button data-opt="d">No flaw — best practices are well documented</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> &ldquo;Best practices&rdquo; is the constraint-section cousin of &ldquo;works correctly&rdquo; — every implementer, human or agent, claims compliance while doing different things. The fix isn't a checkbox (B keeps the vagueness, just relocated), it's recovering the concrete decisions the phrase is hiding. If the grill never settled them, the critique just found a branch that needs grilling — also a useful finding.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">2. A classmate's PRD is two tight pages: decisions unambiguous, every story numbered with a checkable criterion, stories trace to goals, non-goals coherent. Your strongest contribution at the meeting is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Say it passes the three lenses and name the best-specified part — a clean bill from a real inspection is a finding, and demanding additions would push toward over-polish</button></li>
+        <li><button data-opt="b">Find something anyway — a critique with zero flags means you didn't look hard enough</button></li>
+        <li><button data-opt="c">Suggest expanding it to five pages with architecture diagrams for the agent build</button></li>
+        <li><button data-opt="d">Skip your turn</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Evaluation means rendering the supported verdict, and sometimes the verdict is &ldquo;done.&rdquo; B manufactures findings — the reviewer failure mode where flags get invented because flags were requested; C is the over-polish pressure M16 warned about, now applied socially. A specific &ldquo;this criterion is the model — checkable by a stranger&rdquo; also teaches the room what good looks like, which is the exercise's actual point.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">3. Why does the course schedule the peer critique <em>before</em> the build instead of after it?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Tradition — requirements reviews always precede builds</button></li>
+        <li><button data-opt="b">Spec flaws caught now cost a sentence to fix; the same flaws found mid-build have already been resolved silently by the agent, in code, invisibly</button></li>
+        <li><button data-opt="c">Because PRDs can't be read after the build starts</button></li>
+        <li><button data-opt="d">To give every student something to present at Meeting 3</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> It's the week's economics applied one last time: alignment defects are cheapest at the document stage, and the critique is a second grill — fresh eyes walking branches the author's session missed. After the build, an ambiguity isn't a flag anymore; it's whatever behavior the agent picked, waiting in the diff for review (Week 6's much more expensive version of the same catch).</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">4. Which finding is <em>scope creep</em> rather than ambiguity or a missing criterion?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;The UI should be clean and modern&rdquo;</button></li>
+        <li><button data-opt="b">A story with no way to verify completion</button></li>
+        <li><button data-opt="c">&ldquo;The scheduler works as expected&rdquo;</button></li>
+        <li><button data-opt="d">A v1 story adding CSV import/export, when the goals mention only creating and reviewing cards and no goal or meeting note asked for it</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The story fails the traceability test — it serves no stated goal, so it's growth beyond the agreed problem: extra build work, extra review surface, and precedent for more. A and C are ambiguity (unmeasurable words); B is the missing-criteria lens. Note the fix for D is cheap and non-destructive: move it to non-goals with a &ldquo;v2 candidate&rdquo; note, which records the idea without widening the destination.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li>Course exercise — the three critique lenses and the meeting protocol are specified by the Meeting 3 exercise; Riley's PRD is course-written for this page (primary grounding for the task)</li>
+      <li><a href="m15-write-the-prd.html">M15 — Write the PRD</a> and <a href="https://github.com/mattpocock/skills">Pocock's to-spec template</a> — the standard the critique measures against: numbered verifiable stories, explicit out-of-scope, decisions not layout</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — the reviewer-overreach caveat (&ldquo;a reviewer prompted to find gaps will usually report some, even when the work is sound&rdquo;) behind the clean-bill rule</li>
+      <li><a href="m16-prd-as-destination.html">M16 — PRD as Destination</a> — why the critique stops at destination-grade rather than demanding blueprint-grade</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m16-prd-as-destination.html"><span class="dir">Previous · M16</span>PRD as Destination</a>
+    <a class="next" href="m18-verifiable-targets.html"><span class="dir">Next · M18</span>Give the Agent a Target</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 3 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

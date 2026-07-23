@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 3 — Specification I: Grill Sessions &amp; PRDs · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb">Week 3 hub</span>
+  </div>
+</header>
+
+<main>
+  <h1>Week 3 — Specification I: Grill Sessions &amp; PRDs</h1>
+  <p class="lede">Weeks 1–2 taught you to run and steer sessions; this week you learn to aim them. Alignment before implementation: get grilled by the agent until the design concept is shared, write it down as a 1–2 page PRD that marks the destination, critique a peer's spec with engineering lenses, and understand why verifiable targets beat open-ended prompting.</p>
+
+  <p><strong>Estimated total time:</strong> 3.5–4.5 hours (readings/videos + quiz + assignment + meeting). These pages cover the same ground as the assigned readings — use them as your primary lesson text, and the linked sources to go deeper.</p>
+
+  <h2>This week's learning pages</h2>
+  <p>Six mastery objectives, six lessons, in recommended order:</p>
+
+  <ul class="card-grid">
+    <li class="card">
+      <div class="meta"><span class="chip">M13</span><span class="chip bloom">Understand</span></div>
+      <a class="title" href="m13-why-grill-first.html">Why Grill First: Alignment Before Implementation</a>
+      <p>What a grill session is — the six-sentence skill, quoted whole — and the failure modes it prevents, starting with good code that solves the wrong problem.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M14</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m14-run-a-grill-session.html">Run a Grill Session</a>
+      <p>The A3 procedure: install or emulate the skill, hold up your half of a 40-question interview, capture decisions as they resolve, and stop only at an accurate restatement.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M15</span><span class="chip bloom">Create</span></div>
+      <a class="title" href="m15-write-the-prd.html">Write the PRD</a>
+      <p>Synthesize the grill session — no second interview — into goals, non-goals, user stories, constraints, and acceptance criteria that pass the stranger test. Commit it.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M16</span><span class="chip bloom">Understand</span></div>
+      <a class="title" href="m16-prd-as-destination.html">PRD as Destination, Not Compiler Input</a>
+      <p>Two models of a spec, why polish past unambiguity changes nothing about the build, and why doc rot is expected, acceptable, and designed for.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M17</span><span class="chip bloom">Evaluate</span></div>
+      <a class="title" href="m17-critique-a-prd.html">Critique a PRD</a>
+      <p>Three lenses — ambiguity, missing acceptance criteria, scope creep — a worked critique of a flawed sample PRD, and the protocol for delivering it at Meeting 3.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M18</span><span class="chip bloom">Understand</span></div>
+      <a class="title" href="m18-verifiable-targets.html">Give the Agent a Target</a>
+      <p>&ldquo;Claude stops when the work looks done&rdquo; — how a runnable check closes the loop, and why your acceptance criteria are targets written in prose.</p>
+    </li>
+  </ul>
+
+  <div class="callout note">
+    <span class="label">Suggested path</span>
+    <p>Read <a href="m13-why-grill-first.html">M13</a>, then run your grill session with <a href="m14-run-a-grill-session.html">M14</a> open — and write the PRD with <a href="m15-write-the-prd.html">M15</a> <em>in the same sitting</em>, while the session context is still warm. Read <a href="m16-prd-as-destination.html">M16</a> before you're tempted to polish, and <a href="m17-critique-a-prd.html">M17</a> before Meeting 3. <a href="m18-verifiable-targets.html">M18</a> pairs naturally with writing your acceptance criteria; read it any time, but before the quiz.</p>
+  </div>
+
+  <h2>How this week is assessed</h2>
+  <ul>
+    <li><strong>Quiz 3</strong> (25 MCQs): purpose and mechanics of grill sessions; PRD-as-destination; expected doc rot; targets and acceptance criteria. Every lesson's self-check is written in the quiz's application-over-recall style.</li>
+    <li><strong>Assignment A3</strong> (10 pts): choose your course project. Install or emulate the grill-me skill and run a grill session until Claude can restate your design concept accurately. Produce a one-to-two page <code>PRD.md</code> (goals, non-goals, user stories, constraints, acceptance criteria) and commit it. Bring it to the meeting for structured peer critique.</li>
+    <li><strong>Meeting 3 exercise:</strong> structured critique of a peer's PRD using the three lenses from <a href="m17-critique-a-prd.html">M17</a>.</li>
+  </ul>
+
+  <h2>Assigned sources for Week 3</h2>
+  <p>The lessons above are grounded in these; read or watch the originals to go deeper.</p>
+  <ul>
+    <li><a href="https://www.aihero.dev/skills-grill-me">aihero.dev — The /grill-me Skill</a> and <a href="https://www.aihero.dev/my-grill-me-skill-has-gone-viral">My &lsquo;Grill Me&rsquo; Skill Went Viral</a> — the grill session's rules, scale, and rationale (Pocock iterates fast: expect the skill catalog to have moved since these were written)</li>
+    <li><a href="https://github.com/mattpocock/skills">GitHub — mattpocock/skills</a> — the actual skill texts (grilling, to-spec) quoted in the lessons, and the four failure modes framing</li>
+    <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices</a> — &ldquo;Give Claude a way to verify its work&rdquo; (the week's Anthropic reading) and the &ldquo;Let Claude interview you&rdquo; pattern</li>
+    <li>Video: <a href="https://www.aihero.dev/real-world-feature-build-with-claude-code">aihero.dev — Real-World Feature Build with Claude Code</a> — the assigned video; watch the grill-session and PRD segments and note how decisions travel from interview to document</li>
+    <li>Video: <a href="https://www.youtube.com/watch?v=-QFHIoCo-Ko">Matt Pocock — Full Walkthrough: Workflow for AI Coding (AI Engineer 2026, YouTube)</a> — the PRD-as-destination and doc-rot arguments in full; lesson claims from this talk were verified against published transcript summaries</li>
+  </ul>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 3 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+</body>
+</html>

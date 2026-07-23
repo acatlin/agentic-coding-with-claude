@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRD as Destination, Not Compiler Input — Week 3 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 3</a> · Objective M16</span>
+  </div>
+</header>
+
+<main>
+  <h1>PRD as Destination, Not Compiler Input</h1>
+  <p class="lede">Two mental models compete over what a spec is for. One treats the PRD as source code for a compiler made of agents; the other treats it as a marker on the map you're navigating toward. Which model you hold decides how much polish the document deserves — and how you feel when it goes stale.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M16 · Specification</span>
+      <span class="chip bloom">Bloom: Understand</span>
+      <span class="chip assessed">Assessed by: Quiz 3</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Explain &lsquo;PRD as destination&rsquo;: why over-polishing specs wastes effort and why doc rot is expected and acceptable.</p>
+  </div>
+
+  <h2>1 · Two models of a spec</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>Compiler-input model (&ldquo;specs-to-code&rdquo;)</th><th>Destination model (this course)</th></tr></thead>
+      <tbody>
+        <tr><td>What the spec is</td><td>The durable source of truth; code is a generated artifact</td><td>A marker recording where you agreed to go; code is the product</td></tr>
+        <tr><td>What you maintain forever</td><td>The spec — change it and regenerate the code</td><td>The code (and its tests) — the spec served its purpose</td></tr>
+        <tr><td>Required polish</td><td>Blueprint-grade: complete, precise, perpetually current</td><td>Destination-grade: unambiguous about the decisions, done</td></tr>
+        <tr><td>When spec and code diverge</td><td>An emergency — the truth is corrupted</td><td>Expected — the journey taught you things the marker didn't know</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The specs-to-code movement — tools and workflows promising that if the spec is good enough, the code becomes a disposable compilation artifact — is the model Pocock explicitly argues against in his AI Engineer 2026 workshop. His counter is that <strong>understanding and managing the code remains essential</strong>: the code is where reality lives, where tests run, where the next feature starts. The PRD's actual job is narrower and shorter-lived. It gets its value at exactly two moments:</p>
+  <ol>
+    <li><strong>Alignment capture</strong> — the moment you write it, it freezes the grill session's shared design concept into a page the meeting can critique and the build can start from.</li>
+    <li><strong>Ambiguity resolution during the build</strong> — &ldquo;a PRD serves as the destination document that agents can reference throughout implementation.&rdquo; When the agent hits a design question mid-build, it returns to the PRD for an authoritative answer <em>instead of inventing one</em> — M13's silent-decision failure mode, blocked by a document.</li>
+    </ol>
+  <p>After the feature ships, both moments are behind you. Nothing still depends on the document.</p>
+
+  <h2>2 · Why over-polishing wastes effort</h2>
+  <p>The workshop's blunt version: <strong>&ldquo;over-optimizing the PRD may not yield significant value.&rdquo;</strong> Here's the reasoning, not just the verdict. A document's worth-polishing threshold is set by what reads it and what that reader does differently. The PRD's readers are your Meeting 3 critics and a build agent — and once the document is <em>unambiguous about the decisions</em>, neither reader behaves differently because you added diagrams, tightened prose, or enumerated edge cases the grill never surfaced. The build produces the same code. Polish past unambiguity is effort with no downstream effect.</p>
+  <p>Compare where effort <em>does</em> have downstream effect, minute for minute:</p>
+  <ul>
+    <li><strong>Before the PRD:</strong> alignment. Ten to fifteen minutes of grill questions prevent hours of wrongly-aimed autonomous work. That leverage lives in the conversation, not the document's finish.</li>
+    <li><strong>After the PRD:</strong> verification. The workshop's advice is to shift the surplus effort toward QA — acceptance criteria that are actually checkable, and (Week 5) tests that enforce them. A sharper acceptance criterion changes what the agent builds; a prettier goals section doesn't.</li>
+  </ul>
+  <p>Even the format is officially unsacred: the PRD &ldquo;should encapsulate design concepts effectively without strict adherence to any particular format.&rdquo; The course fixes a five-section template for peer-critique comparability, not because the sections are magic. And the 1–2 page limit is the anti-over-polish mechanism built right into the assignment: you cannot blueprint in two pages.</p>
+  <div class="callout tip">
+    <span class="label">The tell</span>
+    <p>You're over-polishing when your edits stop changing <em>decisions</em> and start changing <em>presentation</em>. &ldquo;Rewrote story 4 because it contradicted non-goal 2&rdquo; is work. &ldquo;Reordered sections and added a mermaid diagram&rdquo; is, per this objective, waste — quiz-grade waste.</p>
+  </div>
+
+  <h2>3 · Doc rot: expected, acceptable, designed-for</h2>
+  <p>Doc rot is what happens next, and the destination model changes its meaning entirely. During and after the build, the code moves — implementation discovers constraints the grill missed, Meeting 3 feedback reshapes a story, Week 5's tests pin behaviors the PRD stated loosely. The document stays where it was. Under the compiler model this divergence is corruption of the source of truth, demanding constant re-synchronization. Under the destination model it's <strong>evidence of arrival</strong>: markers are supposed to be behind you eventually.</p>
+  <p>Three practices follow:</p>
+  <ul>
+    <li><strong>Design for rot.</strong> Build the PRD from the slowest-rotting material: decisions and behaviors. This is why <a href="m15-write-the-prd.html">M15</a> banned file paths and code snippets — Pocock's template excludes them precisely because they &ldquo;may end up being outdated very quickly.&rdquo; A PRD that says &ldquo;storage is local, offline-first&rdquo; rots in years; one that says &ldquo;see <code>src/store/localStore.js</code>&rdquo; rots in days.</li>
+    <li><strong>Don't maintain it — retire it.</strong> Nobody updates a trail marker after the hike. The workshop's guidance goes further than tolerance: once an old PRD has become irrelevant or misleading, <em>don't keep it in the repo</em> — delete or archive it. A stale-but-present document is worse than an absent one, because future sessions (and future agents) will read it as if it were true.</li>
+    <li><strong>Know what must NOT rot.</strong> The tolerance is scoped, and the quiz will probe the boundary. Your tests must track the code (they <em>are</em> its current truth). Week 2's durable state — CLAUDE.md, the project glossary — must stay accurate <em>because it's loaded into every future session</em>. The difference is consumption: rot is acceptable in a per-feature document whose job ends, unacceptable in standing context that keeps getting read.</li>
+  </ul>
+  <div class="callout warn">
+    <span class="label">Rot is not a license to skip</span>
+    <p>&ldquo;It'll be stale in a month&rdquo; argues against <em>polishing</em>, never against <em>writing</em>. The PRD earns its keep during the weeks it's live — alignment captured, critique enabled, mid-build ambiguity answered — and A3, Meeting 3, and the Week 5 build all consume yours during exactly that window. Expected rot means the document is allowed to die <em>after</em> serving; it was never optional to have served.</p>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. A teammate wants to spend the rest of the week on the PRD: architecture diagrams, exhaustive edge-case tables, polished prose — &ldquo;so the agent build can't go wrong.&rdquo; The destination model's answer:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Agreed — more spec detail always de-risks the build</button></li>
+        <li><button data-opt="b">Refuse — PRDs should be as vague as possible to leave the agent creative room</button></li>
+        <li><button data-opt="c">Stop at unambiguous-about-the-decisions; past that point the build doesn't change, so put the surplus effort into acceptance criteria and verification instead</button></li>
+        <li><button data-opt="d">Fine, as long as the diagrams are committed with the PRD</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> &ldquo;Over-optimizing the PRD may not yield significant value&rdquo; — the reader (agent or critic) does nothing differently once the decisions are unambiguous, so extra polish has no downstream effect; sharper checkable criteria do. B swaps one error for another: vagueness reopens M13's silent decisions. The de-risking instinct in A is right but aimed at the wrong artifact — verification, not documentation, is what catches a build going wrong.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. Three weeks after your feature ships, you notice PRD.md describes a scheduling behavior the app no longer has. Under the destination model, the right response is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Urgently rewrite the PRD to match the code, and keep them synchronized forever</button></li>
+        <li><button data-opt="b">Nothing urgent — divergence is expected; if the stale document could now mislead a reader or a future session, delete or archive it</button></li>
+        <li><button data-opt="c">Regenerate the code from the PRD, since the spec is the source of truth</button></li>
+        <li><button data-opt="d">Revert the app to match the document</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> The marker is behind you; the code (with its tests) is the current truth. The one active duty is hygiene: a misleading document left in the repo will be read as true by future agents, so the workshop's guidance is to remove or archive it rather than maintain it. A is the compiler model's perpetual-sync burden; C and D both subordinate working code to a dead document — the exact inversion the destination model rejects.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Which pairing correctly matches an artifact to its rot policy?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">CLAUDE.md may rot freely; the PRD must be kept current forever</button></li>
+        <li><button data-opt="b">Tests may rot freely; PRDs must never contain decisions</button></li>
+        <li><button data-opt="c">Everything in a repo must be kept perpetually current</button></li>
+        <li><button data-opt="d">The PRD may rot once its build is done; CLAUDE.md and tests must stay accurate because sessions and CI consume them continuously</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The dividing line is consumption: rot tolerance is for per-feature documents whose reading life ends, not for standing context. CLAUDE.md is loaded into every session (Week 2) and tests run against every change — staleness there actively corrupts future work, whereas a retired PRD just needs to be archived out of the way. A inverts both policies; C is the compiler model generalized into a full-time documentation job.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Mid-build, the agent hits a question the PRD does answer (&ldquo;what happens when no cards are due?&rdquo;) — and consults PRD.md instead of picking a behavior. Which claim about the destination model does this illustrate?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">The PRD's second value moment: during implementation it's the authoritative reference that stops ambiguity from being resolved by agent invention</button></li>
+        <li><button data-opt="b">A failure — a destination document shouldn't be read after kickoff</button></li>
+        <li><button data-opt="c">Proof the PRD should have contained the implementation code</button></li>
+        <li><button data-opt="d">Doc rot in action</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> &ldquo;Agents can reference [it] throughout implementation&rdquo; — this is the destination doing its live job, converting a would-be silent decision (M13) into a lookup. B misreads &ldquo;destination&rdquo; as &ldquo;write-only&rdquo;; the marker guides the whole journey and only <em>then</em> retires. D is the opposite case: rot is when the document no longer matches reality, not when it answers correctly.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li>Companion (primary source for this objective): <a href="https://www.youtube.com/watch?v=-QFHIoCo-Ko">Pocock — Full Walkthrough: Workflow for AI Coding (AI Engineer 2026, YouTube)</a> — destination-document framing, the specs-to-code critique, over-optimization warning, and remove-misleading-PRDs guidance; claims verified against published transcript summaries of the talk (<a href="https://videohighlight.com/v/-QFHIoCo-Ko">transcript summary</a>, <a href="https://www.sean-weldon.com/blog/2026-04-27-workflow-for-ai-coding-matt-pocock">workshop notes</a>)</li>
+      <li><a href="https://github.com/mattpocock/skills">Pocock — to-spec skill (mattpocock/skills)</a> — the no-file-paths rule as designed-for-rot in practice</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — where spec effort pays: self-containment and verification, not polish</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m15-write-the-prd.html"><span class="dir">Previous · M15</span>Write the PRD</a>
+    <a class="next" href="m17-critique-a-prd.html"><span class="dir">Next · M17</span>Critique a PRD</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 3 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

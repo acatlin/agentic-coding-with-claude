@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why Grill First: Alignment Before Implementation — Week 3 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 3</a> · Objective M13</span>
+  </div>
+</header>
+
+<main>
+  <h1>Why Grill First: Alignment Before Implementation</h1>
+  <p class="lede">The most expensive failure in agentic coding isn't bad code — it's good code that solves the wrong problem. This lesson explains the grill session: an interview, run by the agent, that makes sure you're both building the same thing before either of you commits to it.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M13 · Specification</span>
+      <span class="chip bloom">Bloom: Understand</span>
+      <span class="chip assessed">Assessed by: Quiz 3</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Explain why alignment precedes implementation: what a grill session is and what failure modes it prevents.</p>
+  </div>
+
+  <h2>1 · The misalignment problem</h2>
+  <p>Anthropic's best-practices guide states the risk in one sentence: <strong>&ldquo;Letting Claude jump straight to coding can produce code that solves the wrong problem.&rdquo;</strong> Week 2 was about protecting <em>execution</em> — keeping the session in the smart zone so the agent works well. This week starts from a harsher observation: perfect execution is worthless when the target is wrong. Matt Pocock's skills repository names four recurring failure modes of agentic work, and <strong>misalignment</strong> — the agent building something other than what you meant — is the first, with a specific prescribed fix: <em>use grilling sessions to align before starting</em>.</p>
+  <p>Why does misalignment happen to careful people? Because a one-paragraph feature request contains dozens of unstated decisions, and <strong>every unstated decision still gets made</strong> — by the agent, mid-implementation, silently. You saw a miniature version in Week 1's <a href="../week-01/m05-whose-decision.html">transcript analysis</a>: the spec said nothing about trailing newlines, so Claude decided, and the human only caught it in the diff. Scale that from one newline to a whole feature — data model, edge cases, what happens on failure — and you get software that is plausible, working, and wrong.</p>
+
+  <h2>2 · What a grill session is</h2>
+  <p>A grill session inverts the usual direction of conversation: instead of you prompting the agent to produce, the agent interviews <em>you</em> — &ldquo;relentlessly,&rdquo; in Pocock's word — until the two of you share the design. His <code>/grill-me</code> skill, which went viral and which Assignment A3 asks you to install or emulate, is short enough to quote whole:</p>
+  <div class="code-label">The grilling skill, verbatim (mattpocock/skills)</div>
+  <pre>Interview me relentlessly about every aspect of this plan until we
+reach a shared understanding. Walk down each branch of the design
+tree, resolving dependencies between decisions one-by-one. For each
+question, provide your recommended answer.
+
+Ask the questions one at a time, waiting for feedback on each
+question before continuing. Asking multiple questions at once is
+bewildering.
+
+If a *fact* can be found by exploring the codebase, look it up
+rather than asking me. The *decisions*, though, are mine — put each
+one to me and wait for my answer.
+
+Do not enact the plan until I confirm we have reached a shared
+understanding.</pre>
+  <p>Every line encodes a rule of the session:</p>
+  <ul>
+    <li><strong>One question at a time.</strong> Batched questions are &ldquo;bewildering&rdquo; — you skim, you answer shallowly, decisions slip through unexamined.</li>
+    <li><strong>A recommended answer with each question.</strong> Often you just accept it; when you override it, that override is exactly the information the agent could never have guessed. Pocock added this line specifically to speed sessions up.</li>
+    <li><strong>Facts from the codebase, decisions from you.</strong> The agent should never ask you what the code already answers — but it must never <em>decide</em> for you what only you can choose.</li>
+    <li><strong>A stop condition.</strong> No implementation until you confirm shared understanding — the session ends by agreement, not exhaustion.</li>
+  </ul>
+  <p>Real sessions are long: accounts from Pocock's AI Engineer 2026 workshop put them at 40–100 questions, and he describes typical sessions as roughly 45 minutes of &ldquo;detailed, in-depth conversation.&rdquo; The output is not primarily a document — it's <strong>&ldquo;a rich conversation full of context, your actual ideas, and answers to difficult questions,&rdquo;</strong> which he calls a <em>shared design concept</em>: you and the agent genuinely holding the same picture of what's being built. (Next lesson you'll write it down; that's a separate step.)</p>
+  <div class="callout note">
+    <span class="label">Rubber ducking, upgraded</span>
+    <p>Pocock frames grilling as the modern form of rubber-duck debugging: engineers have always discovered requirements by explaining plans out loud. The upgrade is that this duck asks follow-up questions — &ldquo;fantastic in the early phase of coding, because you need to discover all of the requirements by talking them through.&rdquo; He uses it beyond code, too (his example: deciding what course to build next).</p>
+  </div>
+
+  <h2>3 · The failure modes it prevents</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Failure mode without grilling</th><th>How the grill session prevents it</th></tr></thead>
+      <tbody>
+        <tr><td>Solving the wrong problem — plausible, working, unwanted software</td><td>Misunderstandings surface as questions <em>before code exists</em>, where a wrong assumption costs one sentence to correct (the same economics as plan mode in <a href="../week-02/m11a-plan-mode.html">M11</a>)</td></tr>
+        <tr><td>Invisible agent decisions — unstated choices resolved silently mid-build</td><td>&ldquo;The decisions, though, are mine&rdquo;: each design choice is put to you explicitly and answered on the record</td></tr>
+        <tr><td>Wasted autonomous work — hours of agent time down a wrong branch</td><td>Workshop framing: 10–15 minutes of alignment questions prevent hours of wasted autonomous work — and the more you plan to walk away (Week 8), the more this matters</td></tr>
+        <tr><td>Late-discovered requirements — &ldquo;oh, I also needed…&rdquo; after the build</td><td>Walking &ldquo;each branch of the design tree&rdquo; forces areas you hadn't considered — auth, failure cases, edges — into the open early</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>4 · Calibration: when to grill</h2>
+  <p>Grilling is not a virtue ritual, any more than plan mode was. The documented sweet spots: before writing a PRD, before asking for a feature implementation, before finalizing data models or API specs, and whenever multiple design choices interconnect. For a task whose diff you could describe in one sentence, 80 questions is pure overhead — the one-sentence test from Week 2 applies here unchanged.</p>
+  <p>Anthropic's best-practices guide teaches the same move in official form: <strong>&ldquo;For larger features, have Claude interview you first&rdquo;</strong> — a minimal prompt asking Claude to interview you in detail, digging into &ldquo;the hard parts I might not have considered,&rdquo; then writing a spec. Two vendors, one conclusion: for non-trivial work, the interview comes first.</p>
+  <div class="callout tip">
+    <span class="label">The tool moved; the idea didn't</span>
+    <p>Pocock iterates fast: he has since said he now prefers <code>/grill-with-docs</code> (which also builds a domain model from your codebase) when aligning a plan with an <em>existing</em> codebase, keeping plain <code>/grill-me</code> for pure plan interviews. A3 targets the interview discipline itself — and your course project starts from an empty repo — so the plain grill is the right tool this week. Expect the skill names to keep changing; the alignment-before-implementation principle is the part to master.</p>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. A student prompts &ldquo;build me a flashcard app with spaced repetition,&rdquo; and twenty minutes later Claude delivers a polished, working app — that schedules reviews completely differently from what the student had in mind. Which failure mode is this, in the course's terms?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Context pollution — the session left the smart zone</button></li>
+        <li><button data-opt="b">Non-functional code — the agent's work didn't run</button></li>
+        <li><button data-opt="c">Misalignment — execution succeeded, but the unstated scheduling design was decided silently by the agent</button></li>
+        <li><button data-opt="d">Doc rot — the requirements went stale</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The app works, so execution (and context) did their job — the failure happened before the first token of code, when &ldquo;spaced repetition&rdquo; left the scheduling algorithm, among dozens of other decisions, for the agent to resolve alone. A and B are execution failures; D (M16's topic) concerns documents aging <em>after</em> alignment, not alignment never happening.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. Mid-grill, Claude asks: &ldquo;Should decks be shareable between users? Recommended: no — single-user keeps v1 simple.&rdquo; You realize you'd never thought about sharing at all. What just happened?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">The session failed — a good grill only asks about things you've already considered</button></li>
+        <li><button data-opt="b">The session worked — a decision that would otherwise have been made silently by the agent mid-implementation just surfaced while it costs one sentence to make</button></li>
+        <li><button data-opt="c">Claude broke the skill's rules by recommending an answer</button></li>
+        <li><button data-opt="d">You should ignore it — sharing is a fact findable in the codebase</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Surfacing decisions you hadn't considered is the point of walking every branch of the design tree — this is the &ldquo;discover all of the requirements by talking them through&rdquo; effect. The recommended answer (C) is required by the skill, not forbidden. D inverts the fact/decision rule: whether decks <em>should</em> be shareable is a decision, and it's yours.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Grilling a feature for an existing repo, Claude asks: &ldquo;What database does the project currently use?&rdquo; Per the skill text, what's wrong?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — every question belongs to the human</button></li>
+        <li><button data-opt="b">It should have asked about the database later in the session</button></li>
+        <li><button data-opt="c">Database choice is too technical for a grill session</button></li>
+        <li><button data-opt="d">That's a fact discoverable in the codebase — the skill says to look those up and reserve questions for decisions</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> &ldquo;If a <em>fact</em> can be found by exploring the codebase, look it up rather than asking me.&rdquo; Questions spent on lookupable facts waste the human's attention, which the session exists to concentrate on genuine decisions — <em>which</em> database a greenfield project should use would be a fair question; what it currently uses never is.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Which task is the <em>weakest</em> candidate for a grill session first?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;Rename <code>totalCnt</code> to <code>totalCount</code> everywhere&rdquo;</button></li>
+        <li><button data-opt="b">Designing the data model for the course project before any code exists</button></li>
+        <li><button data-opt="c">A feature where the storage choice, sync behavior, and UI all depend on each other</button></li>
+        <li><button data-opt="d">Writing the PRD you'll hand to an agent for an away-from-keyboard build</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Its diff fits in one sentence — the same test that says skip plan mode says skip the grill; interviewing yourself for 45 minutes about a rename is overhead with nothing to align. B, C, and D are the documented sweet spots: data models, interconnected design choices, and pre-PRD alignment — and D is where misalignment is costliest, since nobody is watching an AFK build go wrong.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://www.aihero.dev/skills-grill-me">Pocock — The /grill-me Skill (aihero.dev)</a> — what it is, the interview rules, when to use it, the move to /grill-with-docs (primary grounding)</li>
+      <li><a href="https://www.aihero.dev/my-grill-me-skill-has-gone-viral">Pocock — My &lsquo;Grill Me&rsquo; Skill Went Viral (aihero.dev)</a> — rubber-ducking framing, ~45-minute sessions, the recommended-answer line, requirements discovery</li>
+      <li><a href="https://github.com/mattpocock/skills">mattpocock/skills (GitHub)</a> — the quoted skill text and the four failure modes (misalignment → grilling)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — &ldquo;solves the wrong problem,&rdquo; the &ldquo;Let Claude interview you&rdquo; pattern</li>
+      <li>Companion: <a href="https://www.youtube.com/watch?v=-QFHIoCo-Ko">Pocock — Full Walkthrough: Workflow for AI Coding (AI Engineer 2026, YouTube)</a> — watch the opening segment for a live grill session; the 40–100 question scale and 10–15-minutes-of-alignment framing come from this talk (via published transcript summaries)</li>
+      <li>Companion: <a href="https://www.aihero.dev/real-world-feature-build-with-claude-code">Pocock — Real-World Feature Build with Claude Code (aihero.dev)</a> — the assigned video's grill segment shows the interview on a real feature; look for how often he overrides the recommended answer</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="index.html"><span class="dir">Week 3 hub</span>Specification I: Grill Sessions &amp; PRDs</a>
+    <a class="next" href="m14-run-a-grill-session.html"><span class="dir">Next · M14</span>Run a Grill Session</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 3 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>
