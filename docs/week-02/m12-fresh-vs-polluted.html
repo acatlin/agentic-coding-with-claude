@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Session Experiment: Fresh vs. Polluted — Week 2 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 2</a> · Objective M12</span>
+  </div>
+</header>
+
+<main>
+  <h1>The Session Experiment: Fresh vs. Polluted</h1>
+  <p class="lede">Everything this week has claimed that context quality shapes output quality. Now you stop taking the course's word for it: run the same task twice — once in the smart zone, once out of it — and weigh the evidence yourself.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M12 · Evidence</span>
+      <span class="chip bloom">Bloom: Evaluate</span>
+      <span class="chip assessed">Assessed by: Assignment A2</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Run the same task in a well-contexted fresh session vs. a polluted long session and document the observed quality difference.</p>
+  </div>
+
+  <h2>1 · The claim under test</h2>
+  <p>Stated falsifiably: <em>holding the task, prompt, and starting code constant, a fresh session seeded with good externalized state will produce observably better output than a long session whose window is full of unrelated material.</em> The mechanism (M07: attention degradation) predicts the polluted run will show more forgotten constraints, more corrections needed, and more confident errors. Your job is to observe honestly — including the possibility that the difference is smaller than the course implies. That, too, is a finding worth documenting.</p>
+
+  <h2>2 · Designing a fair comparison</h2>
+  <p>An Evaluate objective is graded on the quality of your <em>judgment</em>, and judgment starts with method. Three variables to control:</p>
+  <ol>
+    <li><strong>Same task, same prompt.</strong> Write the prompt once, in a file, and paste it verbatim into both runs. A &ldquo;moderate&rdquo; task is one that touches 2–3 files and has checkable results — e.g. &ldquo;add a <code>--top N</code> option to wordcount that prints the N most frequent words, with tests&rdquo; in your Week 1 repo.</li>
+    <li><strong>Same starting code.</strong> Run A from a clean commit; then <code>git reset --hard</code> (or a fresh branch from the same commit) before run B. Otherwise run B is building on run A's output and the comparison is void.</li>
+    <li><strong>Same model and settings.</strong> Change only the variable under test: the state of the context window.</li>
+  </ol>
+  <p>Then set up the two conditions:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>Run A — fresh, well-contexted</th><th>Run B — polluted, long</th></tr></thead>
+      <tbody>
+        <tr><td>Setup</td><td><code>/clear</code>, your lean CLAUDE.md (M09) in place, paste the prompt</td><td>At the <em>end</em> of a long working session (see below), paste the same prompt without clearing</td></tr>
+        <tr><td>Window state</td><td>Near-empty; only durable state loaded</td><td>Tens of thousands of tokens of unrelated history</td></tr>
+        <tr><td>Check</td><td colspan="2">Run <code>/context</code> before each run and record the occupancy — these two numbers anchor your write-up</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn">
+    <span class="label">Pollute honestly</span>
+    <p>The polluted session must be <em>realistic</em>, not sabotage. Recreate the best-practices guide's kitchen-sink pattern with real work: explore a few large files for an unrelated question, debug something with a couple of failed approaches, ask a few off-topic questions. Do <strong>not</strong> feed Claude false information or instructions to do badly — that tests gullibility, not context degradation, and your write-up should say how you polluted so a reader can judge the fairness themselves.</p>
+  </div>
+
+  <h2>3 · What to measure</h2>
+  <p>Decide the rubric <em>before</em> run A, so the outcome can't tempt you into scoring what favors the story:</p>
+  <ul>
+    <li><strong>Correctness:</strong> does the feature work? Do the tests pass — and actually test the behavior?</li>
+    <li><strong>Adherence:</strong> did it follow CLAUDE.md conventions and every constraint in the prompt? Count violations.</li>
+    <li><strong>Corrections needed:</strong> how many times did you have to redirect? (Week 1's M05 transcript-reading skill is how you count.)</li>
+    <li><strong>Memory failures:</strong> forgotten constraints, re-made mistakes, assertions contradicted by files it read — M07's symptom list, tallied.</li>
+    <li><strong>Turns/time to done,</strong> as a secondary signal.</li>
+  </ul>
+
+  <h2>4 · Documenting the difference</h2>
+  <p>A2 asks for a half-page comparison. The structure graders look for: <strong>setup</strong> (task, how B was polluted, occupancy numbers from <code>/context</code>) → <strong>observations</strong> (the rubric, scored, with at least one verbatim example per claim) → <strong>verdict</strong> (what the evidence supports, stated no more strongly than the evidence allows). The most common failure is a write-up that <em>narrates the doctrine instead of the data</em> — asserting &ldquo;the polluted session was worse, as expected&rdquo; with nothing a reader could check. One quoted exchange where Claude forgets a constraint outweighs a paragraph of vibes.</p>
+
+  <h2>5 · Judge two write-ups</h2>
+  <p>Before writing yours, practice the evaluation on someone else's. Two condensed A2 excerpts, same assignment:</p>
+  <div class="transcript" aria-label="Two sample A2 comparison excerpts">
+    <div class="turn human">
+      <span class="who">Write-up 1 — &ldquo;Jordan&rdquo;</span>
+      <p>&ldquo;The fresh session was way better, just like the readings said it would be. The polluted session felt slower and dumber and made more mistakes. This confirms the smart zone/dumb zone theory. Context management clearly matters and I will use /clear more.&rdquo;</p>
+    </div>
+    <div class="turn agent">
+      <span class="who">Write-up 2 — &ldquo;Sam&rdquo;</span>
+      <p>&ldquo;Both runs produced a working --top flag. Fresh run (18% occupancy): 2 turns, one correction (misread my tie-breaking rule). Polluted run (81% after ~50 turns of unrelated debugging): 5 turns, three corrections — it named the flag --limit despite the prompt, used unittest although CLAUDE.md and the existing suite use pytest, and claimed &lsquo;all tests pass&rsquo; when 2 failed; pasting the failure output fixed it. Difference was smaller than I expected on correctness (both got there) but large on adherence and supervision cost. Caveat: n=1, and my pollution recipe (mostly debugging another file) may matter.&rdquo;</p>
+    </div>
+  </div>
+
+  <div class="q" data-answer="c">
+    <p class="q-text">Which write-up better meets the objective, and why?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Jordan's — it clearly connects the result to the week's theory</button></li>
+      <li><button data-opt="b">Sam's — because it found the polluted session performed worse</button></li>
+      <li><button data-opt="c">Sam's — it reports checkable evidence (occupancy, counts, verbatim failures), separates correctness from adherence, and sizes its conclusion to n=1</button></li>
+      <li><button data-opt="d">Neither — a single run of each proves nothing, so both are worthless</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>C — and the reason matters.</strong> Jordan's is doctrine-narration: every sentence could have been written <em>before</em> the experiment, and none of it can be checked. Sam's earns its verdict — numbers a reader can weigh, one example per claim (naming, convention, false success), an honest surprise (correctness gap smaller than expected), and a stated limitation. B praises Sam's for the wrong reason: the write-up's value is its method, not its direction — Sam's would be equally good if the runs had tied. D overcorrects: n=1 can't <em>prove</em> the general claim, but the objective says <em>document the observed difference</em>, and a well-controlled anecdote with stated limits is exactly what good engineering judgment produces from one trial.</p>
+    </div>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. A student runs the fresh session first, commits its output, then runs the polluted session <em>on top of that commit</em>. What's broken?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — the sessions are still separate</button></li>
+        <li><button data-opt="b">The starting code differs between runs: run B begins from run A's solution, so the comparison no longer isolates context state</button></li>
+        <li><button data-opt="c">Committing is forbidden during experiments</button></li>
+        <li><button data-opt="d">The polluted run must always come first</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Run B now faces a different (mostly solved) task — any result is uninterpretable. The fix is resetting to the same commit before each run. Order (D) doesn't matter as long as the start state is identical; commits (C) are fine, and useful, as reset points.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">2. To make the polluted condition &ldquo;really show the effect,&rdquo; a student ends the long session by telling Claude several false facts about the repo before pasting the task prompt. Why does this invalidate the experiment?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">It doesn't — pollution is pollution</button></li>
+        <li><button data-opt="b">False facts get cleared automatically, so they have no effect</button></li>
+        <li><button data-opt="c">Because it makes the session too long to finish within Pro limits</button></li>
+        <li><button data-opt="d">It changes what's being tested — from &ldquo;does realistic accumulated context degrade output&rdquo; to &ldquo;does the model believe direct misinformation&rdquo; — so the result can't support the claim under test</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The claim is about <em>occupancy and irrelevance</em> degrading attention, and the condition must resemble how sessions actually bloat — real detours, real debugging, real off-topic questions. Deliberate misinformation would degrade a <em>fresh</em> session too, so observing failure tells you nothing about context occupancy. An experiment's pollution recipe should be disclosed precisely so readers can catch this.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">3. Your two runs come out nearly identical in quality. The best response in your A2 write-up is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Report it straight, with your occupancy numbers and rubric scores, and reason about why — task too small? pollution too mild? — without overclaiming either way</button></li>
+        <li><button data-opt="b">Re-run with heavier pollution until the expected difference appears, then report that run</button></li>
+        <li><button data-opt="c">Conclude the smart-zone theory is false</button></li>
+        <li><button data-opt="d">Don't submit — a null result fails the assignment</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The objective grades your documentation and judgment, not the direction of the outcome — and a null result honestly analyzed is stronger evaluative work than a confirmation vaguely narrated. B is running the experiment until it agrees with you (mention the extra run if you do one — as a second data point, not a replacement); C overclaims off n=1 exactly as badly as Jordan's write-up does in the other direction.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">4. Which detail does the <em>fresh</em> condition require — not just an empty window?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">A brand-new git repository</button></li>
+        <li><button data-opt="b">Running /compact immediately before starting</button></li>
+        <li><button data-opt="c">Good externalized state loaded — your lean CLAUDE.md — plus the full task prompt: the objective says well-contexted, not merely empty</button></li>
+        <li><button data-opt="d">Switching to a larger model to give the fresh run its best chance</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The experiment tests the whole Week 2 stack: fresh means <em>deterministic empty conversation + durable state you wrote</em> (M08 + M09) — an empty window with no CLAUDE.md would handicap run A and muddy the comparison. B produces a summary, not a fresh state; D changes a controlled variable and voids the whole design.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li>Course exercise — the experimental design is specified by Assignment A2 in the syllabus (primary grounding for the task itself)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — the kitchen-sink pattern your polluted condition recreates; &ldquo;a clean session with a better prompt almost always outperforms a long session&rdquo; — the official form of the claim you're testing</li>
+      <li><a href="https://github.com/mattpocock/dictionary-of-ai-coding">Pocock — Dictionary of AI Coding</a> — smart zone, dumb zone, attention degradation: the predicted failure modes your rubric counts</li>
+      <li>Companion: Pocock's AI Engineer 2026 workshop — his live sessions are an existence proof of the fresh-session workflow this experiment evaluates.</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m11b-rewind.html"><span class="dir">Previous · M11 lesson 2</span>Rewind &amp; Course-Correction</a>
+    <a class="next" href="index.html"><span class="dir">Week 2 hub</span>Context: The Smart Zone</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 2 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

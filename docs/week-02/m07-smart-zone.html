@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Smart Zone and the Dumb Zone — Week 2 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 2</a> · Objective M07</span>
+  </div>
+</header>
+
+<main>
+  <h1>The Smart Zone and the Dumb Zone</h1>
+  <p class="lede">Why the same model gets visibly dumber as a session grows, what that degradation looks like from your chair, and how to judge when a session has stopped paying for itself.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M07 · Context</span>
+      <span class="chip bloom">Bloom: Understand</span>
+      <span class="chip assessed">Assessed by: Quiz 2</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Explain why context occupancy degrades model output (&ldquo;smart zone&rdquo; vs. &ldquo;dumb zone&rdquo;) and estimate when a session should be reset.</p>
+  </div>
+
+  <h2>1 · What actually fills the context window</h2>
+  <p>Everything Claude knows about your session lives in one place: the <strong>context window</strong> — in Matt Pocock's dictionary definition, &ldquo;everything the model sees on each model provider request. Finite, model-specific, and the <em>only</em> surface through which the model perceives anything.&rdquo; There is no side channel. If it isn't in the window, Claude doesn't know it; if it is, Claude is paying attention to it whether it helps or not.</p>
+  <p>And far more enters the window than you see in your terminal. Before you type your first prompt, the system prompt, your CLAUDE.md files, auto memory, and the list of available skills and tools have already loaded. Then, as Claude works, the docs' interactive walkthrough shows where the real weight comes from: <strong>file reads dominate context usage.</strong> A single file read can cost more tokens than your entire prompt; every command output, every diff, and every response accumulates on top. Anthropic's best-practices guide is direct about the scale: &ldquo;A single debugging session or codebase exploration might generate and consume tens of thousands of tokens.&rdquo;</p>
+  <div class="callout note">
+    <span class="label">See it live</span>
+    <p>Run <code>/context</code> in any session for a live breakdown of your window by category — how much is system overhead, memory files, messages, and free space. It's the instrument panel for everything in this lesson.</p>
+  </div>
+
+  <h2>2 · Occupancy degrades output — the mechanism</h2>
+  <p>The core fact this week is built on, from the best-practices guide: <strong>&ldquo;LLM performance degrades as context fills. When the context window is getting full, Claude may start &lsquo;forgetting&rsquo; earlier instructions or making more mistakes.&rdquo;</strong> The window doesn't fail like a disk filling up — nothing errors. Output quality just slides.</p>
+  <p>Pocock's AI Coding Dictionary names the mechanism <strong>attention degradation</strong>: &ldquo;As a session grows, each token's attention budget is spread across more competitors.&rdquo; The attention the model can devote to any one relationship — an instruction you gave, a constraint in CLAUDE.md, the actual bug — shrinks as thousands of tokens of stale file reads and old command output compete for it. Signal thins; noise crowds in.</p>
+  <p>Hence the two zones, in the dictionary's words:</p>
+  <ul>
+    <li><strong>Smart zone:</strong> &ldquo;Early in a session the agent is in a &lsquo;smart zone&rsquo; — sharp, focused, recall is good.&rdquo;</li>
+    <li><strong>Dumb zone:</strong> &ldquo;As the session grows it drifts into a &lsquo;dumb zone&rsquo;: sloppier, forgetful, more mistakes — and more faithfulness hallucinations.&rdquo;</li>
+  </ul>
+  <p>A <em>faithfulness hallucination</em> is the nastiest symptom: the model confidently asserts something its own context contradicts — quoting a function signature that the file it read an hour of tokens ago plainly doesn't have. The information is <em>in</em> the window; there's just not enough attention left to retrieve it faithfully.</p>
+
+  <h2>3 · Where's the boundary?</h2>
+  <p>Nobody can give you an exact line, and Pocock doesn't try — his materials put the onset of the dumb zone well before the advertised context limit (figures around 125K–150K tokens on frontier models circulate in his workshop and dictionary discussions), while noting that <em>where</em> the boundary sits is debated; <em>that</em> it exists is not. The practical takeaway does not depend on the number:</p>
+  <div class="callout tip">
+    <span class="label">The rule that matters</span>
+    <p><strong>The advertised window is not the useful window.</strong> A model that accepts 200K tokens does not think equally well at token 180,000 as at token 20,000. Plan your sessions around the smart zone, not around the spec sheet.</p>
+  </div>
+  <p>This is also why &ldquo;more context always helps&rdquo; — the beginner instinct — is backwards. Irrelevant context isn't neutral filler; it actively competes for attention with the context that matters. The best-practices guide: long sessions full of irrelevant content &ldquo;can reduce performance and sometimes distract Claude.&rdquo;</p>
+
+  <h2>4 · Estimating when to reset</h2>
+  <p>&ldquo;Estimate when a session should be reset&rdquo; is the second half of this objective. You have two kinds of evidence: the gauge and the symptoms.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Signal</th><th>What it looks like</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td>Task boundary</td><td>You finished one task and are about to start an unrelated one</td><td>Reset — <em>always</em>, regardless of occupancy</td></tr>
+        <tr><td>Two failed corrections</td><td>You've corrected the same mistake twice and it's still wrong</td><td>Reset — the guide's explicit rule: after two failed corrections, <code>/clear</code> and write a better prompt incorporating what you learned</td></tr>
+        <tr><td>Forgetting</td><td>Claude drops an instruction you gave earlier, or re-makes a mistake it already fixed</td><td>Reset — you're watching attention degradation happen</td></tr>
+        <tr><td>Confident wrongness</td><td>Claude asserts things the session's own files contradict</td><td>Reset — faithfulness hallucination, deep dumb zone</td></tr>
+        <tr><td>The gauge</td><td><code>/context</code> shows the window largely consumed by old exploration</td><td>Reset before starting anything new that matters</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Notice that the strongest signals are <em>behavioral</em>, not numerical. The best-practices guide's summary of the judgment: &ldquo;A clean session with a better prompt almost always outperforms a long session with accumulated corrections.&rdquo; The kitchen-sink session — task, unrelated question, back to the task — is the canonical way students wander into the dumb zone without noticing.</p>
+  <div class="callout note">
+    <span class="label">Where this week goes next</span>
+    <p>Knowing <em>that</em> you should reset raises the practical question: reset <em>how</em>, without losing the state you care about? That's <a href="m08-memento-principle.html">M08, the memento principle</a> — and <a href="m12-fresh-vs-polluted.html">M12</a> has you generate the evidence for all of this yourself.</p>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. Ninety minutes into a debugging session, Claude confidently describes a helper function's arguments — but the file it read earlier in the session shows a different signature. What is the most likely explanation?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">The file changed on disk and Claude is out of date</button></li>
+        <li><button data-opt="b">The model was trained on an older version of your code</button></li>
+        <li><button data-opt="c">Attention degradation — the signature is in context, but too much competes with it for the model to retrieve it faithfully</button></li>
+        <li><button data-opt="d">Claude never actually read the file</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> This is a faithfulness hallucination, the signature symptom of the dumb zone: the information is present in the window, but each token's attention budget is spread across so many competitors that retrieval fails. A and D are possible in other scenarios, but the question stipulates the file was read this session; B misunderstands where session knowledge comes from — the context window, not training.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. A classmate says: &ldquo;My model supports 200K tokens, so I keep sessions going until the window is nearly full — otherwise I'm wasting capacity.&rdquo; What's wrong with this reasoning?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — unused context is wasted capacity</button></li>
+        <li><button data-opt="b">Output quality degrades well before the limit; the advertised window is not the useful window</button></li>
+        <li><button data-opt="c">Sessions have a separate 1-hour time limit that hits first</button></li>
+        <li><button data-opt="d">The window only holds your prompts, so it never actually fills</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Performance slides long before capacity runs out — the dumb zone begins far below the advertised limit, and exactly where is debated but its existence isn't. C is invented; D is backwards — file reads and tool output, not your prompts, dominate the window.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. You fixed a failing test, then spent twenty minutes asking Claude unrelated questions about Docker, and now want to start renaming a module. The session feels fine so far. Per this lesson, you should:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Continue — quality hasn't degraded yet, so the context is still useful</button></li>
+        <li><button data-opt="b">Continue — the Docker discussion might turn out to be relevant</button></li>
+        <li><button data-opt="c">Ask Claude whether it feels confused</button></li>
+        <li><button data-opt="d">Reset — a task boundary plus accumulated unrelated context is exactly when to start fresh, before symptoms appear</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The reset-at-task-boundaries rule doesn't wait for symptoms — irrelevant context (the test fix, the Docker chat) competes for attention with the renaming task and can only hurt it. This is the kitchen-sink session forming in real time. C doesn't work: a degraded model is not a reliable reporter of its own degradation.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Why does a big irrelevant file read make output <em>worse</em>, rather than just using up spare room?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Attention is a budget spread across all tokens — irrelevant tokens compete with relevant ones, thinning the signal on what matters</button></li>
+        <li><button data-opt="b">It doesn't — extra context is neutral until the window is 100% full</button></li>
+        <li><button data-opt="c">Large files corrupt the model's weights during the session</button></li>
+        <li><button data-opt="d">The model bills irrelevant tokens at a higher rate, so it skips them</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> That's attention degradation: &ldquo;each token's attention budget is spread across more competitors.&rdquo; Occupancy itself carries a quality cost, which is why B — the &ldquo;it's free until it's full&rdquo; model — is the specific misconception this objective exists to remove. Weights never change during a session (C), and D is invented.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">5. You've told Claude twice that the project uses <code>pnpm</code>, not <code>npm</code>, and it just ran <code>npm install</code> again. The best next move is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Correct it a third time, more firmly, in all caps</button></li>
+        <li><button data-opt="b">Reset the session and start with a prompt (or CLAUDE.md line) that states the pnpm rule up front</button></li>
+        <li><button data-opt="c">Switch to a model with a bigger context window</button></li>
+        <li><button data-opt="d">Let it finish with npm and fix the lockfile later</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Two failed corrections is the guide's explicit reset threshold: the context is polluted with failed approaches, and a clean session with the constraint stated up front &ldquo;almost always outperforms&rdquo; a third correction shouted into a noisy window. A bigger window (C) just gives you a longer runway to the same dumb zone. (A recurring correction is also a textbook candidate for CLAUDE.md — that's <a href="m09-lean-claudemd.html">M09</a>.)</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://github.com/mattpocock/dictionary-of-ai-coding">Pocock — Dictionary of AI Coding</a> (also at <a href="https://www.aihero.dev/ai-coding-dictionary">aihero.dev/ai-coding-dictionary</a>) — smart zone, dumb zone, context window, attention degradation entries (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — &ldquo;performance degrades as context fills,&rdquo; the two-corrections rule, kitchen-sink failure pattern</li>
+      <li><a href="https://code.claude.com/docs/en/context-window">Claude Code docs — Explore the context window</a> — interactive walkthrough of what loads and what each read costs</li>
+      <li>Companion: Pocock's AI Engineer 2026 workshop (<a href="https://www.aihero.dev/posts">aihero.dev</a>) — watch for the segment where he discusses where the dumb zone begins and why he sizes sessions to stay out of it.</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="index.html"><span class="dir">Week 2 hub</span>Context: The Smart Zone</a>
+    <a class="next" href="m08-memento-principle.html"><span class="dir">Next · M08</span>The Memento Principle</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 2 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rewind: Course-Correct Without Starting Over — Week 2 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 2</a> · Objective M11 · lesson 2 of 2</span>
+  </div>
+</header>
+
+<main>
+  <h1>Rewind: Course-Correct Without Starting Over</h1>
+  <p class="lede">Every prompt you send checkpoints your session. The rewind menu turns those checkpoints into surgical undo — conversation, code, or both — which changes how boldly you can let an agent work.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M11 · Steering · 2 of 2</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A2</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Use plan mode to scope work before execution and the rewind menu to course-correct a session. <em>(<a href="m11a-plan-mode.html">Lesson 1: plan mode.</a> This lesson: rewind.)</em></p>
+  </div>
+
+  <h2>1 · Checkpoints: the safety net you already have</h2>
+  <p>You don't set checkpoints up — from the Checkpointing docs: &ldquo;checkpointing automatically captures the state of your code before each user prompt. This safety net lets you pursue ambitious, wide-scale tasks knowing you can always return to a prior code state.&rdquo; Every prompt creates one; snapshots are kept for the 100 most recent checkpoints; and they're saved with the conversation, so a session you resume tomorrow can still rewind.</p>
+  <p>To open the menu: run <code>/rewind</code>, or press <kbd>Esc</kbd> <kbd>Esc</kbd> <em>when the prompt input is empty</em> (if you've typed something, double-Esc clears the text instead — press <kbd>↑</kbd> to recall it). The menu lists each prompt you sent; select one, then choose what to do from there.</p>
+
+  <h2>2 · The menu: two restores, two summarizes</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Option</th><th>What it does</th><th>Reach for it when…</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Restore code and conversation</strong></td><td>Reverts both to that point</td><td>The whole direction since then was wrong</td></tr>
+        <tr><td><strong>Restore conversation</strong></td><td>Rewinds messages, keeps current code</td><td>The code is fine but the discussion went sideways</td></tr>
+        <tr><td><strong>Restore code</strong></td><td>Reverts files, keeps the conversation</td><td>Keep everything learned, discard the edits it produced</td></tr>
+        <tr><td><strong>Summarize from here</strong></td><td>Compresses that message onward into a summary</td><td>Discard a verbose side-quest, keep early context intact</td></tr>
+        <tr><td><strong>Summarize up to here</strong></td><td>Compresses everything before that message</td><td>Squash early setup, keep recent work in full detail</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The restore/summarize distinction is the one to internalize: <strong>restore reverts state; summarize compresses history without touching files on disk.</strong> The summarize pair is targeted compaction — <code>/compact</code> aimed at the half of the conversation you choose, with optional inline instructions to steer what the summary keeps. After a conversation restore, your original prompt from that point is placed back in the input field, ready to edit and re-send — which is precisely the M08 move: the failed attempt polluted the context; rewinding un-pollutes it and hands you the prompt to improve.</p>
+  <div class="callout tip">
+    <span class="label">Why this changes your behavior</span>
+    <p>From the best-practices guide: &ldquo;Instead of carefully planning every move, you can tell Claude to try something risky. If it doesn't work, rewind and try a different approach.&rdquo; Checkpoints convert failed experiments from damage into information. With plan mode scoping the work up front and rewind un-doing what goes wrong anyway, you have this objective's full steering toolkit.</p>
+  </div>
+
+  <h2>3 · What rewind does <em>not</em> cover</h2>
+  <p>The limitations are as examinable as the features — and they matter for trusting the tool correctly:</p>
+  <ul>
+    <li><strong>Bash-command changes aren't tracked.</strong> Only edits made through Claude's file-editing tools are captured. If Claude ran <code>rm file.txt</code> or <code>mv old.txt new.txt</code> in the shell, rewind cannot undo it.</li>
+    <li><strong>External changes aren't tracked</strong> — edits you made in your editor, or another concurrent session's work.</li>
+    <li><strong>It's not version control.</strong> The docs' framing: &ldquo;Think of checkpoints as &lsquo;local undo&rsquo; and Git as &lsquo;permanent history.&rsquo;&rdquo; Checkpoints expire with session cleanup (30 days by default); commits don't. Week 1's commit discipline is not replaced by any of this.</li>
+  </ul>
+  <p>One recovery detail worth knowing before A2's experiments: if you ran <code>/clear</code> earlier in the same Claude Code process, the rewind menu's top entry lets you resume the pre-clear session — so even a hasty clear is survivable.</p>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>Run this drill in your Week 1 repo — deliberately break things so the recovery is practiced, not theoretical (A2 asks you to practice rewind):</p>
+    <label class="check"><input type="checkbox"><span>Committed first, so git is your backstop.</span></label>
+    <label class="check"><input type="checkbox"><span>Had Claude make a change you intend to throw away (e.g. &ldquo;rewrite the CLI output as a table&rdquo;).</span></label>
+    <label class="check"><input type="checkbox"><span>Pressed <kbd>Esc</kbd> <kbd>Esc</kbd> with an empty input and confirmed the checkpoint list shows your prompts.</span></label>
+    <label class="check"><input type="checkbox"><span>Chose <strong>Restore code</strong> only — verified the files reverted (<code>git status</code>/<code>git diff</code>) while the conversation still remembers the attempt.</span></label>
+    <label class="check"><input type="checkbox"><span>Made another change, rewound with <strong>Restore code and conversation</strong>, and re-sent an improved version of the restored prompt.</span></label>
+    <label class="check"><input type="checkbox"><span>Used <strong>Summarize from here</strong> on a verbose stretch and read what the summary kept.</span></label>
+    <label class="check"><input type="checkbox"><span>Confirmed the limitation yourself: asked Claude to <code>touch scratch.txt</code> via Bash, then verified no rewind option offers to remove it.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. Claude's last three turns produced a refactor you dislike, but the debugging insights from earlier in the session are valuable. You want the code back as it was <em>and</em> to keep the conversation's knowledge. Which option?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Restore code and conversation</button></li>
+        <li><button data-opt="b">Restore code</button></li>
+        <li><button data-opt="c">Restore conversation</button></li>
+        <li><button data-opt="d">/clear, then re-explain the insights</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Restore code reverts the files while the conversation — including everything learned — stays. A discards the valuable discussion; C is backwards (keeps the unwanted code, loses the talk); D destroys exactly what you wanted to keep and re-typing it is lossy.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. During the session, Claude ran <code>mv config.yaml config.old.yaml</code> in Bash and also edited <code>main.py</code> with its editing tools. You restore code to an earlier checkpoint. What state are you in?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Both the rename and the edit are undone</button></li>
+        <li><button data-opt="b">Neither is undone — restore only affects the conversation</button></li>
+        <li><button data-opt="c">main.py is reverted; config.yaml is still renamed — bash changes aren't tracked</button></li>
+        <li><button data-opt="d">config.yaml is restored; main.py keeps its edits</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> This is the limitation in action: checkpoints track file-editing-tool changes only, so the tool-made edit reverts and the shell-made rename survives. Knowing this asymmetry is what keeps rewind from giving you false confidence — for shell-side damage, git is the answer.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">3. Early in a long session you did messy environment setup; the recent thirty turns are focused, valuable implementation. Context is filling. The targeted move is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Rewind menu → select the message where implementation began → Summarize up to here</button></li>
+        <li><button data-opt="b">Rewind menu → same message → Summarize from here</button></li>
+        <li><button data-opt="c">Restore conversation to that message</button></li>
+        <li><button data-opt="d">/clear — summaries are never acceptable</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> &ldquo;Up to here&rdquo; compresses everything <em>before</em> the selected point — squashing the setup noise while the recent work stays verbatim, exactly matching the docs' &ldquo;compress early setup discussion&rdquo; use case. B compresses the wrong side (the valuable work); C deletes the recent thirty turns entirely; D overapplies M08 — mid-task with rich unexternalized state is the acknowledged good case for targeted summarization.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">4. Why doesn't checkpointing replace git in your workflow?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">It does — commits are now optional between sessions</button></li>
+        <li><button data-opt="b">Checkpoints are slower to create than commits</button></li>
+        <li><button data-opt="c">Checkpoints require manual creation before each risky step</button></li>
+        <li><button data-opt="d">Checkpoints are session-scoped local undo with expiring snapshots and untracked gaps (bash, external edits); git is permanent, complete, shareable history</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> &ldquo;Local undo&rdquo; vs. &ldquo;permanent history&rdquo; is the docs' own framing: checkpoints expire with session cleanup, miss bash and external changes, and live only on your machine. B is false (they're automatic and instant), C inverts how they work — automatic capture before every prompt is the entire point.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/checkpointing">Claude Code docs — Checkpointing</a> — automatic tracking, the rewind menu options, restore vs. summarize, limitations (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — &ldquo;try something risky… rewind and try a different approach,&rdquo; course-correct early and often</li>
+      <li>Companion: Skilljar, <em>Claude Code in Action</em> — &ldquo;Steer the Work: Steering Long Sessions&rdquo; (login required) — watch for the rewind-menu demo and directed compaction.</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m11a-plan-mode.html"><span class="dir">Previous · M11 lesson 1</span>Plan Mode</a>
+    <a class="next" href="m12-fresh-vs-polluted.html"><span class="dir">Next · M12</span>The Session Experiment</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 2 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

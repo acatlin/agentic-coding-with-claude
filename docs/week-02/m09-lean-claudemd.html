@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writing a Lean CLAUDE.md — Week 2 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 2</a> · Objective M09</span>
+  </div>
+</header>
+
+<main>
+  <h1>Writing a Lean CLAUDE.md</h1>
+  <p class="lede">The most important file you can create — and the one most students ruin by overfilling. This lesson teaches the craft: what earns a line, what to cut, and how to defend every exclusion.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M09 · CLAUDE.md</span>
+      <span class="chip bloom">Bloom: Create</span>
+      <span class="chip assessed">Assessed by: Assignment A2</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Write a lean CLAUDE.md (build commands, conventions, layout, non-negotiable rules) and justify what was deliberately left out.</p>
+  </div>
+
+  <h2>1 · What CLAUDE.md is — and what it costs</h2>
+  <p>CLAUDE.md is a plain markdown file Claude reads at the start of <strong>every</strong> session: persistent instructions that survive every <code>/clear</code>. In memento-principle terms (<a href="m08-memento-principle.html">M08</a>), it's your most durable externalized state — the conventions layer of your project's memory.</p>
+  <p>But it isn't configuration, and it isn't free. The Memory docs are explicit on both points: CLAUDE.md is <em>context</em>, &ldquo;not enforced configuration&rdquo; — Claude reads it and tries to follow it — and it's &ldquo;loaded into the context window at the start of every session, consuming tokens alongside your conversation.&rdquo; Every line you write occupies smart-zone budget in every session forever, whether or not that session needs it. That's why this objective says <em>lean</em>: the file's cost structure, not aesthetics, demands it.</p>
+  <div class="callout warn">
+    <span class="label">The failure mode</span>
+    <p>From the best-practices guide: &ldquo;Bloated CLAUDE.md files cause Claude to ignore your actual instructions!&rdquo; Past a point, adding rules makes <em>all</em> rules less followed — important ones get lost in the noise. The docs target under 200 lines per file; A2 holds you to under 100. Length is not thoroughness; it's dilution.</p>
+  </div>
+
+  <h2>2 · What earns a line</h2>
+  <p>The Memory docs give a precise trigger list. Add to CLAUDE.md when:</p>
+  <ul>
+    <li>Claude makes the same mistake a second time</li>
+    <li>A code review catches something Claude should have known about this codebase</li>
+    <li>You type the same correction into chat that you typed last session</li>
+    <li>A new teammate would need the same context to be productive</li>
+  </ul>
+  <p>Notice what these have in common: each line is a <em>proven, recurring</em> need — CLAUDE.md is grown from evidence, not drafted from imagination. The categories that recur, matching this objective's own list:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>✅ Include</th><th>❌ Exclude</th></tr></thead>
+      <tbody>
+        <tr><td>Build/test commands Claude can't guess (<code>pnpm test:unit</code>, required env vars)</td><td>Anything Claude can figure out by reading code</td></tr>
+        <tr><td>Code style rules that <em>differ from defaults</em></td><td>Standard language conventions Claude already knows</td></tr>
+        <tr><td>Project layout facts that aren't obvious (&ldquo;API handlers live in <code>src/api/handlers/</code>&rdquo;)</td><td>File-by-file descriptions of the codebase</td></tr>
+        <tr><td>Repository etiquette (branch naming, commit format)</td><td>Information that changes frequently</td></tr>
+        <tr><td>Non-negotiable rules and gotchas (&ldquo;never edit <code>generated/</code> by hand&rdquo;)</td><td>Self-evident practices like &ldquo;write clean code&rdquo;</td></tr>
+        <tr><td>Architectural decisions specific to this project</td><td>Long explanations, tutorials, API documentation (link instead)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>And write each surviving line concretely enough to verify — the docs' own examples: &ldquo;Use 2-space indentation&rdquo; not &ldquo;Format code properly&rdquo;; &ldquo;Run <code>npm test</code> before committing&rdquo; not &ldquo;Test your changes.&rdquo; A vague rule costs the same tokens as a precise one and buys you nothing.</p>
+
+  <h2>3 · The pruning test — and justifying exclusions</h2>
+  <p>The single sharpest tool in the official guidance is a question. For each line, ask:</p>
+  <div class="callout tip">
+    <span class="label">The test</span>
+    <p><em>&ldquo;Would removing this cause Claude to make mistakes?&rdquo;</em> If not, cut it.</p>
+  </div>
+  <p>A2 makes the cutting visible: you must note, in comments, two things you <strong>deliberately excluded and why</strong>. That's the Create-level skill this objective assesses — a lean file is defined by its refusals. A good exclusion note names the candidate, the reason it fails the test, and where the content lives instead if it lives anywhere. (HTML comments <code>&lt;!-- like this --&gt;</code> are ideal: the docs note block-level comments are stripped before injection, so your justifications cost zero tokens.) For example:</p>
+  <pre><code>&lt;!-- Excluded: description of the src/ directory tree.
+     Claude discovers layout by reading; a prose copy would
+     go stale and pay rent in every session. --&gt;
+&lt;!-- Excluded: "how to add a new command" walkthrough.
+     Multi-step procedure needed only sometimes — belongs in
+     a skill loaded on demand, not in every session. --&gt;</code></pre>
+  <p>That second note points at a real boundary: recurring <em>procedures</em> belong in skills, and rules needed only for part of the codebase belong in path-scoped rules — <a href="m10-scope-hierarchy.html">M10</a> maps that whole territory.</p>
+
+  <h2>4 · Workflow: generate, then treat it like code</h2>
+  <p>Don't start from a blank page. <code>/init</code> analyzes your codebase and generates a starter file (build commands, test instructions, discovered conventions) — you saw this in Week 1. The value you add is what <code>/init</code> can't discover: the gotchas, the decisions, the non-negotiables. From there, the docs' maintenance stance is: <strong>&ldquo;Treat CLAUDE.md like code: review it when things go wrong, prune it regularly, and test changes by observing whether Claude's behavior actually shifts.&rdquo;</strong></p>
+  <p>Two debugging rules of thumb from the Memory docs: if Claude keeps violating a rule the file contains, the file is probably too long and the rule is getting lost; if Claude asks questions the file answers, the phrasing is probably ambiguous. Either way the fix is usually deletion or sharpening — almost never addition. Check what actually loaded with <code>/context</code>, and open the file quickly with <code>/memory</code>.</p>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>This is the first half of Assignment A2 — build the artifact now:</p>
+    <label class="check"><input type="checkbox"><span>Reviewed the CLAUDE.md that <code>/init</code> generated in your Week 1 repo (or ran <code>/init</code> now if you skipped it).</span></label>
+    <label class="check"><input type="checkbox"><span>Applied the pruning test to every existing line — cut anything Claude could derive by reading the code.</span></label>
+    <label class="check"><input type="checkbox"><span>Added your real build/test commands, one convention that differs from defaults, one layout fact, and at least one non-negotiable rule — each phrased concretely enough to verify.</span></label>
+    <label class="check"><input type="checkbox"><span>Confirmed the file is under 100 lines.</span></label>
+    <label class="check"><input type="checkbox"><span>Wrote two <code>&lt;!-- exclusion comments --&gt;</code> naming what you left out and why (required by A2).</span></label>
+    <label class="check"><input type="checkbox"><span>Ran <code>/context</code> in a fresh session and confirmed the file loaded under Memory files.</span></label>
+    <label class="check"><input type="checkbox"><span>Tested one rule: gave Claude a small task where the rule applies and watched whether behavior matches it.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. Which candidate line <em>best</em> earns its place in a lean CLAUDE.md?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;Write clean, well-documented code&rdquo;</button></li>
+        <li><button data-opt="b">&ldquo;This project uses TypeScript&rdquo; (the repo is full of .ts files)</button></li>
+        <li><button data-opt="c">&ldquo;Tests require Redis running locally: docker compose up redis first&rdquo;</button></li>
+        <li><button data-opt="d">A 40-line description of every directory in src/</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> It passes the pruning test — nothing in the code reveals that hidden environmental dependency, so removing the line <em>would</em> cause mistakes (failing tests with confusing errors). A is a self-evident practice, B is discoverable in one glance at the repo, and D is the classic bloat pattern: layout Claude learns faster by reading than by being told, going stale from day one.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. Claude keeps using <code>npm</code> despite your CLAUDE.md rule &ldquo;use pnpm&rdquo; — the rule is in a 240-line file. Per the docs, the most likely diagnosis is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">CLAUDE.md rules are only suggestions, so nothing can be done</button></li>
+        <li><button data-opt="b">The file is too long — the rule is getting lost in noise; prune the file rather than emphasizing harder</button></li>
+        <li><button data-opt="c">The rule needs to be repeated three times to take effect</button></li>
+        <li><button data-opt="d">pnpm rules require a hook and can never live in CLAUDE.md</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> &ldquo;If Claude keeps doing something you don't want despite having a rule against it, the file is probably too long and the rule is getting lost.&rdquo; The counterintuitive fix is deletion — of <em>other</em> lines. A is half-true (it's context, not enforcement) but fatalistic: adherence responds strongly to length and specificity. C adds noise. D overreaches — though for a truly must-never-fail rule, a hook <em>is</em> the enforcement-grade tool, which is exactly why CLAUDE.md keeps only rules where advisory is enough.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. A2 requires justifying two deliberate exclusions. Which justification shows the intended reasoning?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;Excluded the test commands — Claude usually guesses them&rdquo;</button></li>
+        <li><button data-opt="b">&ldquo;Excluded everything about style — style doesn't matter&rdquo;</button></li>
+        <li><button data-opt="c">&ldquo;Excluded the deploy steps to keep the file under 100 lines&rdquo;</button></li>
+        <li><button data-opt="d">&ldquo;Excluded the dependency list — package.json already states it authoritatively, and a prose copy would go stale while paying token rent every session&rdquo;</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> It names the candidate, applies the pruning test (removal causes no mistakes — the source of truth is readable), and adds the cost argument (staleness + per-session rent). A excludes something that usually <em>passes</em> the test — build/test commands are the docs' first-listed inclusion; &ldquo;usually guesses&rdquo; is exactly the recurring-mistake risk the file exists to prevent. B doesn't reason at all, and C treats the line budget as the goal rather than a symptom of good selection.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Why does the guidance say to phrase rules like &ldquo;Run npm test before committing&rdquo; rather than &ldquo;Test your changes&rdquo;?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Concrete, verifiable instructions are followed more reliably — and cost the same tokens as vague ones</button></li>
+        <li><button data-opt="b">Vague instructions crash the CLAUDE.md parser</button></li>
+        <li><button data-opt="c">Only imperative sentences are loaded into context</button></li>
+        <li><button data-opt="d">Specific commands are exempt from the line limit</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> CLAUDE.md is context, not configuration — how you write it is the only lever you have over how reliably it's followed, and &ldquo;specific, concise, well-structured instructions work best.&rdquo; There is no parser, no sentence filter, and no exemption: the file is plain markdown, all of it loaded, all of it paying rent.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/memory">Claude Code docs — How Claude remembers your project</a> — when to add, size/structure/specificity guidance, /init, /memory, treat-like-code maintenance (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — include/exclude table, the pruning test, &ldquo;bloated CLAUDE.md files cause Claude to ignore your actual instructions&rdquo;</li>
+      <li>Companion: Skilljar, <em>Claude Code in Action</em> — &ldquo;A CLAUDE.md That Follows&rdquo; module (login required) — watch for how they evolve a CLAUDE.md across sessions rather than writing it once.</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m08-memento-principle.html"><span class="dir">Previous · M08</span>The Memento Principle</a>
+    <a class="next" href="m10-scope-hierarchy.html"><span class="dir">Next · M10</span>Scopes — and When to Use a Skill</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 2 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

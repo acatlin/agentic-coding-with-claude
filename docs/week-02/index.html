@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 2 — Context: The Smart Zone · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb">Week 2 hub</span>
+  </div>
+</header>
+
+<main>
+  <h1>Week 2 — Context: The Smart Zone</h1>
+  <p class="lede">The context window is the resource everything else depends on. This week you learn why output degrades as it fills, how to reset without losing what matters, how to give every session durable memory with a lean CLAUDE.md, and how to steer with plan mode and rewind — then you prove the difference experimentally.</p>
+
+  <p><strong>Estimated total time:</strong> 3.5–4.5 hours (readings/videos + quiz + assignment + meeting). These pages cover the same ground as the assigned readings — use them as your primary lesson text, and the linked sources to go deeper.</p>
+
+  <h2>This week's learning pages</h2>
+  <p>Six mastery objectives, seven lessons, in recommended order:</p>
+
+  <ul class="card-grid">
+    <li class="card">
+      <div class="meta"><span class="chip">M07</span><span class="chip bloom">Understand</span></div>
+      <a class="title" href="m07-smart-zone.html">The Smart Zone and the Dumb Zone</a>
+      <p>Why context occupancy degrades output — attention degradation — and how to judge when a session should be reset.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M08</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m08-memento-principle.html">The Memento Principle: /clear over /compact</a>
+      <p>Externalize state to files and start empty, rather than trusting a lossy summary — and the honest tradeoff between the two.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M09</span><span class="chip bloom">Create</span></div>
+      <a class="title" href="m09-lean-claudemd.html">Writing a Lean CLAUDE.md</a>
+      <p>What earns a line, the pruning test, and justifying what you deliberately left out — the A2 artifact.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M10</span><span class="chip bloom">Understand</span></div>
+      <a class="title" href="m10-scope-hierarchy.html">CLAUDE.md Scopes — and When to Use a Skill</a>
+      <p>User, project, local, and path-scoped instruction files; how they load; and when content belongs in a skill or hook instead.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M11 · 1 of 2</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m11a-plan-mode.html">Plan Mode: Scope Before You Execute</a>
+      <p>Read-and-propose mode: agree on the approach while a veto still costs nothing, then execute on the context planning built.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M11 · 2 of 2</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m11b-rewind.html">Rewind: Course-Correct Without Starting Over</a>
+      <p>Checkpoints, the rewind menu's restore and summarize options, and the limitations that keep git in your workflow.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M12</span><span class="chip bloom">Evaluate</span></div>
+      <a class="title" href="m12-fresh-vs-polluted.html">The Session Experiment: Fresh vs. Polluted</a>
+      <p>Run the same task in both conditions, measure with a pre-committed rubric, and write a comparison a skeptic could check.</p>
+    </li>
+  </ul>
+
+  <div class="callout note">
+    <span class="label">Suggested path</span>
+    <p>Concepts first (M07 → M08), then the CLAUDE.md pair — skim <a href="m10-scope-hierarchy.html">M10</a> for the map, write yours with <a href="m09-lean-claudemd.html">M09</a> — then the steering pair (M11) hands-on in one sitting. Do M12 last, immediately before writing your A2 comparison: it uses the CLAUDE.md you just wrote and every habit from the week.</p>
+  </div>
+
+  <h2>How this week is assessed</h2>
+  <ul>
+    <li><strong>Quiz 2</strong> (25 MCQs): context occupancy and output quality; CLAUDE.md scope hierarchy; <code>/clear</code> vs. <code>/compact</code> tradeoffs; plan mode and rewind. Every lesson's self-check is written in the quiz's application-over-recall style.</li>
+    <li><strong>Assignment A2</strong> (10 pts): write a lean CLAUDE.md (under 100 lines) for your Week 1 repository and note, in comments, two things you deliberately excluded and why. Then run the same moderate task twice — once in a fresh, well-contexted session and once at the end of a long polluted session — and write a half-page comparison of the results.</li>
+  </ul>
+
+  <h2>Assigned sources for Week 2</h2>
+  <p>The lessons above are grounded in these; read or watch the originals to go deeper.</p>
+  <ul>
+    <li><a href="https://code.claude.com/docs/en/memory">code.claude.com — How Claude remembers your project</a> — CLAUDE.md scopes, rules, auto memory (the week's central official reading)</li>
+    <li><a href="https://www.aihero.dev/ai-coding-dictionary">aihero.dev — AI Coding Dictionary</a> (source on <a href="https://github.com/mattpocock/dictionary-of-ai-coding">GitHub</a>) — smart zone, dumb zone, attention degradation, clear, compaction</li>
+    <li><a href="https://www.aihero.dev/plan-mode-introduction">aihero.dev — An Introduction to Plan Mode</a></li>
+    <li><a href="https://anthropic.skilljar.com/claude-code-in-action">Anthropic Academy: Claude Code in Action</a> — &ldquo;Steer the Work&rdquo; module (login required; free with your Pro-qualified account) — plan mode, directed compaction, and the rewind menu in video form</li>
+    <li>Video: Matt Pocock, AI Engineer 2026 workshop — &ldquo;Full Walkthrough: Workflow for AI Coding&rdquo; (AI Engineer YouTube channel) — the context-management segments</li>
+    <li>Supplementary official docs used throughout: <a href="https://code.claude.com/docs/en/context-window">Explore the context window</a>, <a href="https://code.claude.com/docs/en/best-practices">Best practices</a>, <a href="https://code.claude.com/docs/en/checkpointing">Checkpointing</a>, <a href="https://code.claude.com/docs/en/permission-modes">Permission modes</a></li>
+  </ul>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 2 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLAUDE.md Scopes — and When to Use a Skill Instead — Week 2 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 2</a> · Objective M10</span>
+  </div>
+</header>
+
+<main>
+  <h1>CLAUDE.md Scopes — and When to Use a Skill Instead</h1>
+  <p class="lede">Instructions can live at four levels, load in a defined order, and can be scoped to paths — or moved out of the always-loaded tier entirely. This is the map of where a given instruction belongs.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M10 · CLAUDE.md</span>
+      <span class="chip bloom">Bloom: Understand</span>
+      <span class="chip assessed">Assessed by: Quiz 2</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Describe the CLAUDE.md scope hierarchy (user, project, path-scoped) and when to move content into a skill instead.</p>
+  </div>
+
+  <h2>1 · The four scopes</h2>
+  <p>The Memory docs define four locations, each answering a different question — <em>who</em> should this instruction apply to?</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Scope</th><th>Location</th><th>Purpose</th><th>Shared with</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Managed policy</strong></td><td>System path (e.g. <code>C:\Program Files\ClaudeCode\CLAUDE.md</code> on Windows)</td><td>Organization-wide standards, deployed by IT</td><td>All users on the machine</td></tr>
+        <tr><td><strong>User</strong></td><td><code>~/.claude/CLAUDE.md</code></td><td>Your personal preferences, every project</td><td>Just you (all projects)</td></tr>
+        <tr><td><strong>Project</strong></td><td><code>./CLAUDE.md</code> or <code>./.claude/CLAUDE.md</code></td><td>Team conventions: build commands, architecture, standards</td><td>Team, via version control</td></tr>
+        <tr><td><strong>Local</strong></td><td><code>./CLAUDE.local.md</code> (gitignored)</td><td>Personal project-specific notes: sandbox URLs, test data</td><td>Just you (this project)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The sorting rule falls out of the &ldquo;shared with&rdquo; column: a preference that follows <em>you</em> everywhere (&ldquo;explain before large refactors&rdquo;) is user scope; a fact about <em>the project</em> that a teammate's Claude should also know is project scope and belongs in git; a fact about the project true only for <em>your machine</em> is local scope. Your Week 1 <code>/init</code> file was project scope — the one graders and teammates get for free.</p>
+
+  <h2>2 · How files load: concatenate, never override</h2>
+  <p>All discovered files are <strong>concatenated into context rather than overriding each other</strong> — every applicable scope is present at once, ordered from broadest to most specific, so project instructions appear after user instructions, and within a directory <code>CLAUDE.local.md</code> is appended after <code>CLAUDE.md</code>. Claude Code finds them by walking up the directory tree from where you launched: run in <code>foo/bar/</code>, and <code>foo/CLAUDE.md</code> loads too — the monorepo case. If two files give conflicting guidance, nothing arbitrates; &ldquo;Claude may pick one arbitrarily,&rdquo; so consistency across scopes is on you.</p>
+  <p>One more direction matters: files in <strong>subdirectories below</strong> your working directory are <em>not</em> loaded at launch — they're pulled in on demand when Claude reads files in those directories. Which is the transition to the real insight of this objective:</p>
+
+  <h2>3 · Path-scoped rules: pay only when relevant</h2>
+  <p>Everything in section 1 loads into <em>every</em> session, paying the rent M09 warned about. The first escape is <code>.claude/rules/</code>: split instructions into topic files (<code>testing.md</code>, <code>api-design.md</code>), and give a rule YAML frontmatter naming the paths it governs:</p>
+  <pre><code>---
+paths:
+  - "src/api/**/*.ts"
+---
+# API Development Rules
+- All API endpoints must include input validation</code></pre>
+  <p>A rule with a <code>paths</code> field loads <strong>only when Claude reads a matching file</strong> — an API rule costs nothing in a session that never touches the API. (Rules <em>without</em> <code>paths</code> load at launch, same as CLAUDE.md; user-level rules in <code>~/.claude/rules/</code> load before project rules.) This is the third tier the objective names: user-wide, project-wide, path-scoped.</p>
+
+  <h2>4 · When to move content into a skill</h2>
+  <p>Path-scoping helps when relevance is <em>where</em>; skills help when relevance is <em>what you're doing</em>. The Memory docs draw the line in one sentence: <strong>&ldquo;If an entry is a multi-step procedure or only matters for one part of the codebase, move it to a skill or a path-scoped rule instead.&rdquo;</strong> And the rules docs add the load-behavior contrast: rules load every session or when matching files are opened; skills &ldquo;only load when you invoke them or when Claude determines they're relevant to your prompt.&rdquo;</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>The content is…</th><th>It belongs in…</th><th>Because it loads…</th></tr></thead>
+      <tbody>
+        <tr><td>A fact/rule needed in <em>every</em> session (&ldquo;use pnpm&rdquo;)</td><td>CLAUDE.md (right scope)</td><td>Always — and should</td></tr>
+        <tr><td>A rule for <em>one region</em> of the codebase</td><td>Path-scoped rule</td><td>When matching files are read</td></tr>
+        <tr><td>A <em>multi-step procedure</em> used sometimes (release process, review checklist)</td><td>Skill</td><td>On demand, when invoked or relevant</td></tr>
+        <tr><td>A step that must run <em>every time, enforced</em></td><td>Hook</td><td>Not context at all — it executes as code</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The hook row completes the picture: CLAUDE.md, rules, and skills are all <em>advisory context</em>; when &ldquo;usually follows it&rdquo; isn't good enough — a check that must gate every commit — the docs point you to hooks, which run deterministically regardless of what Claude decides. Week 7 has you write skills; Week 8 covers hooks. Today you only need to route content correctly.</p>
+  <div class="callout note">
+    <span class="label">Also in the memory family</span>
+    <p><strong>Auto memory</strong> is the complement to everything above: notes <em>Claude writes itself</em> — build commands it learned, corrections you made — stored per-repository and loaded each session (the first 200 lines or 25KB of its <code>MEMORY.md</code> index). You write CLAUDE.md; Claude writes auto memory. Browse or edit both with <code>/memory</code>, and verify what actually loaded with <code>/context</code>.</p>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. &ldquo;Always explain your changes before large refactors&rdquo; — you want this in every project you ever open, but your teammates shouldn't inherit it. Where does it go?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">./CLAUDE.md in each project</button></li>
+        <li><button data-opt="b">~/.claude/CLAUDE.md — user scope: just you, all projects</button></li>
+        <li><button data-opt="c">./CLAUDE.local.md in each project</button></li>
+        <li><button data-opt="d">A path-scoped rule matching **/*</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> &ldquo;Just you + all projects&rdquo; is the user-scope cell of the table. A shares it with every teammate via git; C works but must be recreated in every repo forever; D reinvents always-on loading with extra machinery — a rule matching everything is just a costlier CLAUDE.md.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. Your project CLAUDE.md has grown a 30-line section of rules that only apply to files under <code>src/api/</code>. The best refactor is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Leave it — API rules are important, so they should load every session</button></li>
+        <li><button data-opt="b">Move it to CLAUDE.local.md to shorten the shared file</button></li>
+        <li><button data-opt="c">Move it to .claude/rules/api.md with paths: ["src/api/**"] so it loads only when API files are read</button></li>
+        <li><button data-opt="d">Move it to a skill so a teammate must invoke /api-rules manually</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> &ldquo;Only matters for one part of the codebase&rdquo; is the literal trigger for path-scoping: full adherence benefit in API sessions, zero token rent everywhere else. A pays for importance with dilution (M09's bloat problem); B changes <em>who</em> gets the rules (your teammates lose them) rather than <em>when</em> they load; D misroutes — these are rules about a region, not a procedure you perform.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. A 25-step &ldquo;how we cut a release&rdquo; runbook is sitting in CLAUDE.md. It's used about twice a month. Per the docs' dividing line, it should become:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">A managed-policy CLAUDE.md, since releases are organization-critical</button></li>
+        <li><button data-opt="b">Part of CLAUDE.local.md</button></li>
+        <li><button data-opt="c">A path-scoped rule on the changelog file</button></li>
+        <li><button data-opt="d">A skill — a multi-step procedure that loads on demand instead of paying rent in every session</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> &ldquo;If an entry is a multi-step procedure… move it to a skill.&rdquo; Twenty-five steps loaded into every session to be used twice a month is the exact waste skills eliminate. A widens the audience without fixing the cost; B hides a team procedure from the team; C is a hack — the procedure isn't about editing that file, and it wouldn't load when you actually need it.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Your user CLAUDE.md says &ldquo;prefer verbose commit messages&rdquo;; the project CLAUDE.md says &ldquo;one-line commit messages only.&rdquo; What actually happens?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Both load, concatenated user-then-project; nothing enforces a winner, though the project rule reads later and more specifically</button></li>
+        <li><button data-opt="b">Project scope formally overrides user scope, so the user line is not loaded</button></li>
+        <li><button data-opt="c">Claude Code refuses to start until the conflict is resolved</button></li>
+        <li><button data-opt="d">The user file wins because it loads first</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Loading is concatenation, not resolution — with contradictory instructions &ldquo;Claude may pick one arbitrarily.&rdquo; Broadest-to-most-specific ordering means the project line appears later, which helps in practice but is not an override mechanism (B) — the fix is to remove the contradiction. No error exists (C), and D gets the ordering backwards.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">5. &ldquo;Every commit must pass lint — no exceptions, ever, even if Claude decides otherwise.&rdquo; Why is CLAUDE.md the wrong home for the <em>enforcement</em> of this rule?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Lint rules are too long for CLAUDE.md's line limits</button></li>
+        <li><button data-opt="b">CLAUDE.md can't contain shell commands</button></li>
+        <li><button data-opt="c">Everything in CLAUDE.md is advisory context, not enforcement — a guarantee needs a hook, which executes regardless of what Claude decides</button></li>
+        <li><button data-opt="d">It isn't wrong — CLAUDE.md instructions are strictly enforced by the harness</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The docs draw this line explicitly: CLAUDE.md is context Claude &ldquo;treats as context, not enforced configuration&rdquo; — &ldquo;to block an action regardless of what Claude decides, use a PreToolUse hook instead.&rdquo; Stating the norm in CLAUDE.md is fine; <em>guaranteeing</em> it is a hook's job. A and B are invented mechanics, and D claims an enforcement layer that doesn't exist.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/memory">Claude Code docs — How Claude remembers your project</a> — scope table, load order, <code>.claude/rules/</code> and <code>paths</code> frontmatter, skills-vs-rules note, auto memory (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — placement list, skills for on-demand knowledge, hooks for zero-exception actions</li>
+      <li>Companion: Skilljar, <em>Claude Code in Action</em> — &ldquo;Configure Claude&rdquo; section (login required) — watch for how CLAUDE.md, skills, and hooks divide the configuration space.</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m09-lean-claudemd.html"><span class="dir">Previous · M09</span>Writing a Lean CLAUDE.md</a>
+    <a class="next" href="m11a-plan-mode.html"><span class="dir">Next · M11 lesson 1</span>Plan Mode</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 2 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

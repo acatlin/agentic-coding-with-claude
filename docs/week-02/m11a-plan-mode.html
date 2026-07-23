@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan Mode: Scope Before You Execute — Week 2 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 2</a> · Objective M11 · lesson 1 of 2</span>
+  </div>
+</header>
+
+<main>
+  <h1>Plan Mode: Scope Before You Execute</h1>
+  <p class="lede">A mode where Claude can read everything and change nothing — so the two of you agree on the approach before a single file is edited. The cheapest place to catch a misunderstanding is before the code exists.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M11 · Steering · 1 of 2</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A2</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Use plan mode to scope work before execution and the rewind menu to course-correct a session. <em>(This lesson: plan mode. <a href="m11b-rewind.html">Lesson 2: rewind.</a>)</em></p>
+  </div>
+
+  <h2>1 · What plan mode is</h2>
+  <p>The official definition: &ldquo;Plan mode tells Claude to research and propose changes without making them. Claude reads files, runs shell commands to explore, and writes a plan, but does not edit your source.&rdquo; It's one of Claude Code's permission modes — a sibling of the default ask-before-acting mode you've used since Week 1 — with edits structurally blocked until you approve a plan.</p>
+  <p>Getting in and out:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Action</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td>Cycle modes in a session</td><td><kbd>Shift</kbd>+<kbd>Tab</kbd> — default → accept-edits → plan; the status bar shows <code>⏸ plan mode on</code></td></tr>
+        <tr><td>Plan mode for a single prompt</td><td>Prefix the prompt with <code>/plan</code></td></tr>
+        <tr><td>Start a session in plan mode</td><td><code>claude --permission-mode plan</code></td></tr>
+        <tr><td>Leave without approving anything</td><td><kbd>Shift</kbd>+<kbd>Tab</kbd> again</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>2 · Why: the misunderstanding tax</h2>
+  <p>Anthropic's best-practices guide names the risk plan mode exists to remove: &ldquo;Letting Claude jump straight to coding can produce code that solves the wrong problem.&rdquo; Its recommended shape for non-trivial work is four phases — <strong>Explore → Plan → Implement → Commit</strong> — with the first two inside plan mode: have Claude read the relevant code and answer questions, then ask for a concrete plan (&ldquo;What files need to change? What's the session flow? Create a plan.&rdquo;).</p>
+  <p>Pocock's introduction to plan mode adds the human half of the argument: <strong>&ldquo;You don't know what you want until you see it.&rdquo;</strong> Writing no code forces the conversation you'd otherwise have <em>through</em> code — requirements get articulated, wrong assumptions surface, and you veto them while a veto costs nothing. Meanwhile the agent is quietly doing something equally valuable: building a context window full of the right files <em>before</em> any code gets written. Which is why his workflow note matters: <strong>&ldquo;You usually don't clear the context window between planning and execution&rdquo;</strong> — the plan's research is precisely the context you want the implementation to run on. Plan-then-execute is one session, not two; it's the memento principle's complement, not a repeat of it.</p>
+  <div class="callout note">
+    <span class="label">Steering, not paperwork</span>
+    <p>Connect this to Week 1's M05: planning decisions are the ones humans dominate. Plan mode is that division of labor built into the tool — it holds the &ldquo;what and how, roughly&rdquo; conversation in a place where you still have full veto power, then hands execution to the agent with the decisions already made.</p>
+  </div>
+
+  <h2>3 · Reviewing and approving a plan</h2>
+  <p>When Claude's plan is ready, it presents it and asks how to proceed. Your options, per the docs:</p>
+  <ul>
+    <li><strong>Approve and let it run</strong> — &ldquo;Yes, auto-accept edits&rdquo; (or auto mode where available): Claude implements without per-edit prompts. Use when the plan is precise enough that you'd approve each edit anyway.</li>
+    <li><strong>Approve but watch</strong> — &ldquo;Yes, manually approve edits&rdquo;: implementation proceeds, you still confirm each change. Good default while you're calibrating trust in Week 2.</li>
+    <li><strong>Keep planning</strong> — &ldquo;No, keep planning&rdquo;: stay in plan mode and tell Claude what to change. Iterating here is the point of the mode — a plan revision costs sentences; a code revision costs a rewind.</li>
+    <li><strong>Edit the plan yourself</strong> — press <kbd>Ctrl</kbd>+<kbd>G</kbd> to open the plan in your text editor and change it directly before Claude proceeds.</li>
+  </ul>
+  <p>Approving exits plan mode and implementation starts. To plan the next chunk, cycle back with <kbd>Shift</kbd>+<kbd>Tab</kbd> or prefix with <code>/plan</code>.</p>
+
+  <h2>4 · When to plan — and when to skip it</h2>
+  <p>Plan mode is not a virtue ritual; the official guidance is candid that it &ldquo;adds overhead.&rdquo; The dividing line:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Plan first</th><th>Skip the plan</th></tr></thead>
+      <tbody>
+        <tr><td>You're uncertain about the approach</td><td>Scope is clear and the fix is small</td></tr>
+        <tr><td>The change touches multiple files</td><td>A typo fix, a log line, a rename</td></tr>
+        <tr><td>You're unfamiliar with the code being modified</td><td>You've made this exact kind of change before</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout tip">
+    <span class="label">The one-sentence test</span>
+    <p>From the best-practices guide: <strong>&ldquo;If you could describe the diff in one sentence, skip the plan.&rdquo;</strong> Cheap, memorable, and it will be on the quiz in application form.</p>
+  </div>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>In your Week 1 repo, run one full plan-first cycle (A2 requires demonstrating this):</p>
+    <label class="check"><input type="checkbox"><span>Pressed <kbd>Shift</kbd>+<kbd>Tab</kbd> until the status bar showed <code>⏸ plan mode on</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>Gave a multi-file objective (e.g. &ldquo;add a --json output option to every command&rdquo;) and let Claude explore and propose a plan.</span></label>
+    <label class="check"><input type="checkbox"><span>Rejected the first plan with &ldquo;No, keep planning&rdquo; and requested one concrete change (smaller scope, different file, an edge case handled).</span></label>
+    <label class="check"><input type="checkbox"><span>Pressed <kbd>Ctrl</kbd>+<kbd>G</kbd> and edited one line of the plan yourself.</span></label>
+    <label class="check"><input type="checkbox"><span>Approved with manual edit approval and watched the implementation follow the plan; flagged any drift.</span></label>
+    <label class="check"><input type="checkbox"><span>Applied the one-sentence test to your next three tasks and skipped planning where it said to.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. In plan mode, Claude can ______ but cannot ______.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">edit files · run any commands</button></li>
+        <li><button data-opt="b">do nothing at all · everything else</button></li>
+        <li><button data-opt="c">read files and explore the codebase · edit your source until a plan is approved</button></li>
+        <li><button data-opt="d">write new files · modify existing ones</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Research and propose, don't modify: reads and exploration are the mode's whole job; edits stay blocked until you approve the plan. A inverts it, B mistakes restriction for paralysis (exploration is active work), and D invents a new-vs-existing distinction that doesn't exist.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. Which task most clearly deserves plan mode first?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;Fix the typo in the README title&rdquo;</button></li>
+        <li><button data-opt="b">&ldquo;Move authentication from cookies to JWT&rdquo; in a codebase you've never touched</button></li>
+        <li><button data-opt="c">&ldquo;Add a debug log line to the request handler&rdquo;</button></li>
+        <li><button data-opt="d">&ldquo;Rename totalCnt to totalCount everywhere&rdquo;</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> It scores on all three plan-first criteria: uncertain approach, many files, unfamiliar code — and you could not describe its diff in one sentence. A, C, and D each fit in a sentence; planning them is pure overhead.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Claude presents a plan that's right except it targets the wrong config file. The best move is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Approve it — fixing the file mid-implementation is easy</button></li>
+        <li><button data-opt="b">Exit plan mode with Shift+Tab and start the whole session over</button></li>
+        <li><button data-opt="c">Approve, then immediately press Esc and correct it</button></li>
+        <li><button data-opt="d">Choose &ldquo;No, keep planning&rdquo; (or Ctrl+G) and fix the file in the plan before any code exists</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> A plan revision costs a sentence — that's the entire economics of the mode; approving a known-wrong plan (A, C) voluntarily pays the misunderstanding tax the mode exists to avoid, and B throws away all the exploration context over a one-line fix.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Why does Pocock advise <em>against</em> clearing context between an approved plan and its execution?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Planning built a context window full of the relevant files and decisions — exactly what the implementation should run on</button></li>
+        <li><button data-opt="b">/clear is disabled while a plan is pending</button></li>
+        <li><button data-opt="c">Clearing would delete the plan from disk</button></li>
+        <li><button data-opt="d">This contradicts the memento principle, which he no longer endorses</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Plan-then-execute is one continuous unit of work: the exploration <em>is</em> the well-contexted state you want at execution time, so clearing between them would throw away signal, not pollution. No command is disabled (B); the conversation isn't disk (C); and D misreads the principle — memento says clear <em>between units of work</em> after externalizing state, which is fully consistent with not clearing <em>inside</em> one.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/permission-modes">Claude Code docs — Permission modes</a> — plan mode definition, Shift+Tab / <code>/plan</code> / <code>--permission-mode plan</code>, the approval options, Ctrl+G (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — Explore–Plan–Implement–Commit, when planning is overhead, the one-sentence test</li>
+      <li><a href="https://www.aihero.dev/plan-mode-introduction">Pocock — An Introduction to Plan Mode (aihero.dev)</a> — the forcing-mechanism argument, don't clear between plan and execution</li>
+      <li>Companion: Skilljar, <em>Claude Code in Action</em> — &ldquo;Steer the Work: Steering Long Sessions&rdquo; (login required) — watch for scoping via plan mode and choosing supervised vs. autonomous execution.</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m10-scope-hierarchy.html"><span class="dir">Previous · M10</span>Scopes — and When to Use a Skill</a>
+    <a class="next" href="m11b-rewind.html"><span class="dir">Next · M11 lesson 2</span>Rewind &amp; Course-Correction</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 2 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

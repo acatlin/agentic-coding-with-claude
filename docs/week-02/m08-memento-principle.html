@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Memento Principle: /clear over /compact — Week 2 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 2</a> · Objective M08</span>
+  </div>
+</header>
+
+<main>
+  <h1>The Memento Principle: /clear over /compact</h1>
+  <p class="lede">Two ways out of a bloated session: summarize it, or write down what matters and start empty. This lesson makes the case for the second — and teaches you to articulate exactly what the first costs you.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M08 · Context</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Quiz 2 · Assignment A2</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Apply the memento principle: prefer <code>/clear</code> plus externalized state over <code>/compact</code>, and articulate the tradeoff between a deterministic empty state and a noisy summary.</p>
+  </div>
+
+  <h2>1 · The two escape hatches</h2>
+  <p><a href="m07-smart-zone.html">M07</a> established that sessions must be reset. Claude Code gives you two very different resets:</p>
+  <ul>
+    <li><strong><code>/clear</code></strong> — ends the conversation history entirely. In the dictionary's words: &ldquo;The next message begins with an empty session and an empty context window.&rdquo; (Your CLAUDE.md and auto memory still load — those live on disk, not in the conversation.)</li>
+    <li><strong><code>/compact</code></strong> — replaces the conversation with an AI-written summary. The dictionary is precise about what this really is: &ldquo;a handoff done in-memory: the previous session's history is summarised, and the summary seeds a fresh session.&rdquo; Claude Code also runs this automatically as you approach the context limit, so a full window never ends your session.</li>
+    </ul>
+  <p>Both free space. The difference is <em>what the next session starts from</em> — and that difference is the whole lesson.</p>
+
+  <h2>2 · What a summary actually is</h2>
+  <p>When <code>/compact</code> runs, a model reads your conversation and writes a structured summary — your requests, key decisions, files touched, errors fixed, pending work. Everything else is gone: full tool outputs, the exact code Claude read, intermediate reasoning. Three properties follow:</p>
+  <ol>
+    <li><strong>It's lossy.</strong> The summary keeps what the summarizer <em>guessed</em> was important. If the crucial detail was an offhand constraint you mentioned once, it may not survive.</li>
+    <li><strong>It's noisy.</strong> Whatever polluted your session — failed approaches, dead ends, the kitchen-sink detours — gets summarized too. A summary of a muddy session is condensed mud. The pollution you were escaping rides along into the &ldquo;fresh&rdquo; session.</li>
+    <li><strong>It's nondeterministic.</strong> You didn't write it, you can't fully predict it, and compacting the same session twice wouldn't produce the same text. In the dictionary's terms it is a <em>secondary source</em> — an account of the work, not the work.</li>
+  </ol>
+  <p>Not everything even makes it into the summarizer's hands equally: project-root CLAUDE.md, unscoped rules, and auto memory are re-injected from disk after compaction, but path-scoped rules and nested CLAUDE.md files are lost until a matching file is read again. What survives is an engineering contingency, not a guarantee.</p>
+
+  <h2>3 · The memento principle</h2>
+  <p>Pocock's alternative — the reason this course prefers <code>/clear</code> — is named for the film <em>Memento</em>, whose protagonist cannot form new memories and survives by externalizing them: notes, photographs, tattoos. He doesn't trust his fading recollection; he trusts what he wrote down while he still knew.</p>
+  <p>Your agent is in exactly his position. It will remember nothing tomorrow. So don't ask a lossy summarizer to guess what mattered — <strong>while the session is still smart, write the state that matters into files, then <code>/clear</code> without fear:</strong></p>
+  <ul>
+    <li><strong>Durable conventions</strong> → CLAUDE.md (<a href="m09-lean-claudemd.html">M09</a>)</li>
+    <li><strong>The goal and its constraints</strong> → a spec or PRD file (Week 3 builds this into a discipline)</li>
+    <li><strong>The task list and progress</strong> → a plan file, or GitHub issues (Week 4)</li>
+    <li><strong>Hard-won discoveries</strong> — &ldquo;the flaky test is timing-dependent, root cause in <code>queue.ts</code>&rdquo; → a notes file, before you clear, not after</li>
+  </ul>
+  <p>The next session then starts from a <strong>deterministic empty state</strong>: a fresh window seeded only by files you wrote and can read, edit, and version-control. Anthropic's own best-practices guide teaches the same move for large features: have Claude interview you, write the result to <code>SPEC.md</code>, then &ldquo;start a fresh session to execute it. The new session has clean context focused entirely on implementation, and you have a written spec to reference.&rdquo; Externalized state plus a clean window — the memento principle in official clothing.</p>
+  <div class="callout tip">
+    <span class="label">The habit, in one loop</span>
+    <p>Work in the smart zone → externalize anything worth keeping (spec, plan, notes, CLAUDE.md) → <code>/clear</code> → re-seed the next session from the files. Repeat. Each session gets the model at its sharpest, and your project's memory lives in git instead of in a summary you never read.</p>
+  </div>
+
+  <h2>4 · Articulating the tradeoff honestly</h2>
+  <p>A2 asks you to <em>articulate</em> this tradeoff, not recite a slogan — so be fair to <code>/compact</code>:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th><code>/clear</code> + externalized state</th><th><code>/compact</code></th></tr></thead>
+      <tbody>
+        <tr><td>Next session starts from</td><td>An empty window + files you wrote</td><td>An AI-written summary you didn't</td></tr>
+        <tr><td>Deterministic?</td><td>Yes — same files, same start, repeatable</td><td>No — lossy, nondeterministic, unreviewed by default</td></tr>
+        <tr><td>Pollution carried forward</td><td>None</td><td>Summarized along with everything else</td></tr>
+        <tr><td>Effort required</td><td>You must write state down <em>before</em> clearing</td><td>None — one command, or automatic</td></tr>
+        <tr><td>Mid-task continuity</td><td>Lost unless it's in the files</td><td>Preserved, approximately</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>That last row is real: mid-task, with rich unexternalized working state, a directed compact can be the pragmatic move — <code>/compact</code> takes instructions (<code>/compact Focus on the API changes</code>), and the rewind menu's <em>summarize from here / up to here</em> options (<a href="m11b-rewind.html">M11</a>) compact only part of the conversation. Auto-compact also keeps long autonomous runs alive when nobody is there to clear. The principle isn't &ldquo;compaction is forbidden&rdquo; — it's that <strong>needing compaction is usually the symptom of state you failed to externalize.</strong> The better your memento habit, the rarer your compacts.</p>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>In your Week 1 repo, practice the full loop once (this is also A2 preparation):</p>
+    <label class="check"><input type="checkbox"><span>Worked a task for a while, then ran <code>/context</code> and noted how much of the window the session had consumed.</span></label>
+    <label class="check"><input type="checkbox"><span>Asked Claude to write the current state to a file before resetting — e.g. &ldquo;write NOTES.md: what we're doing, what's decided, what's left.&rdquo;</span></label>
+    <label class="check"><input type="checkbox"><span>Read NOTES.md yourself and fixed anything wrong or missing — it's your memento; you own it.</span></label>
+    <label class="check"><input type="checkbox"><span>Ran <code>/clear</code>, then started the next prompt with &ldquo;Read NOTES.md and continue.&rdquo; Confirmed Claude picked up exactly where you left off.</span></label>
+    <label class="check"><input type="checkbox"><span>Separately, ran <code>/compact</code> once in a throwaway session and read what survived — so your A2 comparison of the two speaks from observation, not doctrine.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. Your session is 70% full and muddled after three abandoned approaches to a bug — but along the way you finally found the root cause. The memento move is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Run /compact so the whole investigation is preserved</button></li>
+        <li><button data-opt="b">Have Claude write the root cause and next step to a notes file, then /clear and re-seed from it</button></li>
+        <li><button data-opt="c">Run /clear immediately — the finding was recent, so Claude will remember it</button></li>
+        <li><button data-opt="d">Keep going — 30% of the window is still free</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Externalize first, <em>then</em> clear: the one finding worth keeping goes into a file you control; the three failed approaches — pure attention pollution — go nowhere. A summarizes the mud along with the gold; C loses everything, because /clear empties the conversation and nothing &ldquo;remembers&rdquo; across it except files; D spends your remaining smart-zone budget dragging dead weight.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">2. &ldquo;A deterministic empty state&rdquo; beats &ldquo;a noisy summary&rdquo; because:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Empty contexts run faster and cost fewer tokens per reply</button></li>
+        <li><button data-opt="b">Summaries are against Anthropic's best practices in all cases</button></li>
+        <li><button data-opt="c">The summary might exceed the context window</button></li>
+        <li><button data-opt="d">You know and control exactly what the next session starts from, instead of inheriting an unreviewed, lossy account that includes the pollution you were escaping</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> Determinism is about knowing and controlling the starting state: files you wrote, versioned in git, same result every time. A is true but incidental — it's not the argument. B is false (the official docs recommend directed compaction in several situations), and C isn't the failure mode — summaries are small; the problem is what they lose and what they keep.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">3. After an auto-compact, Claude keeps following your project conventions but has forgotten a rule that lives in a nested CLAUDE.md deep in a subdirectory. Why?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Root CLAUDE.md is re-injected from disk after compaction; nested ones reload only when a file in their directory is read again</button></li>
+        <li><button data-opt="b">Compaction deletes CLAUDE.md files it considers redundant</button></li>
+        <li><button data-opt="c">Nested CLAUDE.md files are never loaded in the first place</button></li>
+        <li><button data-opt="d">The summary was too long and truncated the rules section</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> What survives compaction depends on how it was loaded: project-root CLAUDE.md, unscoped rules, and auto memory come back from disk automatically; nested CLAUDE.md files and path-scoped rules return only when a matching file is next read. Nothing on disk is ever deleted (B). C is false — nested files load on demand — and D isn't how survival is decided.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">4. Which situation is the <em>best</em> case for reaching for compaction rather than /clear?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">You're switching from a bug fix to an unrelated feature</button></li>
+        <li><button data-opt="b">The session is polluted with failed approaches</button></li>
+        <li><button data-opt="c">You're mid-task with rich context that isn't yet written down anywhere, and stopping to externalize would cost more than a directed summary loses</button></li>
+        <li><button data-opt="d">You want a reliable record of decisions for your repo</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> That's the honest edge of the tradeoff — mid-task continuity is the one thing /compact buys that /clear doesn't, and a <em>directed</em> compact (&ldquo;/compact Focus on…&rdquo;) mitigates the lossiness. A is the textbook /clear case (task boundary, no state worth carrying); B is the case where compaction is worst — it condenses the mud; D wants a file in git, not a summary in a context window.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">5. A teammate objects: &ldquo;/clear throws away work; /compact at least keeps it.&rdquo; The memento-principle reply is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Correct — never clear until auto-compact has run at least once</button></li>
+        <li><button data-opt="b">Work worth keeping shouldn't live only in the conversation — externalize it to files, and then /clear throws away nothing that matters</button></li>
+        <li><button data-opt="c">Compaction also throws everything away, so the two are identical</button></li>
+        <li><button data-opt="d">Clearing is fine because Claude Code keeps a transcript you can re-attach later</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> The objection assumes the conversation is the only home for state — that's the assumption the memento principle removes. Once the goal, plan, and discoveries live in files, the conversation is disposable by design. C overstates (a summary does persist <em>something</em>, just lossily and noisily); D describes resuming a session, which brings back the <em>whole</em> polluted context, not a fix for it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://github.com/mattpocock/dictionary-of-ai-coding">Pocock — Dictionary of AI Coding</a> — clear, compaction (&ldquo;a handoff done in-memory&rdquo;), secondary source entries (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/context-window">Claude Code docs — Explore the context window</a> — what /compact keeps and drops, what survives compaction, auto-compact, directed compaction (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code docs — Best practices</a> — /clear between tasks, interview → SPEC.md → fresh session, compaction-steering via CLAUDE.md</li>
+      <li>Companion: Pocock's AI Engineer 2026 workshop, &ldquo;Full Walkthrough — Workflow for AI Coding&rdquo; — watch for how his brief → PRD → Kanban pipeline makes every session cheap to clear because state always lives in files.</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m07-smart-zone.html"><span class="dir">Previous · M07</span>The Smart Zone and the Dumb Zone</a>
+    <a class="next" href="m09-lean-claudemd.html"><span class="dir">Next · M09</span>Writing a Lean CLAUDE.md</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 2 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>
