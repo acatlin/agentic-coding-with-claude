@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tracer-Bullet Decomposition — Week 4 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 4</a> · Objective M21</span>
+  </div>
+</header>
+
+<main>
+  <h1>Tracer-Bullet Decomposition</h1>
+  <p class="lede">Your PRD marks the destination. This lesson is about cutting it into 6–10 issues that are each a thin, complete path through every layer of the system — tracer bullets that light up whether your architecture actually works, one demoable slice at a time.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M21 · Planning</span>
+      <span class="chip bloom">Bloom: Create</span>
+      <span class="chip assessed">Assessed by: Assignment A4</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Decompose a PRD into 6–10 vertical-slice &lsquo;tracer bullet&rsquo; issues that each cross every layer and emit observable feedback.</p>
+  </div>
+
+  <h2>1 · Two ways to slice a build</h2>
+  <p>Imagine your flashcards app as a stack of layers: data storage, application logic, UI, tests. There are two ways to decompose the PRD into work items:</p>
+  <ul>
+    <li><strong>Horizontal slices</strong> ship one layer at a time: &ldquo;build the storage layer,&rdquo; &ldquo;build all the endpoints,&rdquo; &ldquo;build the UI.&rdquo; Each item sounds clean — and nothing works until <em>every</em> layer lands. Integration problems hide until the end, when they're most expensive.</li>
+    <li><strong>Vertical slices</strong> ship one narrow path through <em>all</em> the layers at once: &ldquo;user can add a card and see it persist.&rdquo; Tiny scope, but storage, logic, and UI each exist in miniature, connected — so the moment the slice is done, you can <em>demo it</em>.</li>
+  </ul>
+  <p>Pocock's term for a vertical slice — borrowed, as he notes, from <em>The Pragmatic Programmer</em> — is the <strong>tracer bullet</strong>: a small, end-to-end slice of functionality that spans all system layers simultaneously. Tracer rounds glow in flight so a gunner can see where fire is actually landing; a tracer-bullet issue does the same for your architecture. Build one tiny vertical slice, validate it, then expand outward.</p>
+
+  <h2>2 · Why this controls AI slop</h2>
+  <p>Left unconstrained, an agent handed a whole PRD &ldquo;tends toward producing enormous complete solutions without validation&rdquo; — hundreds of horizontal-layer files that have never once run together. Pocock's tracer-bullets essay frames the fix as forced feedback: build small, test immediately, gather feedback, then expand. Instead of discovering architectural problems after massive code generation, you &ldquo;test assumptions continuously, identify issues early, and proceed with confidence that foundational approaches actually work.&rdquo;</p>
+  <p>The objective's phrase <strong>&ldquo;emit observable feedback&rdquo;</strong> is the operative requirement. Every slice must end in something you can <em>observe</em>: a behavior you can click through, a test that passes, output you can inspect. That's Week 3's M18 (give the agent a target) fused with Week 2's smart zone: a slice small enough to verify is also small enough to fit one fresh session.</p>
+  <div class="callout note">
+    <span class="label">His worked example</span>
+    <p>Building a &ldquo;Reveal in File System&rdquo; feature, Pocock didn't wire it into every surface at once: he created the backend endpoint and connected it to <em>one</em> UI location first, validated the core path worked, and only then expanded to the three other UI locations. First slice proves the path; later slices widen it.</p>
+  </div>
+
+  <h2>3 · The slicing rules</h2>
+  <p>The course's decomposition rules come from Pocock's to-tickets skill, verbatim:</p>
+  <div class="code-label">Vertical-slice rules (mattpocock/skills, to-tickets)</div>
+  <pre>- Each slice cuts a narrow but COMPLETE path through every layer
+  (schema, API, UI, tests) — vertical, NOT a horizontal slice of
+  one layer
+- A completed slice is demoable or verifiable on its own
+- Each slice is sized to fit in a single fresh context window
+- Any prefactoring should be done first</pre>
+  <p>Plus A4's sizing constraint: <strong>6–10 issues</strong> for your whole PRD. That number is doing real work. Fewer than six and your slices are probably multi-session epics; more than ten and you're probably slicing thinner than the overhead of a branch-PR-review cycle per issue is worth. Each issue then gets the M20 anatomy: what-to-build, acceptance criteria, blocked-by.</p>
+  <p>Two terms from the rules deserve expansion:</p>
+  <ul>
+    <li><strong>Prefactoring</strong> — if the codebase needs reshaping to make the feature slices easy, that reshaping is its own slice, ordered first: &ldquo;make the change easy, then make the easy change.&rdquo;</li>
+    <li><strong>The wide-refactor exception</strong> — one mechanical change with a blast radius across the whole codebase (rename a column, retype a shared symbol) can't land green as any vertical slice. The skill sequences it as <em>expand–contract</em>: add the new form beside the old, migrate call sites in batches (each batch its own issue), then delete the old form once no caller remains. You likely won't need this for a fresh course project — but recognize it, because &ldquo;this work resists vertical slicing&rdquo; is a real category, not a rule violation.</li>
+  </ul>
+
+  <h2>4 · Worked decomposition</h2>
+  <p>The Week 3 sample PRD — a flashcards app with decks, card-flipping, and spaced repetition, no accounts, localStorage — decomposed into seven tracer bullets:</p>
+  <div class="code-label">A 7-issue backlog (each issue would carry full M20 anatomy)</div>
+  <pre>1. Walking skeleton: app shell renders, one hard-coded deck displays,
+   deployed and openable in a browser            [blocked by: none]
+2. User can create a deck and it survives reload (localStorage
+   round-trip)                                   [blocked by: 1]
+3. User can add cards to a deck and see them listed
+                                                 [blocked by: 2]
+4. User can flip a card to reveal its answer     [blocked by: 3]
+5. User can mark a card right/wrong and the result is stored
+                                                 [blocked by: 4]
+6. Review scheduling: "due today" queue derived from results
+                                                 [blocked by: 5]
+7. User can delete decks and cards               [blocked by: 3]</pre>
+  <p>Check it against the rules: every issue crosses data, logic, and UI (even #1 — a deployed shell is the thinnest possible full path, sometimes called a <em>walking skeleton</em>); every issue ends in something observable (&ldquo;survives reload,&rdquo; &ldquo;see them listed&rdquo;); none is a layer (&ldquo;build the storage module&rdquo; appears nowhere — storage gets built <em>inside</em> #2, to exactly the depth #2 needs, then deepened by #5). And #7 hangs off #3, not #6 — its blocked-by edge records that deletion doesn't care about scheduling, which is what will let slices run in parallel in <a href="m22-sequencing-the-backlog.html">M22</a>.</p>
+
+  <section class="handson">
+    <h2>Decomposition exercise + A4 start</h2>
+    <p>This is the Create-level heart of Assignment A4 — do the drill, then the real thing:</p>
+    <label class="check"><input type="checkbox"><span><strong>Drill:</strong> took the flashcards backlog above and deliberately broke it — rewrote issues 2–4 as horizontal slices (&ldquo;storage layer,&rdquo; &ldquo;logic layer,&rdquo; &ldquo;UI layer&rdquo;) — then articulated, for each, what feedback disappears and when integration problems would now surface.</span></label>
+    <label class="check"><input type="checkbox"><span>Reread your own PRD and listed your project's layers (for most course projects: storage, logic, UI, tests).</span></label>
+    <label class="check"><input type="checkbox"><span>Drafted 6–10 tracer-bullet issues, first slice a walking skeleton, each named for observable user-facing behavior.</span></label>
+    <label class="check"><input type="checkbox"><span>Ran the three-rule audit on every draft: crosses every layer? demoable/verifiable alone? fits one fresh session?</span></label>
+    <label class="check"><input type="checkbox"><span>Checked for needed prefactoring and made it its own first slice if so.</span></label>
+    <label class="check"><input type="checkbox"><span>Added blocked-by edges — only where the dependency is genuine (ask: &ldquo;could an agent start this with the blocker unmerged?&rdquo;).</span></label>
+    <label class="check"><input type="checkbox"><span>Confirmed every acceptance criterion describes something observable — a behavior, a passing check, an inspectable output. Keep the drafts: M22 sequences them and M23 files them.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. A classmate's backlog: 1. Design the database schema. 2. Build all API endpoints. 3. Build the UI. 4. Write tests. 5. Integration. What's the core critique?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Too few issues — pad it to six</button></li>
+        <li><button data-opt="b">Every slice is horizontal: nothing is demoable until everything lands, so integration problems — the expensive kind — stay invisible until issue 5, and no issue emits feedback along the way</button></li>
+        <li><button data-opt="c">Tests should come first, not fourth</button></li>
+        <li><button data-opt="d">It's fine — layers are how systems are organized, so they're how work should be organized</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> This is the textbook horizontal decomposition: clean-sounding items, zero observable feedback until the end, and an &ldquo;integration&rdquo; issue that is really &ldquo;discover all the problems at once.&rdquo; A misses the point — renumbering layers doesn't make them vertical. C is a real instinct but inside each <em>slice</em>, not as a global layer of its own. D confuses the system's structure with the work's structure — the whole insight is that they shouldn't match.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. Which issue best satisfies &ldquo;emits observable feedback&rdquo;?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;Refactor state management for future flexibility&rdquo;</button></li>
+        <li><button data-opt="b">&ldquo;Add error handling throughout the app&rdquo;</button></li>
+        <li><button data-opt="c">&ldquo;User can export a deck as JSON and the downloaded file re-imports to an identical deck&rdquo;</button></li>
+        <li><button data-opt="d">&ldquo;Improve code quality in the scheduler module&rdquo;</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The round-trip is directly observable and even self-verifying: export, re-import, compare. You (or the agent) can check &ldquo;done&rdquo; without trusting anyone's assertion. A, B, and D all describe internal virtues with no defined observation that would distinguish done from not-done — as targets they'd reduce to &ldquo;looks done,&rdquo; the signal M18 taught you never to rely on.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">3. Your first drafted slice is &ldquo;User can study a full session: flip cards, mark answers, see tomorrow's queue.&rdquo; It crosses every layer and is demoable. What rule does it likely still break?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Sized to fit a single fresh context window — it's three or four tracer bullets fused into an epic, and an agent implementing it will be deep in the dumb zone before the queue logic starts</button></li>
+        <li><button data-opt="b">None — crossing layers and being demoable is the full test</button></li>
+        <li><button data-opt="c">It mentions the user, which issues shouldn't</button></li>
+        <li><button data-opt="d">It should be split by layer: storage first, then logic, then UI</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Vertical is necessary, not sufficient — the third rule is sizing, and this slice bundles flipping, scoring, and scheduling, each independently demoable. The fix is to split it <em>vertically</em> (flip / mark / queue, as in the worked backlog), never by layer (D re-creates the horizontal problem at smaller scale). B forgets the context-window rule that makes slices agent-runnable at all.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">4. You need to rename a core field used across the whole codebase — hundreds of call sites. Forcing it into one vertical slice would mean a giant red diff that can't land green. The course-endorsed move is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Do it anyway in one issue — rules are rules</button></li>
+        <li><button data-opt="b">Skip the rename — refactors don't belong in a backlog</button></li>
+        <li><button data-opt="c">Rename secretly across several feature issues, a few files each</button></li>
+        <li><button data-opt="d">Expand–contract: one issue adds the new field beside the old, batch issues migrate call sites (each blocked by the expand), a final issue deletes the old field once no caller remains — CI green throughout</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> This is the wide-refactor exception, sequenced exactly as the to-tickets skill prescribes: expand, migrate in blast-radius-sized batches, contract — the old form's continued existence is what keeps every intermediate state green. A produces the unlandable mega-diff the exception exists for; C hides a refactor inside unrelated diffs, sabotaging review; B pretends the need away.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://www.aihero.dev/tracer-bullets">Pocock — Tracer Bullets: Keeping AI Slop Under Control (aihero.dev)</a> — the Pragmatic Programmer lineage, vertical vs. horizontal, observable feedback, the Reveal in File System example (primary grounding)</li>
+      <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/to-tickets/SKILL.md">mattpocock/skills — to-tickets SKILL.md</a> — the vertical-slice rules quoted verbatim, prefactoring, and the expand–contract wide-refactor exception</li>
+      <li>Course syllabus, Week 4 / Assignment A4 — the 6–10 issue count and acceptance-criteria requirement</li>
+      <li>Companion: <a href="https://www.youtube.com/watch?v=-QFHIoCo-Ko">Pocock — Full Walkthrough: Workflow for AI Coding (AI Engineer 2026, YouTube)</a> — the PRD-to-Kanban segment shows a live decomposition; watch for how he merges and splits slices while quizzing the breakdown</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m20-anatomy-of-an-issue.html"><span class="dir">Previous · M20</span>Issues as Units of Agent Work</a>
+    <a class="next" href="m22-sequencing-the-backlog.html"><span class="dir">Next · M22</span>Sequence the Backlog to De-Risk</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 4 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

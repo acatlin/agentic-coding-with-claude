@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Issue per Session — Week 4 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 4</a> · Objective M24</span>
+  </div>
+</header>
+
+<main>
+  <h1>One Issue per Session</h1>
+  <p class="lede">Everything this week built converges on a single working rule: one issue, one fresh session, one branch, one PR. This lesson explains <em>why</em> the rule holds — one argument from the context window, one from the reviewer's chair.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M24 · Judgment</span>
+      <span class="chip bloom">Bloom: Understand</span>
+      <span class="chip assessed">Assessed by: Quiz 4</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Explain why one-issue-per-session keeps the agent in the smart zone and simplifies review.</p>
+  </div>
+
+  <h2>1 · The rule</h2>
+  <p>When implementation starts in Week 5, each unit of work runs as: pick one <code>ready-for-agent</code> issue from the frontier → start a <em>fresh</em> session → agent works the issue on its own branch → PR with <code>Closes #N</code> → review → merge → issue closes → next issue, next fresh session.</p>
+  <p>Nothing in the tooling forces this. You could feed an agent three issues in one conversation, or let a session that finished issue #4 &ldquo;just continue&rdquo; into #5. The rule says don't — for two independent reasons, either of which would justify it alone.</p>
+
+  <h2>2 · Argument one: the smart zone</h2>
+  <p>Week 2 established the mechanics: the context window holds everything — every message, file read, and command output — it fills fast, and &ldquo;LLM performance degrades as context fills.&rdquo; The smart zone is the early, sharp stretch of a session; the dumb zone is what a full window buys you.</p>
+  <p>Now recall the third vertical-slice rule from <a href="m21-tracer-bullet-issues.html">M21</a>: each slice is <strong>&ldquo;sized to fit in a single fresh context window.&rdquo;</strong> That sizing rule and this session rule are two halves of one design:</p>
+  <ul>
+    <li><strong>Decomposition sizes the work to the window</strong> — an issue is, by construction, an amount of work an agent can complete while still sharp.</li>
+    <li><strong>One-issue-per-session spends a whole window on it</strong> — the issue gets the smart zone it was sized for. Start issue #5 in issue #4's session and #5 runs in whatever degraded remainder #4 left behind; its careful sizing bought nothing.</li>
+  </ul>
+  <p>There's a contamination argument stacked on the budget argument. Anthropic's best-practices guide names the &ldquo;kitchen sink session&rdquo; as a leading failure pattern — one task, then an unrelated one, then back, until &ldquo;context is full of irrelevant information&rdquo; — and its standing fix is <code>/clear</code> between tasks, because &ldquo;a clean session with a better prompt almost always outperforms a long session with accumulated corrections.&rdquo; Your backlog makes the guidance mechanical: issue boundaries <em>are</em> the task boundaries, decided once at decomposition time instead of re-judged mid-flow. And the fresh session isn't flying blind — the durable context (Week 2's memento principle) is all in the repo: PRD.md, CLAUDE.md, the merged code of every prior slice, and the issue itself.</p>
+
+  <h2>3 · Argument two: review</h2>
+  <p>Follow the chain: one issue per session means one branch per issue means the PR's diff contains <em>exactly one issue's work</em>. That transforms the reviewer's job:</p>
+  <ul>
+    <li><strong>The diff has a spec.</strong> The linked issue's acceptance criteria are the review checklist — walk the checkboxes against the diff. A three-issue PR makes you review against a mental union of specs, and scope creep hides in the seams between them.</li>
+    <li><strong>&ldquo;Out of scope&rdquo; becomes decidable.</strong> With one issue linked, any changed file that serves no criterion is a flag you can raise mechanically. Anthropic's model review prompt in the best-practices guide checks precisely this: &ldquo;every requirement is implemented, the listed edge cases have tests, and <em>nothing outside the task's scope changed</em>.&rdquo;</li>
+    <li><strong>Verdicts stay clean.</strong> A one-issue PR can be approved, rejected, or sent back as a unit. A bundle where slice A is right and slice B is wrong forces either partial-merge surgery or rejecting good work.</li>
+    <li><strong>The record stays legible.</strong> Merge closes exactly the issue that was done (M20's closing keywords); the PR-linked session (M19b) holds the reasoning for exactly this slice. Six weeks later, &ldquo;why does this code exist&rdquo; has a one-issue answer.</li>
+  </ul>
+  <div class="callout note">
+    <span class="label">Same principle, next scale</span>
+    <p>The best-practices guide notes that &ldquo;a fresh context improves code review since Claude won't be biased toward code it just wrote&rdquo; — its adversarial-review pattern gives a reviewer subagent <em>only the diff and the criteria</em>, not the conversation that produced the change. One-issue-per-session is that same isolation principle applied to production rather than review: bounded context in, bounded reviewable artifact out. Week 6 builds the review half; Week 8 scales the production half to parallel sessions — which only works because no two frontier issues ever share a session.</p>
+  </div>
+
+  <h2>4 · What the rule is not</h2>
+  <p>Understanding a rule includes knowing its edges:</p>
+  <ul>
+    <li><strong>It's not &ldquo;one prompt per session.&rdquo;</strong> Within the issue, iterate freely — run the checks, fix failures, course-correct. The boundary is the <em>issue</em>, not the message count.</li>
+    <li><strong>It's not &ldquo;never talk about two issues.&rdquo;</strong> Planning sessions (like the one that drafted your backlog in M23) legitimately hold the whole board. The rule governs <em>implementation</em> sessions, where the work product is a diff.</li>
+    <li><strong>It's not free.</strong> Each fresh session re-reads project context, and each issue pays branch-PR-review overhead. That cost is real — it's why M21 caps decomposition at 6–10 issues rather than fifty. The rule and the sizing rule justify each other; adopt them together or the math stops working.</li>
+  </ul>
+  <div class="callout warn">
+    <span class="label">A sourcing note</span>
+    <p>The syllabus lists an &ldquo;Ettema write-up&rdquo; as an assigned source for this objective alongside Pocock. We could not locate that write-up at build time, so no claim on this page relies on it — everything above is grounded in the Pocock material and Anthropic's best-practices guide linked below. If your instructor supplies the link, read it as a practitioner's field report on this rule.</p>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. A session just finished issue #4; tests pass, PR opened. The agent still &ldquo;knows&rdquo; the codebase intimately, and issue #5 touches the same files. Restarting fresh feels wasteful. What does the restart actually buy?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — it's ritual hygiene, and continuing would be strictly better</button></li>
+        <li><button data-opt="b">Safety only: the old session might push to #4's branch by accident</button></li>
+        <li><button data-opt="c">Issue #5 gets the full smart zone it was sized for, instead of running in #4's degraded remainder — and the &ldquo;knowledge&rdquo; being discarded isn't lost, because everything durable (merged code, PRD, CLAUDE.md, the issue text) reloads from the repo</button></li>
+        <li><button data-opt="d">A faster session, since empty contexts respond quicker</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The felt waste is mostly illusion: what the old session &ldquo;knows&rdquo; splits into durable context (in the repo — the memento principle means the fresh session recovers it) and conversational residue (file dumps, dead ends, #4's corrections — which is contamination, not knowledge). Slices were sized to a <em>fresh</em> window; spending a used one on #5 silently breaks that contract. B names a real but minor risk; it isn't the argument.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. To &ldquo;save review overhead,&rdquo; a classmate has one session implement issues #5, #6, and #7, then opens a single PR: &ldquo;Closes #5, closes #6, closes #7.&rdquo; The keywords are correct. What did the bundling actually cost?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — three issues closed, review happened, same outcome</button></li>
+        <li><button data-opt="b">The reviewable unit: the diff now answers to three specs at once, out-of-scope changes hide in the seams between them, and if #6's work is wrong the reviewer must either reject #5 and #7's good work or perform partial-merge surgery</button></li>
+        <li><button data-opt="c">Only the closing automation — GitHub can't close three issues from one PR</button></li>
+        <li><button data-opt="d">Nothing about review — but GitHub forbids branches spanning issues</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Review cost isn't proportional to PR count; it's proportional to how hard each verdict is. Three specs sharing one diff means no changed line has an unambiguous owner, and approve/reject stops being a unit decision. (C is false — M20 showed multi-issue closing syntax works fine; the <em>mechanics</em> allow bundling, which is exactly why the discipline has to come from the workflow.) The classmate saved two PR creations and spent the decidability of the review.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Which pair correctly names the two independent arguments for one-issue-per-session?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Cost control (fewer tokens) and speed (shorter sessions)</button></li>
+        <li><button data-opt="b">GitHub's linking rules and gh CLI limitations</button></li>
+        <li><button data-opt="c">Agent obedience (smaller tasks are followed better) and merge safety</button></li>
+        <li><button data-opt="d">Production quality — the issue runs entirely in the smart zone it was sized for, uncontaminated by neighboring tasks — and review quality: the resulting PR is one spec's worth of diff, checkable criterion by criterion, approvable or rejectable as a unit</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> One argument faces the agent (context budget + contamination), one faces the human (a decidable review unit) — and they're independent: even a hypothetical never-degrading agent would leave the review argument fully intact, and even with no reviewer the smart-zone argument would stand. A's factors are side effects, not reasons; B inverts causality (the tooling permits bundling; the workflow forbids it).</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. The rule exists because of a matching rule from M21. Which one, and why do they only work together?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;Each slice is sized to fit in a single fresh context window&rdquo; — sizing guarantees the issue fits a window, and one-per-session guarantees it gets one; break either and the other stops delivering (oversized issues hit the dumb zone even when fresh; bundled sessions waste the sizing)</button></li>
+        <li><button data-opt="b">&ldquo;Prefactoring should be done first&rdquo; — refactoring requires its own session type</button></li>
+        <li><button data-opt="c">&ldquo;Blockers-first publishing&rdquo; — sessions must match filing order</button></li>
+        <li><button data-opt="d">The 6–10 issue count — sessions per week must stay single-digit</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The two rules are one contract seen from both sides: decomposition promises &ldquo;this fits a fresh window,&rdquo; the session discipline promises &ldquo;it gets a fresh window.&rdquo; Each is the other's reason. B and C are real rules solving different problems (ordering, reference integrity); D's count is a consequence of per-issue overhead, not a session-scheduling constraint.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/to-tickets/SKILL.md">mattpocock/skills — to-tickets SKILL.md</a> — the sized-to-a-fresh-context-window rule this lesson pairs with the session discipline (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices</a> — context degradation, the kitchen-sink failure pattern, /clear-between-tasks, fresh-context review, and the nothing-outside-scope review prompt, quoted directly</li>
+      <li><a href="https://www.aihero.dev/ai-coding-dictionary">Pocock — AI Coding Dictionary (aihero.dev)</a> — smart zone and dumb zone, as established in Week 2's M07</li>
+      <li>Course syllabus, Week 4 — &ldquo;why one issue per session&rdquo; as a Quiz 4 topic. (The syllabus's assigned &ldquo;Ettema write-up&rdquo; could not be located at build time; no claim here relies on it — see the sourcing note above.)</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m23-filing-issues-with-gh.html"><span class="dir">Previous · M23</span>File Issues with Claude + gh CLI</a>
+    <a class="next" href="index.html"><span class="dir">Week 4 hub</span>GitHub for Agentic Work</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 4 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

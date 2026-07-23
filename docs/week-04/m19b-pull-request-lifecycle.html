@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Pull Request Lifecycle — Week 4 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 4</a> · Objective M19</span>
+  </div>
+</header>
+
+<main>
+  <h1>The Pull Request Lifecycle</h1>
+  <p class="lede">A pull request is a proposal to merge changes, wrapped in a place to discuss them. For agentic work it's something more: the checkpoint where AI-produced code waits, in full view, for a human decision. This lesson walks the lifecycle from branch to merge — then you open one for real.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M19 · GitHub</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Quiz 4 · Assignment A4</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Explain branches, merges, and the pull request lifecycle; create a feature branch and open a PR. <span class="chip">Part 2 of 2 — the PR lifecycle</span></p>
+  </div>
+
+  <h2>1 · What a pull request is</h2>
+  <p>GitHub's definition: pull requests are &ldquo;proposals to merge code changes into a project,&rdquo; and they're the platform's central collaboration tool — they let teams &ldquo;discuss and review changes before merging them,&rdquo; which &ldquo;helps teams work together, catch issues early, and maintain code quality.&rdquo;</p>
+  <p>Notice what a PR adds on top of a plain merge: <em>a pause with a conversation in it</em>. The branch (M19a) contains the work; the PR is the request for that work to be judged. In this course's terms, the PR is where the <strong>review</strong> activity — one of the three activities the whole course is built on — actually happens. Weeks 6 and 9 live inside this pause; this week you just need the mechanics.</p>
+
+  <h2>2 · The lifecycle, step by step</h2>
+  <ol>
+    <li><strong>Branch and commit.</strong> Work happens on a feature branch — in our convention, the branch for one issue.</li>
+    <li><strong>Open the PR.</strong> You propose merging the feature branch (the <em>head</em> branch) into <code>main</code> (the <em>base</em> branch), with a title and description. The description is where you tell the reviewer — often future-you — what this change is and which issue it resolves (<a href="m20-anatomy-of-an-issue.html">M20</a> covers the linking keywords).</li>
+    <li><strong>Discussion and review.</strong> Reviewers comment, request changes, or approve. Crucially, <em>new commits pushed to the head branch automatically update the open PR</em> — you respond to review feedback by pushing fixes, not by opening a new PR.</li>
+    <li><strong>Checks run.</strong> Automated validations (tests, linters, CI) report pass/fail on the PR itself.</li>
+    <li><strong>Merge.</strong> Someone with write access merges — merge commit, squash, or rebase (M19a) — and the head branch can be deleted. If the PR's description linked an issue with a closing keyword, merging into the default branch closes that issue automatically.</li>
+  </ol>
+  <p>The PR page organizes all of this into tabs — GitHub currently shows five: <strong>Conversation</strong> (description, timeline, comments, reviews), <strong>Commits</strong> (how the branch evolved), <strong>Checks</strong> (automated validations), <strong>Files changed</strong> (the diffs — where review actually happens), and <strong>Findings</strong> (code-scanning results). A merge-status indicator shows what's still blocking: missing approvals, failing checks.</p>
+
+  <div class="callout note">
+    <span class="label">Draft PRs</span>
+    <p>A PR can be opened as a <strong>draft</strong>: it &ldquo;cannot be merged,&rdquo; and code owners aren't automatically asked to review it. Drafts let you share work-in-progress without requesting formal review, then mark it &ldquo;ready for review&rdquo; when it's time. In agentic work this maps neatly onto &ldquo;the agent thinks it's done, but I haven't looked yet&rdquo; — open as draft, review the diff yourself, then promote.</p>
+  </div>
+
+  <h2>3 · Opening a PR with Claude</h2>
+  <p>Claude Code creates pull requests on request — the Common Workflows docs show it as a one-liner: after the work is committed, say <code>create a pr</code>. Claude uses the <code>gh</code> CLI underneath (<code>gh pr create</code>), writes a summary of the changes as the description, and you can refine it: &ldquo;enhance the PR description with more context about the security improvements.&rdquo;</p>
+  <div class="code-label">The step-by-step version (from code.claude.com Common Workflows)</div>
+  <pre>&gt; summarize the changes I've made to the authentication module
+&gt; create a pr
+&gt; enhance the PR description with more context about the security improvements</pre>
+  <p>Two facts worth keeping:</p>
+  <ul>
+    <li><strong>Sessions link to PRs.</strong> When a PR is created via <code>gh pr create</code>, the Claude Code session is automatically linked to it — later, <code>claude --from-pr 1234</code> reopens the session picker filtered to sessions tied to that PR. The conversation that produced the code stays findable from the code.</li>
+    <li><strong>Review before submitting.</strong> The docs' own tip: &ldquo;Review Claude's generated PR before submitting.&rdquo; The description is a claim about what the diff does — and you are accountable for claims made under your username. This is the same review-the-draft rule <a href="m23-filing-issues-with-gh.html">M23</a> applies to issues.</li>
+  </ul>
+
+  <h2>4 · Two development models</h2>
+  <p>GitHub describes two ways PRs get used. In the <strong>shared repository model</strong>, everyone has push access to one repository, creates branches in it, and uses PRs for review before merging — this is your course project, and most professional team repos. In the <strong>fork and pull model</strong>, contributors fork the repository, work in their own copy, and submit PRs without needing upstream permissions — this is how open source accepts changes from strangers. Same lifecycle, different trust boundary. Knowing which model a repo runs tells you whether a branch or a fork is your starting move.</p>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>Open a real PR in your course-project repo — this is the second half of M19's objective, and the muscle A4 assumes:</p>
+    <label class="check"><input type="checkbox"><span>Created a feature branch (or reused M19a's practice branch) with at least one commit that <code>main</code> doesn't have.</span></label>
+    <label class="check"><input type="checkbox"><span>Pushed the branch and opened a PR — either yourself (<code>gh pr create</code>) or by telling Claude <code>create a pr</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>Read the generated title and description as a skeptic and edited at least one thing (even just tightening the summary) before considering it submitted.</span></label>
+    <label class="check"><input type="checkbox"><span>Visited all the PR tabs on github.com: found the diff under Files changed and the merge-status indicator on Conversation.</span></label>
+    <label class="check"><input type="checkbox"><span>Pushed one more commit to the branch and watched the open PR update automatically.</span></label>
+    <label class="check"><input type="checkbox"><span>Merged the PR (squash is fine), confirmed the change landed on <code>main</code>, and deleted the branch.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. A reviewer requests changes on your open PR. Claude has made the fixes on the same feature branch. What happens next?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Open a second PR containing just the fixes and link it to the first</button></li>
+        <li><button data-opt="b">Push the commits — the open PR updates automatically, and the reviewer sees the new state of the same proposal</button></li>
+        <li><button data-opt="c">Close the PR and reopen it so the diff refreshes</button></li>
+        <li><button data-opt="d">Merge first, then apply fixes on main</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> A PR tracks its head branch, so pushed commits appear in the existing PR — the Commits tab shows the branch's evolution over time precisely because this is the normal flow. A fragments one logical change across two proposals; C is unnecessary ritual; D merges before review completes, defeating the pause the PR exists to create.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. Claude finishes an issue overnight and you want the work visible on GitHub — but you haven't read the diff yet. The mechanism that best fits this exact state is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Merge immediately — the checks passed</button></li>
+        <li><button data-opt="b">Keep the branch local until you've reviewed it</button></li>
+        <li><button data-opt="c">Open the PR as a draft: it's shared and diffable but cannot be merged, and no one is asked to review it until you promote it</button></li>
+        <li><button data-opt="d">Open a normal PR and approve it yourself unread</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Draft status encodes &ldquo;exists, not yet endorsed&rdquo; — exactly the gap between agent-done and human-reviewed. A treats passing checks as equivalent to review (Week 3's M18 told you a check is a floor, not a verdict). B hides the work and loses the PR's diff view for your own reading; D manufactures a false endorsement, which is worse than no review signal at all.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Six weeks from now you're staring at a merged PR wondering why the code does something odd. Which fact from this lesson helps most?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">The Findings tab lists every design decision</button></li>
+        <li><button data-opt="b">Squash-merged PRs preserve all nine original commits on main</button></li>
+        <li><button data-opt="c">The merge-status indicator records who approved</button></li>
+        <li><button data-opt="d">PRs created via gh are linked to their Claude Code session — <code>claude --from-pr</code> with that PR's number reopens the very conversation that produced the code</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The session link is the answer to &ldquo;what was the agent thinking?&rdquo; — the reasoning, alternatives considered, and instructions given all live in the linked conversation. A is wrong (Findings shows code-scanning results, not rationale); B is wrong (squash condenses commits — though the PR page itself still shows them); C names a real UI element but approval names don't explain oddities.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. You want to contribute a fix to an open-source library you have no permissions on. Applying this lesson's models:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Fork and pull: fork the repo, branch in your fork, and open a PR to the upstream — no upstream permissions needed</button></li>
+        <li><button data-opt="b">Shared repository: ask the maintainers for push access first</button></li>
+        <li><button data-opt="c">Email the maintainers a diff — PRs are only for teams</button></li>
+        <li><button data-opt="d">Push a branch directly to their repository</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> GitHub's fork and pull model exists exactly so open-source projects can accept proposals from contributors without granting write access. B inverts the trust model (access is the thing you don't have and don't need); D is what the missing write access prevents; C abandons the review, checks, and discussion machinery the PR provides for free.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">GitHub Docs — About pull requests</a> — definition, tabs, draft PRs, merge status, development models (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/common-workflows">code.claude.com — Common workflows</a> — the create-a-PR recipe, session-to-PR linking via <code>claude --from-pr</code>, and the review-before-submitting tip</li>
+      <li><a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges">GitHub Docs — About pull request merges</a> — the three merge methods available at the lifecycle's end</li>
+      <li>Companion: <a href="https://www.youtube.com/@GitHub">GitHub's official YouTube channel</a> or <a href="https://www.youtube.com/watch?v=RGOj5yH7evk">freeCodeCamp — Git and GitHub for Beginners (YouTube)</a> — the assigned primer; watch the pull-request segment and match each step to the five-step lifecycle above</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m19a-branches-and-merges.html"><span class="dir">Previous · M19</span>Branches and Merges</a>
+    <a class="next" href="m20-anatomy-of-an-issue.html"><span class="dir">Next · M20</span>Issues as Units of Agent Work</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 4 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

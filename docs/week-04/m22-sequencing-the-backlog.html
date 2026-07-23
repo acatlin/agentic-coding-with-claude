@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sequence the Backlog to De-Risk — Week 4 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 4</a> · Objective M22</span>
+  </div>
+</header>
+
+<main>
+  <h1>Sequence the Backlog to De-Risk</h1>
+  <p class="lede">Ten well-cut issues can still be a bad backlog if they're ordered wrong. Sequencing is a judgment call: which slice, done first, would teach you the most about whether your design survives contact with reality? This lesson gives you the criteria — and practice making the call.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M22 · Planning</span>
+      <span class="chip bloom">Bloom: Evaluate</span>
+      <span class="chip assessed">Assessed by: Assignment A4</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Sequence and prioritize an issue backlog (Kanban) so that early slices de-risk the architecture.</p>
+  </div>
+
+  <h2>1 · The backlog as a Kanban board</h2>
+  <p>In Pocock's seven-phase workflow, the Kanban board is phase 5 — between the PRD and execution. His board is not a fancy tool requirement; it's a <em>shape of information</em>: a list of tickets, each declaring which tickets block it. GitHub issues with blocked-by lines (M20/M21) already are one; GitHub Projects, Linear, or three columns of sticky notes just render it.</p>
+  <p>The blocking edges are what make a backlog more useful than a plan document. The to-tickets skill publishes tickets <strong>blockers-first</strong>, so every edge can reference a real issue number, and then defines the key concept:</p>
+  <div class="code-label">The frontier (mattpocock/skills, to-tickets)</div>
+  <pre>Work the frontier: any ticket whose blockers are all done.
+For a purely linear chain that means top to bottom.</pre>
+  <p>The frontier is the set of issues startable <em>right now</em>. A linear chain has a one-issue frontier — fine for working solo. A backlog whose independent slices carry no false edges has a wide frontier — which is what lets multiple agent sessions work in parallel later (Week 8's subject). Sequencing decisions you make now determine how wide that frontier can get.</p>
+
+  <h2>2 · What &ldquo;de-risk&rdquo; means</h2>
+  <p>Not all slices carry equal information. The tracer-bullets essay's core promise is that early slices let you &ldquo;identify issues early, and proceed with confidence that foundational approaches actually work&rdquo; — <em>if</em> the early slices are the ones that test foundational approaches. A slice de-risks the architecture to the degree that its failure would force a redesign. So the sequencing question for every issue is:</p>
+  <p><strong>&ldquo;If this slice fails, how much of the design do I have to change?&rdquo;</strong> — schedule the biggest answers first.</p>
+  <ul>
+    <li><strong>Riskiest assumptions first.</strong> Unproven integrations, novel data models, the API you've never used — put a thin slice through each one early. If localStorage can't hold your data shape, you want to know in slice 2, not slice 9.</li>
+    <li><strong>The walking skeleton is always slice 1.</strong> Deployed shell, thinnest full path, observable in a browser. Everything else builds on a proven pipeline.</li>
+    <li><strong>Prefactoring before the slices it enables</strong> — by construction, it's a blocker.</li>
+    <li><strong>Low-information slices last.</strong> Polish, secondary CRUD, cosmetic features: if their failure changes nothing about the design, they can't de-risk anything — their position in the sequence is a free choice, so spend it late.</li>
+  </ul>
+  <div class="callout warn">
+    <span class="label">The demo-first temptation</span>
+    <p>The tempting order is the <em>impressive</em> order: build the flashiest feature first. But demo value and information value are different currencies. A gorgeous card-flip animation on slice 1 proves nothing about whether review scheduling — the app's actual reason to exist — can be computed from your data model. Sequence by what failure would <em>teach</em>, not by what success would <em>show</em>.</p>
+  </div>
+
+  <h2>3 · Priority is not readiness, and neither is order</h2>
+  <p>Three properties of an issue that are easy to conflate, kept straight:</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Property</th><th>Question it answers</th><th>Where it lives</th></tr>
+    <tr><td><strong>Readiness</strong></td><td>Is this specified well enough to start?</td><td><code>ready-for-agent</code> label (M20)</td></tr>
+    <tr><td><strong>Blockedness</strong></td><td><em>May</em> this start now?</td><td>Blocked-by edges; the frontier is where they're all resolved</td></tr>
+    <tr><td><strong>Priority</strong></td><td>Of the startable issues, which <em>should</em> go first?</td><td>Your sequencing judgment — the subject of this lesson</td></tr>
+  </table>
+  </div>
+  <p>Blocking edges are facts about the work; priority is a decision about risk. Keep them separate: don't add a fake blocked-by edge to encode &ldquo;I want this done first&rdquo; — false edges narrow the frontier and serialize work that could have run in parallel. Order within the frontier is what you control by choosing what to pick up (or hand to an agent) next.</p>
+  <p>One more consequence of sequencing well, from the seven-phases workflow: the board is not write-once. QA (phase 7) generates new tickets, and &ldquo;you'll iterate through phases 5–7 multiple times.&rdquo; A backlog whose early slices de-risked the design absorbs new tickets cheaply — they're additions, not rework.</p>
+
+  <h2>4 · Worked judgment: sequencing the flashcards backlog</h2>
+  <p>Take M21's seven issues. The blocking edges force a partial order (1 before 2 before 3; 7 after 3) — but they leave real decisions open. Two of them, worked:</p>
+  <p><strong>Decision 1: After #3 (add cards), the frontier holds #4 (flip) and #7 (delete). Which first?</strong> Flip. Its failure would implicate the card data model and per-card state handling — foundations five other slices sit on. Deletion's failure would implicate almost nothing. Same frontier, different information value.</p>
+  <p><strong>Decision 2: A classmate proposes moving #6 (review scheduling) to slice 2, arguing it's the riskiest logic.</strong> The instinct is right — scheduling <em>is</em> the app's riskiest assumption — but the move breaks a genuine dependency: scheduling consumes marked-answer data that doesn't exist until #5. The de-risking move that respects the edges: keep the chain but <em>thin every intermediate slice</em> to the minimum that feeds #6, so the riskiest logic is reached in the fewest possible sessions. Sequencing operates within the dependency structure, not against it.</p>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+    <p>Evaluate-level: each question asks you to judge a sequencing decision, then compare your rationale with the model answer.</p>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. A course project's PRD hinges on calling an external dictionary API the student has never used. Their backlog defers the API slice to #8 of 9, &ldquo;because the UI issues are easier to start with.&rdquo; Judge the sequencing.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Good — early wins build momentum, and easy-first is a valid strategy</button></li>
+        <li><button data-opt="b">Bad — external APIs should never be in a backlog; mock everything</button></li>
+        <li><button data-opt="c">Bad — the API is the project's riskiest assumption, and its slice is scheduled where failure is most expensive: if the API can't do what the PRD assumes, eight slices of dependent design get invalidated at once</button></li>
+        <li><button data-opt="d">Neutral — order doesn't matter since every issue must be done eventually</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> &ldquo;If this slice fails, how much design changes?&rdquo; — for the API slice the answer is &ldquo;most of it,&rdquo; which is precisely the profile that belongs early. Easy-first (A) optimizes comfort, not information; the momentum it builds is on a foundation that hasn't been checked. D is refuted by the asymmetry: total effort is order-independent, but the <em>cost of discovering a failure</em> grows with everything built on top of it.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. To make sure the walking skeleton is done first, a student adds &ldquo;Blocked by #1&rdquo; to all eight other issues — including three that don't touch anything #1 produces. Judge it.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Correct — it guarantees the intended order, which is what edges are for</button></li>
+        <li><button data-opt="b">Wrong tool — edges should record genuine dependencies only; the false edges narrow every future frontier to a serial line, and the intended order was available anyway by just picking #1 up first</button></li>
+        <li><button data-opt="c">Wrong only because #1 should block nothing</button></li>
+        <li><button data-opt="d">Harmless — extra edges are documentation</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Priority is a decision; edges are facts — encoding one as the other corrupts the frontier, the very thing that lets independent slices run in parallel (and that Week 8 will exploit with multiple sessions). The skeleton being genuinely foundational means <em>most</em> issues legitimately depend on it — but the three that don't are exactly the parallelism the false edges destroy (D's &ldquo;harmless&rdquo; is measurably false). Order-within-the-frontier was already yours to choose.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Two startable slices: (i) a settings page for font size — cosmetic, nothing depends on it; (ii) &ldquo;due today&rdquo; queue computation — novel logic that three later slices consume. The student picks the settings page &ldquo;to bank an easy win before the hard part.&rdquo; Judge it.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Sound — alternating easy and hard prevents burnout</button></li>
+        <li><button data-opt="b">Sound — settings pages are user-visible, so they de-risk UX</button></li>
+        <li><button data-opt="c">Unsound — settings pages should never be issues</button></li>
+        <li><button data-opt="d">Unsound — the queue slice carries nearly all the information: if its data model is wrong, three dependent slices get redesigned, and every session spent elsewhere delays that discovery; the settings page teaches nothing and can go anywhere, so spend it late</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> Both slices are startable; only one is <em>informative</em>. The de-risking criterion says schedule by what failure would teach — the queue's failure forces redesign, the settings page's failure forces nothing. B mistakes visibility for risk (the page is visible but its design is settled); A's pacing argument prices the student's mood but not the compounding cost of deferred discovery. Low-information slices are exactly the ones whose position is free — so spend them where they cost nothing: last.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Mid-project, QA on slice 4 reveals card data needs a schema change. A new ticket is filed. The student is discouraged: &ldquo;my sequencing failed — the plan changed.&rdquo; Evaluate.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">The sequencing worked: phases 5–7 are documented as iterative, and discovering a schema problem at slice 4 of 9 — before the slices that build on it — is the early, cheap discovery that de-risk ordering exists to produce; a changed board is evidence of feedback, not failure</button></li>
+        <li><button data-opt="b">Correct to be discouraged — a well-sequenced board never changes</button></li>
+        <li><button data-opt="c">The new ticket should be refused to protect the original sequence</button></li>
+        <li><button data-opt="d">Sequencing was irrelevant — schema problems surface at the same cost whenever they're found</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The success criterion for sequencing isn't &ldquo;the plan survived unchanged&rdquo; — it's &ldquo;surprises arrived while they were cheap.&rdquo; Pocock's workflow explicitly loops: QA generates tickets, and you iterate through Kanban–execution–QA multiple times. B describes a board that produced no learning (or was never tested); C protects the artifact by discarding its purpose; D is exactly backwards — the cost of a schema change is proportional to how much has been built on the schema, which is what the ordering minimized.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/to-tickets/SKILL.md">mattpocock/skills — to-tickets SKILL.md</a> — blocking edges, blockers-first publishing, and the frontier definition quoted verbatim (primary grounding)</li>
+      <li><a href="https://www.aihero.dev/my-7-phases-of-ai-development">Pocock — My 7 Phases of AI Development (aihero.dev)</a> — the Kanban phase, blocking relationships enabling parallelization, and the QA-generates-tickets iteration loop</li>
+      <li><a href="https://www.aihero.dev/tracer-bullets">Pocock — Tracer Bullets (aihero.dev)</a> — early validation of foundational approaches as the point of slice ordering</li>
+      <li>Companion: <a href="https://www.youtube.com/watch?v=-QFHIoCo-Ko">Pocock — Full Walkthrough: Workflow for AI Coding (AI Engineer 2026, YouTube)</a> — the assigned workshop; in the Kanban segment, watch which ticket he starts and ask what its failure would have invalidated</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m21-tracer-bullet-issues.html"><span class="dir">Previous · M21</span>Tracer-Bullet Decomposition</a>
+    <a class="next" href="m23-filing-issues-with-gh.html"><span class="dir">Next · M23</span>File Issues with Claude + gh CLI</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 4 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>File Issues with Claude + gh CLI — Week 4 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 4</a> · Objective M23</span>
+  </div>
+</header>
+
+<main>
+  <h1>File Issues with Claude + gh CLI</h1>
+  <p class="lede">You've decomposed and sequenced the backlog; now it goes on GitHub. This is a delegation task with a review gate in the middle: Claude drafts the issues, you check every draft for accuracy, then the <code>gh</code> CLI files them — blockers first, so the edges reference real numbers.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M23 · Tooling</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A4</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Use Claude Code with the gh CLI to draft and file issues, and review the drafts for accuracy before submitting.</p>
+  </div>
+
+  <h2>1 · Why gh is the right tool</h2>
+  <p>Anthropic's best-practices guidance is direct: &ldquo;If you use GitHub, install the <code>gh</code> CLI. Claude knows how to use it for creating issues, opening pull requests, and reading comments.&rdquo; Two properties make CLIs the preferred bridge to external services:</p>
+  <ul>
+    <li><strong>Context efficiency.</strong> The docs call CLI tools &ldquo;the most context-efficient way to interact with external services&rdquo; — a <code>gh issue create</code> round-trip costs a few lines of your session's context, where a browser-automation detour would cost screenshots and page dumps.</li>
+    <li><strong>Authentication.</strong> Without <code>gh</code>, Claude falls back to GitHub's API, where &ldquo;unauthenticated requests often hit rate limits.&rdquo; <code>gh auth login</code> (once, interactive — run it yourself in a terminal, not through Claude) gives every future session authenticated access.</li>
+  </ul>
+  <div class="code-label">The gh commands underneath</div>
+  <pre>gh auth status                          # confirm you're logged in
+gh label create ready-for-agent         # one-time label setup
+gh issue create --title "..." --body "..." --label ready-for-agent
+gh issue list                           # verify what got filed
+gh issue view 12                        # read one back, with body</pre>
+  <p>You won't usually type the <code>create</code> lines yourself — Claude will. But you should recognize them, because reviewing delegated work means being able to read what the delegate is about to run.</p>
+
+  <h2>2 · The workflow: draft → review → file</h2>
+  <p>Starting from your M21/M22 drafts (or fresh from the PRD), in a fresh session in your project repo:</p>
+  <div class="code-label">Step 1 — draft</div>
+  <pre>Read PRD.md. Here are my 8 sequenced issue drafts with blocked-by
+edges: [paste]. Format each as a GitHub issue: title naming the
+end-to-end behavior, a "What to build" section from the user's
+perspective, acceptance criteria as checkboxes, and a "Blocked by"
+section. Show me all 8 drafts. Do NOT file anything yet.</pre>
+  <p>The explicit &ldquo;do not file yet&rdquo; matters: it inserts you between drafting and publishing. This is the same pattern the to-tickets skill builds in — before publishing, it &ldquo;quizzes you on the breakdown (granularity, blocking edges, what to merge or split)&rdquo; — and the same review-before-submit rule the PR docs gave you in M19b. Publishing is the irreversible-ish step (issues can be edited, but agents may have already grabbed them); review happens before it.</p>
+  <div class="code-label">Step 2 — review every draft (the A4 requirement)</div>
+  <p>A4's wording is &ldquo;reviewing every draft before submission,&rdquo; and the review is for <em>accuracy against your PRD and your decomposition</em> — not prose style. Concretely, per draft:</p>
+  <ul>
+    <li><strong>Traceability:</strong> does every behavior claimed trace to the PRD? Drafting is where an agent most naturally embellishes — a &ldquo;reasonable&rdquo; extra criterion here is scope creep with your name on it.</li>
+    <li><strong>Criteria fidelity:</strong> are the acceptance criteria <em>yours</em> — the ones your decomposition settled — not weakened (&ldquo;works correctly&rdquo;) or silently strengthened?</li>
+    <li><strong>Edge fidelity:</strong> do the blocked-by edges match your sequencing? An added edge serializes your frontier; a dropped one lets an agent start work whose foundation doesn't exist.</li>
+    <li><strong>Anatomy check (M20):</strong> behavior-named title, user-perspective body, no file paths or speculative code.</li>
+  </ul>
+  <div class="code-label">Step 3 — file, blockers first</div>
+  <pre>Drafts 1–8 are approved with my edits. File them with gh in
+dependency order (blockers first) so each "Blocked by" section can
+reference the actual issue numbers of the already-filed blockers.
+Apply the ready-for-agent label. Then run gh issue list and show me
+the result.</pre>
+  <p>The ordering rule comes straight from to-tickets: publish &ldquo;in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers.&rdquo; File #1 first and issue #2's body can truly say &ldquo;Blocked by #1&rdquo;; file them in reverse and every edge is a dangling promise. The final <code>gh issue list</code> is your verification step — evidence, not assertion, that the board matches the plan.</p>
+
+  <div class="callout tip">
+    <span class="label">Accountability, restated</span>
+    <p>Week 1's M05 gave you the rule: the human owns what ships under their name. Filed issues are published artifacts in your repo — each one is a claim about what your project will do, and next week they become instructions to implementation agents. An unreviewed inaccurate issue doesn't just sit there; it gets <em>built</em>. The review gate is where a five-second read prevents a session of misdirected work.</p>
+  </div>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>This completes Assignment A4's filing step — your reviewed backlog, live on GitHub:</p>
+    <label class="check"><input type="checkbox"><span>Confirmed <code>gh auth status</code> succeeds (ran <code>gh auth login</code> yourself first if not).</span></label>
+    <label class="check"><input type="checkbox"><span>Created the <code>ready-for-agent</code> label in your course-project repo.</span></label>
+    <label class="check"><input type="checkbox"><span>Had Claude draft all 6–10 issues from your PRD + decomposition, with an explicit &ldquo;do not file yet.&rdquo;</span></label>
+    <label class="check"><input type="checkbox"><span>Reviewed every draft against the four checks (traceability, criteria fidelity, edge fidelity, anatomy) — and edited or rejected at least the ones that failed. If all passed untouched, re-read two of them skeptically; drafting rarely goes 10-for-10.</span></label>
+    <label class="check"><input type="checkbox"><span>Had Claude file the approved issues blockers-first with the label applied.</span></label>
+    <label class="check"><input type="checkbox"><span>Verified with <code>gh issue list</code> (or the web UI) that count, titles, labels, and blocked-by numbers all match your plan.</span></label>
+    <label class="check"><input type="checkbox"><span>Set up the board view you'll submit for A4 (a GitHub Project board over these issues, or the issue list itself) and saved its link.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. Reviewing Claude's draft for your &ldquo;flip a card&rdquo; issue, you find a criterion you never specified: &ldquo;[ ] Flip animation runs at 60fps.&rdquo; It's a perfectly reasonable idea. What do you do, and why?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Keep it — the agent improved your spec for free</button></li>
+        <li><button data-opt="b">Cut it (or consciously adopt it as your own decision): it's untraceable to the PRD, and every criterion in a filed issue becomes a requirement some future session will spend work satisfying — scope decisions are yours, not the draft's</button></li>
+        <li><button data-opt="c">Keep it but mark it optional</button></li>
+        <li><button data-opt="d">Refile the whole backlog from scratch — one embellishment means none of the drafts can be trusted</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> This is exactly what the accuracy review exists to catch: plausible additions are the failure mode, because implausible ones would catch themselves. The issue isn't whether 60fps is good — it's <em>whose decision it is</em>. Adopting it deliberately is fine; letting it through unread is scope creep that a Week 5 session will faithfully build. C files an ambiguity (what does an agent do with &ldquo;optional&rdquo;?); D overcorrects — the gate caught it, which means the gate works.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. Why does the workflow file issues blockers-first rather than in whatever order the drafts sit?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">GitHub rejects issues that reference higher numbers</button></li>
+        <li><button data-opt="b">Blockers-first is alphabetical convention</button></li>
+        <li><button data-opt="c">Issue numbers are assigned at creation — filing a blocker before its dependents means each dependent's &ldquo;Blocked by&rdquo; can cite the blocker's real number instead of a placeholder that someone must remember to fix</button></li>
+        <li><button data-opt="d">It makes the issues display in the right order on the board</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The to-tickets rule verbatim: publish in dependency order &ldquo;so each ticket's blocking edges can reference real identifiers.&rdquo; Dangling references (&ldquo;blocked by the storage issue, whatever number that becomes&rdquo;) are precisely the kind of loose end that breaks when an agent — which follows references literally — reads the board. A is false (GitHub happily accepts any #N in text); D confuses filing order with board layout, which is configurable anyway.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">3. A classmate skips gh: &ldquo;Claude can just open Chrome and click through the New Issue form ten times.&rdquo; It would work. What's the strongest case for gh anyway?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Context and verifiability: gh does the round-trip in a few lines of text (browser automation spends screenshots and page-loads from the same finite context budget), and the filing step ends with a checkable text artifact — gh issue list output — instead of &ldquo;I clicked submit ten times&rdquo;</button></li>
+        <li><button data-opt="b">Browsers can't create GitHub issues</button></li>
+        <li><button data-opt="c">gh is required by GitHub's terms of service for bulk actions</button></li>
+        <li><button data-opt="d">There is no real case — the approaches are equivalent</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Both halves come from the best-practices doc: CLI tools are &ldquo;the most context-efficient way to interact with external services,&rdquo; and evidence-over-assertion is the standing verification rule. Ten form fills burn context (Week 2 taught you what that costs the rest of the session) and leave nothing greppable to verify against your plan. B and C are false; D ignores that &ldquo;would work&rdquo; and &ldquo;works efficiently and verifiably&rdquo; are different bars.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">4. Claude reports: &ldquo;All 8 issues filed successfully with labels and blocking references.&rdquo; Per this course's habits, what — if anything — remains?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — the drafts were already reviewed before filing</button></li>
+        <li><button data-opt="b">Re-review every issue body word by word on GitHub</button></li>
+        <li><button data-opt="c">File one extra test issue to confirm gh works</button></li>
+        <li><button data-opt="d">Verify the outcome against the plan: gh issue list (or the board) checked for count, titles, labels, and that spot-checked blocked-by lines cite the right numbers — the report is an assertion; the board is the evidence</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> Draft review checked the <em>content</em>; this checks the <em>execution</em> — a partial failure (a create that errored, a label that didn't exist, an edge referencing the wrong number) can hide behind a confident summary. &ldquo;Have Claude show evidence rather than asserting success&rdquo; is the best-practices rule, and it's cheap here: one list command against an 8-line plan. B duplicates completed review at the wrong altitude; A conflates the two gates this lesson deliberately keeps separate.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices</a> — the gh recommendation, CLI context-efficiency, unauthenticated rate limits, and evidence-over-assertion, quoted directly (primary grounding; this page now hosts the assigned Anthropic best-practices article)</li>
+      <li><a href="https://code.claude.com/docs/en/common-workflows">code.claude.com — Common workflows</a> — the assigned reading for this objective: PR/issue recipes and the review-before-submitting tip this lesson extends to issues</li>
+      <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/to-tickets/SKILL.md">mattpocock/skills — to-tickets SKILL.md</a> — the quiz-before-publish gate, blockers-first publishing, and the ready-for-agent label</li>
+      <li><a href="https://cli.github.com/manual/gh_issue_create">GitHub CLI manual — gh issue create</a> — flag reference for the commands shown</li>
+      <li>Course syllabus, Assignment A4 — &ldquo;use Claude + gh CLI to file them&rdquo; and &ldquo;reviewing every draft before submission&rdquo;</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m22-sequencing-the-backlog.html"><span class="dir">Previous · M22</span>Sequence the Backlog to De-Risk</a>
+    <a class="next" href="m24-one-issue-per-session.html"><span class="dir">Next · M24</span>One Issue per Session</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 4 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

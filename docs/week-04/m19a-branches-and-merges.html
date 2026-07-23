@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Branches and Merges — Week 4 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 4</a> · Objective M19</span>
+  </div>
+</header>
+
+<main>
+  <h1>Branches and Merges</h1>
+  <p class="lede">A branch is a contained area of the repository where work can happen without touching anything else — which is exactly what delegated agent work needs. This lesson covers what branches are, how merges bring work back, and why this course adopts a branch-per-issue convention.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M19 · GitHub</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Quiz 4 · Assignment A4</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Explain branches, merges, and the pull request lifecycle; create a feature branch and open a PR. <span class="chip">Part 1 of 2 — branches &amp; merges</span></p>
+  </div>
+
+  <h2>1 · What a branch is</h2>
+  <p>GitHub's docs put it in one sentence: branches &ldquo;let you develop features, fix bugs, or safely experiment with new ideas in a contained area of your repository.&rdquo; A branch is not a copy of the project — it's a movable label pointing at a line of commits. Two branches can share almost all their history and differ only in the commits made since they diverged.</p>
+  <p>Every repository starts with one <strong>default branch</strong>, commonly named <code>main</code>. It's the branch you see when you visit the repository, the branch checked out when someone clones it, and — unless you choose otherwise — &ldquo;the base branch for new pull requests and code commits.&rdquo; Treat <code>main</code> as the version of the project that is always presentable: everything on it has been reviewed and merged deliberately.</p>
+  <p>Branches you create for a specific piece of work are called <strong>feature branches</strong> (GitHub also says <em>topic branches</em>). They're typically created from the default branch, carry a handful of commits, and are deleted once merged. Creating one requires write access to the repository — which you have on your own course-project repo.</p>
+
+  <div class="callout note">
+    <span class="label">Why agents make this matter more</span>
+    <p>In Week 1 you worked directly on <code>main</code>, and for a solo first repo that was fine. But from this week, an agent is doing multi-file work on your behalf — and work you didn't type yourself deserves a containment area. A feature branch means the agent's changes exist <em>somewhere reviewable</em> before they exist <em>on the version that counts</em>. If the work goes wrong, you delete a branch, not untangle <code>main</code>.</p>
+  </div>
+
+  <h2>2 · Creating and switching branches</h2>
+  <p>The two commands you need, runnable yourself or delegatable to Claude:</p>
+  <div class="code-label">Create a branch and switch to it</div>
+  <pre>git switch -c 12-deck-import     # create branch "12-deck-import" and switch to it
+git switch main                  # go back to main
+git branch                       # list branches; * marks the current one</pre>
+  <p>This course's convention — adopted formally in Assignment A4 — is <strong>branch-per-issue</strong>: one branch for each GitHub issue, named after it (issue number plus a short slug, like <code>12-deck-import</code>). The branch name then answers &ldquo;what is this work?&rdquo; by pointing at the issue that specifies it. You'll see in <a href="m20-anatomy-of-an-issue.html">M20</a> how the issue carries the acceptance criteria; the branch is where the agent works toward them.</p>
+
+  <h2>3 · Merging: bringing work back</h2>
+  <p>A merge takes the commits from one branch and incorporates them into another. On GitHub you'll almost always merge through a pull request (next lesson), and when you do, GitHub offers three merge methods:</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Method</th><th>What it does</th><th>When it fits</th></tr>
+    <tr><td><strong>Merge commit</strong></td><td>Preserves every commit from the branch and adds an explicit merge point</td><td>When individual commits have meaningful context worth keeping</td></tr>
+    <tr><td><strong>Squash and merge</strong></td><td>Combines all the branch's commits into a single commit on the base branch</td><td>When the PR is one logical change with many work-in-progress commits — a common shape for agent branches</td></tr>
+    <tr><td><strong>Rebase and merge</strong></td><td>Replays each commit onto the base branch with no merge commit, for a linear history</td><td>When the team wants linear history and the commits are already well organized</td></tr>
+  </table>
+  </div>
+  <p>For the course project, <strong>squash and merge</strong> is a sensible default: an agent working an issue tends to produce several incremental commits, but what <code>main</code> needs to record is &ldquo;issue #12 was implemented.&rdquo; One issue, one branch, one squashed commit — history that reads like your backlog.</p>
+  <p>GitHub's own workflow guidance is to merge the base branch into long-lived topic branches frequently, and — better — to <strong>merge pull requests promptly</strong>, keeping contributions small. Small, quickly-merged branches barely have time to drift from <code>main</code>, which is how you avoid most merge conflicts before they exist. The vertical-slice issues you'll write in <a href="m21-tracer-bullet-issues.html">M21</a> are sized to make exactly this possible.</p>
+
+  <h2>4 · Protected branches</h2>
+  <p>GitHub lets repository administrators mark critical branches as <strong>protected</strong>. Protection rules can block force pushes, prevent the branch from being deleted, require status checks to pass, require reviews before merging, or require signed commits. On a team repo, protecting <code>main</code> is what makes &ldquo;everything on main was reviewed&rdquo; a guarantee instead of a habit. For a solo course repo you don't need protection rules — but you should know they exist, because they're the enforcement layer for every convention this week teaches by discipline.</p>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>Ten minutes in your course-project repo — the mechanics you'll use for every A4 issue:</p>
+    <label class="check"><input type="checkbox"><span>Ran <code>git branch</code> and confirmed which branch you're on (expect <code>main</code>).</span></label>
+    <label class="check"><input type="checkbox"><span>Created a practice feature branch with <code>git switch -c practice-branch</code> and confirmed the switch with <code>git branch</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>Made a small commit on the branch (edit any file), then switched back to <code>main</code> and confirmed the change is <em>not</em> there — that's containment working.</span></label>
+    <label class="check"><input type="checkbox"><span>Merged it locally (<code>git merge practice-branch</code> from <code>main</code>) or kept the branch to open a PR from in <a href="m19b-pull-request-lifecycle.html">M19b</a>'s checklist.</span></label>
+    <label class="check"><input type="checkbox"><span>Deleted the practice branch afterwards (<code>git branch -d practice-branch</code>) — merged branches are disposable.</span></label>
+    <label class="check"><input type="checkbox"><span>Decided your branch-naming pattern for A4 (recommended: <code>&lt;issue-number&gt;-&lt;short-slug&gt;</code>).</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. You ask Claude to implement issue #7 and it proposes committing directly to <code>main</code>. The best reason to redirect it to a feature branch first is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Commits on main are permanent; commits on branches can be edited freely</button></li>
+        <li><button data-opt="b">Branches run faster because they contain less history</button></li>
+        <li><button data-opt="c">The branch gives the agent's work a contained, reviewable place to exist before it reaches the version of the project that counts — and a failed attempt costs a branch deletion, not surgery on main</button></li>
+        <li><button data-opt="d">GitHub requires a branch before it will accept any push</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> That's the containment argument, and it's why branch-per-issue is this course's convention for agent work. A is false — commits are equally permanent everywhere; branches differ in what <em>points</em> at them, not in mutability. B is nonsense (branches share history). D is false — you can push to main on your own repo, which is exactly why the discipline has to come from you.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. An agent branch for one vertical-slice issue has nine commits: &ldquo;wip&rdquo;, &ldquo;fix test&rdquo;, &ldquo;actually fix test&rdquo;… The work is done and reviewed. Which merge method best fits, and why?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Merge commit — never discard history</button></li>
+        <li><button data-opt="b">Squash and merge — the PR is one logical change, and main's history should read &ldquo;issue implemented,&rdquo; not the agent's trial and error</button></li>
+        <li><button data-opt="c">Rebase and merge — nine separate commits on main, but linear</button></li>
+        <li><button data-opt="d">No merge — copy the final files onto main by hand</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> GitHub's docs recommend squash for exactly this shape: a PR representing one logical change with many small fixup commits. The branch still exists in the PR record if you ever need the blow-by-blow. A and C preserve nine commits nobody will want to read individually; D abandons version control's whole value — attribution, review linkage, and revertability.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Why does GitHub's guidance to &ldquo;merge pull requests promptly&rdquo; matter <em>more</em> in an agentic workflow than a solo-human one?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">It doesn't — merge timing is purely a team-size question</button></li>
+        <li><button data-opt="b">Agents can't resolve merge conflicts, so conflicts must never occur</button></li>
+        <li><button data-opt="c">Unmerged branches consume the agent's context window</button></li>
+        <li><button data-opt="d">Agentic work arrives as many small, parallel-friendly slices; the longer each branch lives, the further it drifts from main, and conflict risk compounds across every open slice at once</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> This week's whole workflow (6–10 vertical-slice issues, branch per issue) multiplies the number of concurrent branches — so drift you'd tolerate on one long-lived solo branch becomes compounding conflict risk across the backlog. Prompt merging keeps every slice's diff small against a fresh main. B is false (agents can resolve conflicts, it just burns time and review attention); C confuses git state with conversation state.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. On a shared team repo, what makes protected branches different from the branch-per-issue convention you're practicing?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Protection is enforcement: rules like required reviews and blocked force pushes are applied by GitHub itself, whereas a convention only holds while people (and agents) follow it</button></li>
+        <li><button data-opt="b">Protected branches can't be merged into</button></li>
+        <li><button data-opt="c">Protection renames the default branch to something agents can't guess</button></li>
+        <li><button data-opt="d">There's no difference — both are documentation</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Per GitHub's docs, protection rules block force pushes, prevent deletion, and can require status checks and reviews before merging — the platform enforces them regardless of anyone's discipline. That's the same advisory-versus-guaranteed distinction Week 2 drew between CLAUDE.md instructions and hooks. B is wrong (merging via reviewed PRs is exactly what protection channels you into); C is invented.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches">GitHub Docs — About branches</a> — branch definition, default branch, topic branches, protection rules, merge-promptly guidance (primary grounding)</li>
+      <li><a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges">GitHub Docs — About pull request merges</a> — merge commit, squash, and rebase methods and when each fits</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices</a> — the Explore–Plan–Code–Commit workflow this branch discipline slots into</li>
+      <li>Companion: <a href="https://www.youtube.com/@GitHub">GitHub's official YouTube channel</a> or <a href="https://www.youtube.com/watch?v=RGOj5yH7evk">freeCodeCamp — Git and GitHub for Beginners (YouTube)</a> — the assigned primer; watch the branching and merging segments and map each command to what you did in the checklist</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="index.html"><span class="dir">Week 4 hub</span>GitHub for Agentic Work</a>
+    <a class="next" href="m19b-pull-request-lifecycle.html"><span class="dir">Next · M19</span>The Pull Request Lifecycle</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 4 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 4 — GitHub for Agentic Work · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb">Week 4 hub</span>
+  </div>
+</header>
+
+<main>
+  <h1>Week 4 — GitHub for Agentic Work</h1>
+  <p class="lede">Week 3 gave you a PRD; this week gives it wheels. Branches contain agent work, pull requests pause it for review, and issues become the unit you hand to a session: 6–10 vertical-slice tracer bullets with acceptance criteria, sequenced so the early ones test your riskiest assumptions, filed with Claude and the gh CLI — every draft reviewed before it's published.</p>
+
+  <p><strong>Estimated total time:</strong> 3.0–4.0 hours (readings/videos + quiz + assignment + meeting). These pages cover the same ground as the assigned readings — use them as your primary lesson text, and the linked sources to go deeper.</p>
+
+  <h2>This week's learning pages</h2>
+  <p>Six mastery objectives, seven lessons (M19 spans two), in recommended order:</p>
+
+  <ul class="card-grid">
+    <li class="card">
+      <div class="meta"><span class="chip">M19</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m19a-branches-and-merges.html">Branches and Merges</a>
+      <p>Branches as contained areas for agent work, the branch-per-issue convention, three merge methods and when each fits, and protected branches as enforcement.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M19</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m19b-pull-request-lifecycle.html">The Pull Request Lifecycle</a>
+      <p>From branch to merge: the five-step lifecycle, draft PRs as &ldquo;agent-done, not human-reviewed,&rdquo; opening PRs with Claude, and the session-to-PR link.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M20</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m20-anatomy-of-an-issue.html">Issues as Units of Agent Work</a>
+      <p>Titles that name behavior, bodies with checkbox acceptance criteria, the ready-for-agent label, closing keywords, and the issue→branch→PR→auto-close loop.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M21</span><span class="chip bloom">Create</span></div>
+      <a class="title" href="m21-tracer-bullet-issues.html">Tracer-Bullet Decomposition</a>
+      <p>Vertical slices vs. horizontal layers, the three slicing rules, a worked 7-issue backlog for the flashcards PRD, and the expand–contract exception.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M22</span><span class="chip bloom">Evaluate</span></div>
+      <a class="title" href="m22-sequencing-the-backlog.html">Sequence the Backlog to De-Risk</a>
+      <p>The frontier, riskiest-assumptions-first, why demo value isn't information value, and keeping priority decisions out of the blocking edges.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M23</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m23-filing-issues-with-gh.html">File Issues with Claude + gh CLI</a>
+      <p>Draft → review every draft for accuracy → file blockers-first with gh, ending with evidence (gh issue list) that the board matches the plan.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M24</span><span class="chip bloom">Understand</span></div>
+      <a class="title" href="m24-one-issue-per-session.html">One Issue per Session</a>
+      <p>The week's converging rule: one issue, one fresh session, one branch, one PR — argued once from the smart zone and once from the reviewer's chair.</p>
+    </li>
+  </ul>
+
+  <div class="callout note">
+    <span class="label">Suggested path</span>
+    <p>Read <a href="m19a-branches-and-merges.html">M19a</a> and <a href="m19b-pull-request-lifecycle.html">M19b</a> together and do their checklists in one sitting — each drill feeds the next. <a href="m20-anatomy-of-an-issue.html">M20</a>'s issue-to-close loop completes the mechanics. Then the A4 arc: decompose with <a href="m21-tracer-bullet-issues.html">M21</a>, sequence with <a href="m22-sequencing-the-backlog.html">M22</a>, and file with <a href="m23-filing-issues-with-gh.html">M23</a> — ideally decomposition and sequencing in one sitting while your PRD is fresh. Read <a href="m24-one-issue-per-session.html">M24</a> any time; it's short, it's on the quiz, and it's the reason next week's workflow looks the way it does.</p>
+  </div>
+
+  <h2>How this week is assessed</h2>
+  <ul>
+    <li><strong>Quiz 4</strong> (25 MCQs): branch/PR lifecycle; anatomy of a good issue; vertical slices vs. horizontal layers; why one issue per session. Every lesson's self-check is written in the quiz's application-over-recall style.</li>
+    <li><strong>Assignment A4</strong> (10 pts): decompose your PRD into six to ten vertical-slice issues, each with acceptance criteria. Sequence them so early slices de-risk the design. Use Claude Code with the gh CLI to draft and file them — reviewing every draft before submission — and adopt a branch-per-issue convention. Submit the issue board link.</li>
+    <li><strong>Meeting 4:</strong> bring your board; expect the M22 sequencing questions (&ldquo;what does this slice's failure teach you?&rdquo;) applied to your own backlog.</li>
+  </ul>
+
+  <h2>Assigned sources for Week 4</h2>
+  <p>The lessons above are grounded in these; read or watch the originals to go deeper.</p>
+  <ul>
+    <li><a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches">GitHub Docs — About branches</a>, <a href="https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues">About issues</a>, and <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">About pull requests</a> — the week's ancillary GitHub readings, plus <a href="https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue">Linking a pull request to an issue</a> and <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges">About pull request merges</a></li>
+    <li><a href="https://code.claude.com/docs/en/best-practices">code.claude.com — Best practices</a> — the assigned Anthropic reading on git workflows, the gh CLI, and commit habits (the former anthropic.com best-practices article now lives at this URL)</li>
+    <li><a href="https://www.aihero.dev/tracer-bullets">aihero.dev — Tracer Bullets: Keeping AI Slop Under Control</a> and <a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/to-tickets/SKILL.md">mattpocock/skills — to-tickets SKILL.md</a> — the vertical-slice decomposition material (Pocock iterates fast: the skill was called <em>to-issues</em> in earlier write-ups; the rules quoted in these lessons are from the current repo)</li>
+    <li><a href="https://www.aihero.dev/my-7-phases-of-ai-development">aihero.dev — My 7 Phases of AI Development</a> — where the Kanban board sits in the full workflow</li>
+    <li>Video: one branches-and-PRs primer — <a href="https://www.youtube.com/@GitHub">GitHub's official channel</a> or <a href="https://www.youtube.com/watch?v=RGOj5yH7evk">freeCodeCamp — Git and GitHub for Beginners</a> (companion material; the shorter, the better — watch the branch, merge, and PR segments)</li>
+    <li>Video: <a href="https://www.youtube.com/watch?v=-QFHIoCo-Ko">Matt Pocock — Full Walkthrough: Workflow for AI Coding (AI Engineer 2026, YouTube)</a> — companion for M21/M22; watch the PRD-to-Kanban segment</li>
+  </ul>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 4 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+</body>
+</html>
