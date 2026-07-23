@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whose Decision Was It? — Week 1 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 1</a> · Objective M05</span>
+  </div>
+</header>
+
+<main>
+  <h1>Whose Decision Was It?</h1>
+  <p class="lede">Reading a session transcript and attributing every decision — human or agent — is the skill your A1 reflection is graded on. Here you'll practice on a worked example.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M05 · Judgment</span>
+      <span class="chip bloom">Bloom: Analyze</span>
+      <span class="chip assessed">Assessed by: A1 reflection</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Identify, in a completed session transcript, which decisions were made by the human and which by the agent.</p>
+  </div>
+
+  <h2>The analysis frame</h2>
+  <p>From <a href="m02-ai-labor.html">objective M02</a> you have the vocabulary: Anthropic's session research found humans making ~70% of <strong>planning decisions</strong> (“what to do”) and Claude making ~80% of <strong>execution decisions</strong> (“how to do it”). To analyze a transcript, walk through it turn by turn asking three questions about each decision you spot:</p>
+  <ol>
+    <li><strong>What was decided?</strong> Name it concretely (“use a JSON file for storage,” not “technical stuff”).</li>
+    <li><strong>Who decided?</strong> The one who chose, not the one who typed. An agent proposing and a human approving is a <em>shared</em> decision — note who had the veto.</li>
+    <li><strong>Which kind?</strong> Planning (what/whether/when to stop) or execution (how/where/in what order).</li>
+  </ol>
+  <p>Decisions hide in unexpected places. Silence is a decision (the human who doesn't object to a proposed approach has approved it). Tool choices are decisions (the agent picked <em>which</em> test command to run). And “done” is always a decision — someone decided the work was finished.</p>
+
+  <h2>A worked transcript</h2>
+  <p>Below is a condensed but realistic Week-1-style session: a student building a small CLI utility (the A1 task). Read it once straight through, then work the analysis questions beneath it.</p>
+
+  <div class="transcript" aria-label="Sample Claude Code session transcript">
+    <div class="turn human">
+      <span class="who">Human — turn 1</span>
+      <p>Build a CLI tool called <code>wordcount</code> that takes a filename and prints lines, words, and characters. Python, standard library only. Add a simple test.</p>
+    </div>
+    <div class="turn agent">
+      <span class="who">Claude — turn 2</span>
+      <p>I'll create <code>wordcount.py</code> using <code>argparse</code> for argument handling, and a <code>test_wordcount.py</code> using <code>unittest</code> since you asked for standard library only. Reading the repo first to check for existing conventions…</p>
+      <p><em>[reads CLAUDE.md, lists directory]</em> The repo is empty apart from README and CLAUDE.md. Creating both files now.</p>
+      <p><em>[permission prompt: create wordcount.py — human approves]</em></p>
+      <p><em>[permission prompt: create test_wordcount.py — human approves]</em></p>
+    </div>
+    <div class="turn agent">
+      <span class="who">Claude — turn 3</span>
+      <p>Running the tests: <code>python -m unittest</code> … 1 failure — my character count includes the trailing newline, but my test expected it excluded. I'll make the implementation count all characters as-is (matching <code>wc -c</code> behavior) and fix the test expectation to match.</p>
+      <p><em>[edits test, reruns: 2 passed]</em> Done — both tests pass.</p>
+    </div>
+    <div class="turn human">
+      <span class="who">Human — turn 4</span>
+      <p>Wait — I'd rather it <em>not</em> count the trailing newline. Most of my files end with one and it's confusing. Change it back.</p>
+    </div>
+    <div class="turn agent">
+      <span class="who">Claude — turn 5</span>
+      <p>Understood — excluding a single trailing newline from the character count. Updated the implementation and the test; both pass. <em>[shows diff]</em></p>
+    </div>
+    <div class="turn human">
+      <span class="who">Human — turn 6</span>
+      <p>What files have I changed? …OK, I've read the diff. Commit with message “Add wordcount CLI with tests”.</p>
+    </div>
+    <div class="turn agent">
+      <span class="who">Claude — turn 7</span>
+      <p><em>[permission prompt: git add / git commit — human approves]</em> Committed: <code>Add wordcount CLI with tests</code>.</p>
+    </div>
+  </div>
+
+  <h2>Analyze it</h2>
+  <p>Each question names a decision from the transcript. Classify it.</p>
+
+  <div class="q" data-answer="a">
+    <p class="q-text">1. “The tool counts lines, words, and characters, in Python, standard library only.” Who decided, and what kind of decision?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Human · planning — the what and its constraints came entirely from turn 1</button></li>
+      <li><button data-opt="b">Claude · planning — it wrote the code that does this</button></li>
+      <li><button data-opt="c">Claude · execution — it chose the implementation</button></li>
+      <li><button data-opt="d">Shared — Claude could have refused</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>A.</strong> Scope and constraints are the archetypal planning decision, and here they were fully specified by the human before the agent acted. Writing code that fulfills a specification is execution, not deciding the specification.</p>
+    </div>
+  </div>
+
+  <div class="q" data-answer="c">
+    <p class="q-text">2. “Use <code>argparse</code> and <code>unittest</code>.” Who decided, and what kind?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Human · planning — “standard library only” named those modules</button></li>
+      <li><button data-opt="b">Human · execution — approving the file creation approved the libraries</button></li>
+      <li><button data-opt="c">Claude · execution — the human constrained the space; Claude chose within it</button></li>
+      <li><button data-opt="d">Claude · planning — library choice defines the project</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>C.</strong> “Standard library only” ruled options out but named nothing; several stdlib approaches existed (<code>sys.argv</code>, <code>getopt</code>, <code>doctest</code>…). Claude picked. That's a how-decision inside a human-set boundary — the everyday texture of the 80% execution share.</p>
+    </div>
+  </div>
+
+  <div class="q" data-answer="b">
+    <p class="q-text">3. In turn 3, the trailing-newline question got its <em>first</em> answer (“count it, like <code>wc -c</code>”). Who made that decision, and what does turn 4 reveal about it?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Human · planning — the spec implied it</button></li>
+      <li><button data-opt="b">Claude · a behavior decision made by the agent — turn 4 shows the human reclaiming it</button></li>
+      <li><button data-opt="c">Claude · pure execution — no product behavior was involved</button></li>
+      <li><button data-opt="d">Nobody — the test framework forced it</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>B.</strong> The spec was silent on trailing newlines, so when the test failure forced the question, Claude resolved it — the agent made a decision about <em>what the product does</em>, not just how. Turn 4 is the human noticing and overriding: the division of decisions is a dial, and this is the dial being turned. Spotting exactly these moments — agent decisions that leak into “what” territory — is the heart of a good A1 reflection.</p>
+    </div>
+  </div>
+
+  <div class="q" data-answer="d">
+    <p class="q-text">4. “The work is finished and worth committing.” Who decided?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Claude — it said “Done — both tests pass” in turn 3</button></li>
+      <li><button data-opt="b">Claude — it performed the commit in turn 7</button></li>
+      <li><button data-opt="c">Nobody — passing tests made it automatic</button></li>
+      <li><button data-opt="d">Human — Claude proposed “done” twice, but the human reviewed the diff and ordered the commit</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>D.</strong> Claude asserted completion in turn 3 — and was wrong (turn 4 reopened the work). Acceptance happened in turn 6, after the human read the diff. “Done” is a planning decision, and in a well-run session it belongs to the human. Note who typed the commit (agent) versus who decided to commit (human): typing isn't deciding.</p>
+    </div>
+  </div>
+
+  <div class="q" data-answer="c">
+    <p class="q-text">5. Tally the transcript in the study's terms. Which summary is most accurate?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Human made all decisions; Claude just typed</button></li>
+      <li><button data-opt="b">Claude made all decisions after turn 1</button></li>
+      <li><button data-opt="c">Human: scope, constraints, newline behavior (reclaimed), acceptance. Claude: libraries, file layout, test command, diagnosis, first newline call</button></li>
+      <li><button data-opt="d">The decisions can't be attributed because both participated</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>C.</strong> That's the humans-plan / agents-execute split with one instructive exception — the newline behavior started as an agent decision and was reclaimed by the human. Attribution is not only possible, it's the exercise: every decision has an owner, even shared ones (owner of the veto).</p>
+    </div>
+  </div>
+
+  <h2>Now do yours</h2>
+  <p>For Assignment A1's five-sentence reflection, apply this frame to your own completed session:</p>
+  <ol>
+    <li>Scroll back through the transcript (or run <code>claude -c</code> to reopen it).</li>
+    <li>List every decision you can find — aim for at least six. Include the quiet ones: approvals, defaults you didn't question, “done.”</li>
+    <li>Mark each Human or Claude, planning or execution.</li>
+    <li>Find at least one decision Claude made that you'd call a <em>what</em>-decision (like the newline call). That one belongs in your reflection.</li>
+    <li>Write the five sentences from the list — specific decisions, named owners.</li>
+  </ol>
+
+  <div class="callout tip">
+    <span class="label">Grader's-eye view</span>
+    <p>Weak reflection: “I made the big decisions and Claude handled the details.” Strong reflection: “Claude decided the character count should include the trailing newline when my spec was silent; I caught it in the diff and reversed it.” Specific decisions, named owners, and one moment where the boundary moved.</p>
+  </div>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://www.anthropic.com/research/claude-code-expertise">How Claude Code is used in practice</a> — the planning/execution decision framework and its measurements (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code works</a> — sessions saved locally; resuming with <code>claude -c</code>; the human's place in the loop</li>
+      <li>The transcript above is a course-written exercise, not a real session.</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m04-session-controls.html"><span class="dir">Previous · M04</span>Core Session Controls</a>
+    <a class="next" href="m06-github-basics.html"><span class="dir">Next · M06</span>GitHub Basics</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 1 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

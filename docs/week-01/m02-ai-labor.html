@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Is AI Labor? — Week 1 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 1</a> · Objective M02</span>
+  </div>
+</header>
+
+<main>
+  <h1>What Is AI Labor?</h1>
+  <p class="lede">Autocomplete suggests, chat advises, agents work. Understanding the difference — and how planning and execution decisions divide between you and the agent — is the intellectual core of this course.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M02 · Foundations</span>
+      <span class="chip bloom">Bloom: Analyze</span>
+      <span class="chip assessed">Assessed by: Quiz 1 · A1 reflection</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Distinguish agentic coding from chat-based code assistance and from autocomplete, and describe what “AI labor” means as a division of planning vs. execution decisions.</p>
+  </div>
+
+  <h2>Three ways AI can help you code</h2>
+  <p>By 2026 you've likely met all three of these. They look similar — “AI writes code” — but they occupy different positions in your workflow, and confusing them leads to using each one badly.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th></th><th>Autocomplete</th><th>Chat assistance</th><th>Agentic coding</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>What it sees</th>
+          <td>The current file (roughly), your cursor position</td>
+          <td>What you paste or describe</td>
+          <td>Your whole project: files, terminal, git state</td>
+        </tr>
+        <tr>
+          <th>What it produces</th>
+          <td>The next few tokens or lines, inline</td>
+          <td>Text: explanations, snippets, advice</td>
+          <td>Completed work: edited files, run tests, commits</td>
+        </tr>
+        <tr>
+          <th>Who acts on the world</th>
+          <td>You (accept/reject each suggestion)</td>
+          <td>You (apply the advice by hand)</td>
+          <td>The agent, with your permission</td>
+        </tr>
+        <tr>
+          <th>Who verifies</th>
+          <td>You, continuously</td>
+          <td>You, after applying</td>
+          <td>The agent first (tests, builds), then you review</td>
+        </tr>
+        <tr>
+          <th>Unit of interaction</th>
+          <td>A keystroke</td>
+          <td>A question</td>
+          <td>A task</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The documentation draws the same line: because Claude Code sees your whole project, it can “work across it” — search for relevant files, make coordinated edits across several of them, run tests, and commit. “This is different from inline code assistants that only see the current file.” And unlike a chatbot that answers and waits, an agentic tool “can read your files, run commands, make changes, and autonomously work through problems while you watch, redirect, or step away entirely.”</p>
+
+  <h2>“AI labor”: a division of decisions</h2>
+  <p>This course's name for what you're buying with that autonomy is <strong>AI labor</strong>: software work performed by an agentic tool <em>under human direction</em>. The emphasis matters. AI labor is not “the AI does everything” — it's a specific division of decisions, and Anthropic's research measured exactly where the line falls in practice.</p>
+  <p>The research post <em>“How Claude Code is used in practice”</em> analyzed roughly 400,000 real sessions and found a consistent split:</p>
+
+  <ul>
+    <li><strong>Humans make the planning decisions.</strong> Users made roughly <strong>70% of the “what to do” determinations</strong> — which feature to build, which bug matters, what done looks like.</li>
+    <li><strong>Agents make the execution decisions.</strong> Claude handled about <strong>80% of the “how to do it” choices</strong> — which files to read, what order to work in, how to implement.</li>
+    <li><strong>The leverage is real.</strong> In typical sessions Claude performed around <strong>10 actions per user instruction</strong>, sometimes more than 100.</li>
+  </ul>
+
+  <div class="callout note">
+    <span class="label">The slogan, and what it hides</span>
+    <p><strong>“Humans plan, agents execute”</strong> is the study's headline — but note it describes proportions, not a wall. You still make some execution decisions (you'll interrupt and redirect), and Claude contributes to planning (it proposes approaches). The study found that the more decision authority users kept, the fewer actions Claude took per instruction (8 vs. 16) — the division is a dial you control, not a fixed contract.</p>
+  </div>
+
+  <h2>Expertise is the multiplier</h2>
+  <p>The study's most important finding for you as a student: <strong>what you know determines what the agent can do for you.</strong></p>
+  <ul>
+    <li>Users with domain expertise achieved 28–33% verified success on their tasks; novices, 15%.</li>
+    <li>Expert users triggered <strong>2.4× more agent actions and about 5× more output per instruction</strong> — the researchers put it as: “the more domain expertise a person brings to a session, the more work Claude does per instruction.”</li>
+    <li>Novices abandoned troubled sessions 19% of the time versus 5–7% for others — expertise is what lets you recover when a session goes sideways.</li>
+    <li>Strikingly, professionals from <em>non-software</em> fields succeeded within 5–7 percentage points of software engineers — domain understanding mattered more than coding background.</li>
+  </ul>
+  <p>The researchers' conclusion: “coding agents are not substituting for domain expertise — the greater understanding a worker brings to an agent, the higher quality work the agent performs.” That is why this course spends ten weeks on <em>your</em> skills — specification, direction, review — rather than on prompting tricks.</p>
+
+  <div class="callout tip">
+    <span class="label">For your A1 reflection</span>
+    <p>Assignment A1 asks you to identify which decisions in your first session were yours and which were Claude's. The planning/execution frame is your instrument: for each decision, ask “was this a <em>what/whether</em> decision or a <em>how</em> decision — and who made it?” <a href="m05-whose-decision.html">Objective M05</a> gives you a full worked example.</p>
+  </div>
+
+  <h2>Analysis exercise: classify the tool</h2>
+  <p>Before the self-check, test the distinction on borderline cases. For each scenario below, decide which category the interaction belongs to — then reveal the analysis.</p>
+
+  <div class="q" data-answer="b">
+    <p class="q-text">Scenario 1. You paste a 40-line function into a web chat, ask “why does this throw on empty input?”, read the explanation, and edit your file accordingly. Which category was this?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Agentic coding — the AI diagnosed a real bug in your project</button></li>
+      <li><button data-opt="b">Chat assistance — the AI only ever produced text; you did all the acting</button></li>
+      <li><button data-opt="c">Autocomplete — it completed your understanding</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>B.</strong> The diagnostic quality doesn't matter — what matters is the division of labor. The AI saw only what you pasted, produced only words, and you performed every action and all verification. That's chat assistance, however smart it is.</p>
+    </div>
+  </div>
+
+  <div class="q" data-answer="c">
+    <p class="q-text">Scenario 2. You type “fix the flaky test in CI” into Claude Code and answer two permission prompts while it runs the suite, reads logs, edits a test helper, and reruns to green. You then review the diff. Which category — and who made the planning decision?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Chat assistance; Claude planned</button></li>
+      <li><button data-opt="b">Agentic coding; Claude made the planning decision</button></li>
+      <li><button data-opt="c">Agentic coding; you planned (“fix this”), Claude made the execution decisions</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>C.</strong> The agent acted on the world (ran, read, edited, verified) — agentic coding. But the <em>what</em> came from you: you decided the flaky test was the thing worth fixing. Claude's decisions — where to look, what to change, when to rerun — were all <em>how</em> decisions. This is the 70/80 split in miniature.</p>
+    </div>
+  </div>
+
+  <div class="q" data-answer="a">
+    <p class="q-text">Scenario 3. As you type <code>for (const user of</code>, your editor ghosts in the rest of the loop body and you press Tab. Which category?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">Autocomplete — keystroke-level suggestion, you continuously verify inline</button></li>
+      <li><button data-opt="b">Agentic coding — the AI wrote multiple lines</button></li>
+      <li><button data-opt="c">Chat assistance — it answered the implied question “what comes next?”</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>A.</strong> Volume of code isn't the test. The interaction unit is the keystroke, the AI sees roughly the current file, and you accept or reject each suggestion in-line. No task was delegated and nothing was verified by the AI.</p>
+    </div>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">1. Which finding comes from Anthropic's study of real Claude Code sessions?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Agents now make most planning decisions</button></li>
+        <li><button data-opt="b">Coding background is the strongest predictor of success</button></li>
+        <li><button data-opt="c">Sessions average one agent action per instruction</button></li>
+        <li><button data-opt="d">Users make ~70% of “what to do” decisions; Claude makes ~80% of “how to do it” decisions</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> That's the study's core division-of-labor finding. (B) is backwards — domain expertise, not coding background, drove success; (C) is off by an order of magnitude (~10 actions per instruction).</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. A teammate says: “AI labor means the agent replaces the developer.” Based on the research findings, what's the strongest correction?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Agents can't write production-quality code yet</button></li>
+        <li><button data-opt="b">Agents amplify expertise rather than replace it — experts get 2.4× more actions and far more output per instruction</button></li>
+        <li><button data-opt="c">AI labor only applies to test code</button></li>
+        <li><button data-opt="d">The agent replaces the developer only on small tasks</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> The study concluded agentic coding “amplifies rather than replaces expertise”: the more understanding the human brings, the more and better work the agent performs. Execution gets cheaper; judgment gets more valuable.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">3. What most fundamentally separates agentic coding from chat-based assistance?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">A newer, larger model</button></li>
+        <li><button data-opt="b">Better answers to programming questions</button></li>
+        <li><button data-opt="c">The tool can act on the project — read, edit, run, verify — instead of only producing text</button></li>
+        <li><button data-opt="d">It works offline in the terminal</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Same models can power both. The difference is the harness: tools plus project access mean the agent performs the work and verifies it, rather than advising you while you do the work.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. The study found managers and other non-engineers succeeded nearly as often as software engineers at coding tasks. What's the best explanation offered?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Success tracked domain understanding and clear specification more than coding skill</button></li>
+        <li><button data-opt="b">The tasks non-engineers attempted were trivial</button></li>
+        <li><button data-opt="c">Engineers were penalized by overconfidence</button></li>
+        <li><button data-opt="d">Non-engineers used better models</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> With execution delegated, what's left is knowing what to build and recognizing whether it's right — domain judgment and specification clarity. The study even notes managers' slight edge may reflect delegation skill. That's exactly the skill set this course trains.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://www.anthropic.com/research/claude-code-expertise">How Claude Code is used in practice</a> — the ~400k-session study; all statistics above (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code works</a> — whole-project access vs. inline assistants</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Best practices for Claude Code</a> — “Unlike a chatbot that answers questions and waits…”</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m01b-tools-permissions.html"><span class="dir">Previous · M01 lesson 2</span>Tools &amp; Permissions</a>
+    <a class="next" href="m03a-install-authenticate.html"><span class="dir">Next · M03 lesson 1</span>Install &amp; Authenticate</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 1 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

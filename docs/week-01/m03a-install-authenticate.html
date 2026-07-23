@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install &amp; Authenticate — Week 1 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 1</a> · Objective M03 · Lesson 1 of 2</span>
+  </div>
+</header>
+
+<main>
+  <h1>Install &amp; Authenticate</h1>
+  <p class="lede">Get Claude Code onto your machine and signed in with your Pro account. Fifteen minutes, one command, one login.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M03 · Setup</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A1</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Install Claude Code, authenticate with a Claude Pro account, and initialize a project with <code>/init</code> inside a Git repository. <span class="dim">This lesson covers install + authenticate; <a href="m03b-first-project.html">Lesson 2</a> covers the project and <code>/init</code>.</span></p>
+  </div>
+
+  <h2>Before you begin</h2>
+  <p>You need three things, all from the course's tooling list:</p>
+  <ul>
+    <li>A <strong>terminal</strong>: Terminal on macOS, PowerShell on Windows, any shell on Linux. (VS Code's built-in terminal works too.)</li>
+    <li>Your <strong>Claude Pro subscription</strong> — Claude Code authenticates against it directly; no API key needed.</li>
+    <li>About 15 minutes.</li>
+  </ul>
+
+  <h2>Step 1 — Run the installer for your OS</h2>
+  <p>The official docs recommend the <strong>native install</strong>. Pick the one command that matches your system:</p>
+
+  <span class="code-label">macOS, Linux, or WSL</span>
+  <pre><code><span class="prompt">$</span> curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+
+  <span class="code-label">Windows — PowerShell</span>
+  <pre><code><span class="prompt">PS C:\&gt;</span> irm https://claude.ai/install.ps1 | iex</code></pre>
+
+  <span class="code-label">Windows — CMD</span>
+  <pre><code><span class="prompt">C:\&gt;</span> curl -fsSL https://claude.ai/install.cmd -o install.cmd &amp;&amp; install.cmd &amp;&amp; del install.cmd</code></pre>
+
+  <div class="callout warn">
+    <span class="label">Windows: which shell am I in?</span>
+    <p>The docs call out the two classic mix-ups. If you see <code>The token '&amp;&amp;' is not a valid statement separator</code>, you're in <strong>PowerShell</strong> but ran the CMD command. If you see <code>'irm' is not recognized</code>, you're in <strong>CMD</strong> but ran the PowerShell command. Check your prompt: it starts with <code>PS C:\</code> in PowerShell and plain <code>C:\</code> in CMD.</p>
+  </div>
+
+  <div class="callout note">
+    <span class="label">Windows only: install Git first</span>
+    <p>The docs recommend <a href="https://git-scm.com/downloads/win">Git for Windows</a> on native Windows so Claude Code can use its Bash tool (without it, Claude falls back to PowerShell as its shell). You need Git anyway for <a href="m06-github-basics.html">objective M06</a> — install it before Claude Code and you'll never think about it again.</p>
+  </div>
+
+  <p>Prefer a package manager? <code>brew install --cask claude-code</code> (macOS) and <code>winget install Anthropic.ClaudeCode</code> (Windows) also work — but note that unlike the native installer, they do <em>not</em> auto-update; you must run <code>brew upgrade</code> / <code>winget upgrade</code> yourself.</p>
+
+  <h2>Step 2 — Confirm the install</h2>
+  <pre><code><span class="prompt">$</span> claude --version</code></pre>
+  <p>Per the Quickstart, a successful install prints a version number followed by <code>(Claude Code)</code>. If the command isn't found, open a <em>new</em> terminal window first — the installer updates your PATH, but already-open terminals don't see it.</p>
+
+  <h2>Step 3 — Log in with your Pro account</h2>
+  <p>Claude Code prompts you to log in the first time you start a session:</p>
+  <pre><code><span class="prompt">$</span> claude</code></pre>
+  <p>Follow the prompts: they open your browser, you sign in to your Claude account, and the credential is stored on your machine. The docs note that once logged in, <strong>you won't need to log in again</strong> — and if you ever need to switch accounts, type <code>/login</code> inside a running session.</p>
+
+  <div class="callout tip">
+    <span class="label">Choose the subscription, not an API key</span>
+    <p>The login screen offers several account types. Choose <strong>Claude account (Pro)</strong> — that's what this course budgets around. A Console/API login bills per-token instead of using your flat $20/month Pro plan, and Week 8's economics exercises assume Pro usage limits.</p>
+  </div>
+
+  <h2>Troubleshooting quick hits</h2>
+  <ul>
+    <li><strong>Install command fails with a curl/403/syntax error:</strong> the docs point to <a href="https://code.claude.com/docs/en/troubleshoot-install">Troubleshoot installation</a>, which matches error text to fixes and lists alternative install methods.</li>
+    <li><strong>Browser never opens during login:</strong> copy the URL printed in the terminal into your browser by hand.</li>
+    <li><strong>Stuck?</strong> Ask in the cohort channel <em>with the exact error text</em> — this is also good practice for how you'll soon be prompting Claude.</li>
+  </ul>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>This objective is assessed by doing (Assignment A1). Work through each item in your own terminal and tick it off:</p>
+    <label class="check"><input type="checkbox"><span>(Windows only) Git for Windows is installed — <code>git --version</code> prints a version.</span></label>
+    <label class="check"><input type="checkbox"><span>Ran the one-line installer for my OS with no errors.</span></label>
+    <label class="check"><input type="checkbox"><span><code>claude --version</code> in a <em>new</em> terminal prints a version and <code>(Claude Code)</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>Started <code>claude</code>, completed the browser login with my <strong>Pro</strong> account.</span></label>
+    <label class="check"><input type="checkbox"><span>The session shows the version, current model, and working directory above the prompt.</span></label>
+    <label class="check"><input type="checkbox"><span>Typed <code>/help</code> and skimmed the command list, then exited with <code>/exit</code>.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. On Windows, you run <code>irm https://claude.ai/install.ps1 | iex</code> and get <code>'irm' is not recognized as an internal or external command</code>. What went wrong?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Claude Code doesn't support Windows</button></li>
+        <li><button data-opt="b">You're in CMD but ran the PowerShell command</button></li>
+        <li><button data-opt="c">Your Pro subscription hasn't activated</button></li>
+        <li><button data-opt="d">Git for Windows is missing</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> <code>irm</code> is a PowerShell alias; CMD doesn't know it. Check the prompt: <code>PS C:\</code> means PowerShell, plain <code>C:\</code> means CMD — each has its own installer one-liner.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. Why does this course have you authenticate with your Pro subscription rather than an API key?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">API keys don't work with Claude Code</button></li>
+        <li><button data-opt="b">Pro accounts unlock a more capable model</button></li>
+        <li><button data-opt="c">Pro gives flat-rate usage the course is budgeted around; API access bills per token</button></li>
+        <li><button data-opt="d">Authentication is only required for API users</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Claude Code accepts both, but the course is designed around Pro's flat $20/month and its usage limits — working within them is a stated learning outcome, and Week 8 studies the economics explicitly.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Install succeeded, but <code>claude --version</code> says “command not found” in the same terminal window. Most likely fix?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Reinstall with the CMD method instead</button></li>
+        <li><button data-opt="b">Log in first; the command is hidden until you authenticate</button></li>
+        <li><button data-opt="c">Your subscription lapsed</button></li>
+        <li><button data-opt="d">Open a new terminal so the updated PATH takes effect</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The installer modifies your PATH, but shells read PATH at startup — an already-open window won't see the new command. New terminal, then retry.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/quickstart">Quickstart</a> — Steps 1–3: install commands per OS, <code>claude --version</code>, login flow (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/overview">Overview</a> — install methods, auto-update behavior, Git for Windows note</li>
+      <li>Companion: Skilljar <a href="https://anthropic.skilljar.com/claude-code-101">Claude Code 101</a>, module 2 “Installing Claude Code” — a guided version of these same steps.</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m02-ai-labor.html"><span class="dir">Previous · M02</span>What Is AI Labor?</a>
+    <a class="next" href="m03b-first-project.html"><span class="dir">Next · M03 lesson 2</span>First Project: Repo + /init</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 1 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

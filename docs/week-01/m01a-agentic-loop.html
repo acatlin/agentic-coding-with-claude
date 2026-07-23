@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Agentic Loop — Week 1 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 1</a> · Objective M01 · Lesson 1 of 2</span>
+  </div>
+</header>
+
+<main>
+  <h1>The Agentic Loop</h1>
+  <p class="lede">How Claude Code actually works: a repeating cycle of gathering context, taking action, and verifying results — with you in the loop.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M01 · Foundations</span>
+      <span class="chip bloom">Bloom: Understand</span>
+      <span class="chip assessed">Assessed by: Quiz 1</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Explain the agentic loop (gather context → take action → verify → repeat) and how Claude Code uses tools to read files, run commands, and edit code. <span class="dim">This lesson covers the loop; <a href="m01b-tools-permissions.html">Lesson 2</a> covers the tools and permissions that power it.</span></p>
+  </div>
+
+  <h2>A different kind of assistant</h2>
+  <p>You have probably used an AI chat assistant for code: you paste a snippet, it replies with text, and then <em>you</em> do everything else — open the file, apply the change, run the tests, read the error, paste the error back. The assistant only ever produces words. You are the one acting on the world.</p>
+  <p>Claude Code is different in exactly one fundamental way: <strong>it can act</strong>. It runs in your terminal with access to your project, and it can read your files, search your codebase, edit code, and run commands — the same things you would do by hand. Anthropic's documentation calls this an <strong>agentic</strong> coding tool: you describe an outcome, and the agent works toward it, step by step, checking its own progress as it goes.</p>
+
+  <h2>The three phases</h2>
+  <p>When you give Claude Code a task, it works through three phases, over and over, until the task is done. The official docs name them like this:</p>
+
+  <div class="loop-diagram" aria-label="Diagram: gather context, then take action, then verify results, repeating">
+    <span class="phase">1 · Gather context</span>
+    <span class="arrow">→</span>
+    <span class="phase">2 · Take action</span>
+    <span class="arrow">→</span>
+    <span class="phase">3 · Verify results</span>
+    <span class="arrow">↺</span>
+  </div>
+
+  <h3>1. Gather context</h3>
+  <p>Before changing anything, Claude figures out what it needs to know. It might search for files matching a pattern, read the relevant source, check your git state, or look at your <code>CLAUDE.md</code> project notes. You don't have to paste code in — Claude reads your project files as needed.</p>
+
+  <h3>2. Take action</h3>
+  <p>Then it acts: editing a file, creating a new one, running a build, executing a git command. Each action is performed through a <em>tool</em> (the subject of <a href="m01b-tools-permissions.html">the next lesson</a>), and each action's result comes back to Claude as new information.</p>
+
+  <h3>3. Verify results</h3>
+  <p>Finally, it checks its own work — rerunning the failing test, rebuilding the project, re-reading the file it just changed. If the check fails, that failure becomes new context, and the loop begins again: gather, act, verify.</p>
+
+  <div class="callout note">
+    <span class="label">Key idea</span>
+    <p>The phases <strong>blend together and repeat</strong>. A question about your codebase might need only context-gathering. A bug fix cycles through all three phases repeatedly. Claude decides what each step requires based on what it learned from the previous step — the docs describe it chaining dozens of actions together and course-correcting along the way.</p>
+  </div>
+
+  <h2>Watch the loop run: “fix the failing tests”</h2>
+  <p>Here is the worked example straight from the official documentation. You type one sentence — <code>fix the failing tests</code> — and Claude might:</p>
+  <ol>
+    <li><strong>Run the test suite</strong> to see what's failing <span class="dim">(action that gathers context)</span></li>
+    <li><strong>Read the error output</strong> <span class="dim">(context)</span></li>
+    <li><strong>Search for the relevant source files</strong> <span class="dim">(context)</span></li>
+    <li><strong>Read those files</strong> to understand the code <span class="dim">(context)</span></li>
+    <li><strong>Edit the files</strong> to fix the issue <span class="dim">(action)</span></li>
+    <li><strong>Run the tests again</strong> to verify <span class="dim">(verify — and if they still fail, loop back to step 2)</span></li>
+  </ol>
+  <p>Notice what you did <em>not</em> have to do: name the failing test, locate the file, describe the fix, or apply it. Each tool use gave Claude new information that informed the next step. That is the agentic loop in action.</p>
+
+  <h2>You are part of the loop</h2>
+  <p>“Agentic” does not mean “unattended.” The docs are explicit: <em>you can interrupt at any point</em> to steer Claude in a different direction, provide additional context, or ask it to try a different approach. Claude works autonomously but stays responsive to your input. In Week 5 you'll formalize this into a deliberate workflow (plan first, then execute); for now, just know the loop has a fourth, human, participant — you.</p>
+
+  <h2>Model + harness = agent</h2>
+  <p>One more piece of vocabulary that Quiz 1 may probe. The loop is powered by two components:</p>
+  <ul>
+    <li><strong>The model</strong> — a Claude language model (Sonnet by default in this course) does the reasoning: understanding code, deciding what needs to change, choosing the next step. When docs say “Claude decides,” it's the model deciding.</li>
+    <li><strong>The tools</strong> — file operations, search, command execution, and more, which let those decisions touch the real world.</li>
+  </ul>
+  <p>Claude Code itself is the <strong>agentic harness</strong> around the model: it provides the tools, context management, and execution environment that, in the docs' words, “turn a language model into a capable coding agent.” Same model, no harness → a chatbot. Model + harness → an agent.</p>
+
+  <div class="callout tip">
+    <span class="label">Why this matters for the course</span>
+    <p>Everything in the next nine weeks is about managing this loop well: feeding it good context (Week 2), pointing it at a well-specified destination (Weeks 3–4), letting it verify against real tests (Week 5), and reviewing what it did (Week 6). If you can explain the loop, the rest of the course is refinements to it.</p>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+    <p>In the style of Quiz 1: application and discrimination, not recall. Click an answer to check it.</p>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. You ask Claude Code to “make the header sticky.” Before editing anything, it searches the codebase for CSS files and reads two components. Which phase of the agentic loop is this?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Take action — it is actively using tools</button></li>
+        <li><button data-opt="b">Verify results — it is checking existing code for correctness</button></li>
+        <li><button data-opt="c">Gather context — it is learning what it needs before acting</button></li>
+        <li><button data-opt="d">None; searching is outside the loop</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Reading and searching before changing anything is context-gathering. Tool use happens in every phase — what distinguishes the phases is the <em>purpose</em>: learning (context), changing (action), or checking (verify).</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. Claude Code edits a function, then immediately reruns the test suite, sees a new failure, and reads the error output before editing again. What does this sequence best illustrate?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">A malfunction — it should have gotten the edit right the first time</button></li>
+        <li><button data-opt="b">The loop repeating — verification output becomes the next round's context</button></li>
+        <li><button data-opt="c">The model switching from Sonnet to a larger model</button></li>
+        <li><button data-opt="d">The permission system blocking an unsafe edit</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> This is the loop working as designed: verify produced a failure, the failure became new context, and the cycle began again. Each tool result feeds back into the loop and informs the next decision.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. What turns a Claude language model into a coding <em>agent</em>?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">A larger context window</button></li>
+        <li><button data-opt="b">Fine-tuning on your specific codebase</button></li>
+        <li><button data-opt="c">Running it in a terminal instead of a browser</button></li>
+        <li><button data-opt="d">A harness that gives it tools, context management, and an execution environment</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The docs call Claude Code the <em>agentic harness</em> around Claude: the model reasons, and the harness supplies the tools and environment that let reasoning become action. Without tools, Claude can only respond with text.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Which task would most likely run the agentic loop through only its first phase?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">“What does this project do?”</button></li>
+        <li><button data-opt="b">“Fix the flaky date-parsing test”</button></li>
+        <li><button data-opt="c">“Rename this function everywhere it's used”</button></li>
+        <li><button data-opt="d">“Upgrade the test framework and make the suite pass”</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The docs note the loop adapts to the ask: “a question about your codebase might only need context gathering.” The other three all require edits (action) and checks (verify).</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code works</a> — the agentic loop, models, and the harness (code.claude.com; primary grounding for this page)</li>
+      <li><a href="https://code.claude.com/docs/en/overview">Claude Code Overview</a> (code.claude.com)</li>
+      <li>Companion: Skilljar <a href="https://anthropic.skilljar.com/claude-code-101">Claude Code 101</a>, module 1 “What is Claude Code? / How Claude Code works” — watch for the same three-phase loop presented with live examples.</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="index.html"><span class="dir">Back</span>Week 1 hub</a>
+    <a class="next" href="m01b-tools-permissions.html"><span class="dir">Next · M01 lesson 2</span>Tools &amp; Permissions</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 1 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

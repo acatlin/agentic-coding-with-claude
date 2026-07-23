@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core Session Controls — Week 1 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 1</a> · Objective M04</span>
+  </div>
+</header>
+
+<main>
+  <h1>Core Session Controls</h1>
+  <p class="lede">Prompting, interrupting, getting help, resetting, and — most importantly — reviewing what changed before you commit. The five controls you'll use in every session for the rest of the course.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M04 · Setup</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A1</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Use core session controls: submitting a prompt, interrupting, <code>/help</code>, <code>/clear</code>, and reviewing what Claude changed before committing.</p>
+  </div>
+
+  <h2>1 · Submitting a prompt</h2>
+  <p>Type what you want and press <kbd>Enter</kbd>. The docs' advice on <em>what</em> to type boils down to two points:</p>
+  <ul>
+    <li><strong>Talk like you'd talk to a colleague.</strong> “Talk to Claude like you would a helpful colleague. Describe what you want to achieve, and it will help you get there.” No magic phrasing required.</li>
+    <li><strong>Specific beats vague.</strong> The Quickstart's own example: not <em>“fix the bug”</em> but <em>“fix the login bug where users see a blank screen after entering wrong credentials.”</em> Precision up front saves corrections later.</li>
+    <li>It's a <strong>conversation</strong>, not a slot machine: when the first attempt isn't right, you refine — “That's not quite right. The issue is in the session handling.” — rather than starting over.</li>
+  </ul>
+  <p>Two input helpers worth knowing from day one: type <code>/</code> to see all available commands, and press <kbd>↑</kbd> for prompt history.</p>
+
+  <h2>2 · Interrupting</h2>
+  <p>You are part of the agentic loop, and interrupting is how you exercise that. The docs give you two distinct moves:</p>
+  <ul>
+    <li><strong>Press <kbd>Esc</kbd> to stop.</strong> Claude halts immediately; the running tool call is canceled; context is preserved; Claude waits for your next instruction.</li>
+    <li><strong>Type a correction and press <kbd>Enter</kbd> — without stopping.</strong> Claude reads your message as soon as the current action completes and adjusts course. Use this when the work is going mostly right and just needs steering.</li>
+  </ul>
+  <p>There's also the bigger hammer: press <kbd>Esc</kbd> <kbd>Esc</kbd> (or run <code>/rewind</code>) to open the rewind menu and restore the conversation and your files to an earlier checkpoint. Week 2 practices this deliberately (objective M11); today, just know it exists — it's why you can let an agent try things without fear.</p>
+
+  <h2>3 · <code>/help</code> and friends</h2>
+  <p>The Quickstart's essential session commands:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>/help</code></td><td>Show available commands</td></tr>
+        <tr><td><code>/clear</code></td><td>Clear conversation history</td></tr>
+        <tr><td><code>/exit</code> (or <kbd>Ctrl</kbd>+<kbd>D</kbd> twice)</td><td>Exit Claude Code</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>And from your shell: <code>claude</code> starts a session, <code>claude -c</code> continues your most recent conversation in this directory, <code>claude -r</code> lets you pick an older one to resume. One more help channel the docs highlight: <strong>Claude Code can teach you how to use it</strong> — just ask it things like “how do I set up hooks?” in plain language.</p>
+
+  <h2>4 · <code>/clear</code>: the reset button</h2>
+  <p>Every message, every file read, and every command output accumulates in the session's context window — and the best-practices guide is blunt about the consequence: long sessions full of irrelevant context “can reduce performance and sometimes distract Claude.” The fix is a habit, not a feature: <strong>run <code>/clear</code> between unrelated tasks.</strong></p>
+  <div class="callout note">
+    <span class="label">Preview of Week 2</span>
+    <p>The guide names the failure mode “the kitchen-sink session”: one task, then an unrelated question, then back again, until the context is mud. Week 2 builds your full mental model of this (the “smart zone”); for now, adopt the rule mechanically — new task, fresh <code>/clear</code>.</p>
+  </div>
+
+  <h2>5 · Reviewing changes before committing</h2>
+  <p>This is the control that separates using AI labor from merely consuming it. When Claude edits files in default mode, it shows you each proposed change and asks approval. But the review that matters most comes <em>at the end</em>, before anything is committed. Two conversational moves from the Quickstart:</p>
+  <pre><code><span class="dim">&gt;</span> what files have I changed?
+<span class="dim">&gt;</span> review my changes and suggest improvements</code></pre>
+  <p>And the classic, always available in another terminal (or via Claude running it for you):</p>
+  <pre><code><span class="prompt">$</span> git diff</code></pre>
+  <p>Read the whole diff. Ask about any line you don't understand — “why did you change this?” is a perfectly good prompt. Only then:</p>
+  <pre><code><span class="dim">&gt;</span> commit my changes with a descriptive message</code></pre>
+  <div class="callout tip">
+    <span class="label">The course policy behind the habit</span>
+    <p>This course replaces “did you write this yourself?” with <strong>“can you account for it?”</strong> — you must be able to explain any line in your repository. The diff review before every commit is where that accountability is earned. Week 6 (“Owning the Diff”) turns it into a full discipline; Assignment A1's reflection already depends on you having watched what changed.</p>
+  </div>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>Run one throwaway session in your A1 repo and exercise every control:</p>
+    <label class="check"><input type="checkbox"><span>Submitted a specific, colleague-style prompt for a small change (e.g., “add a --version flag that prints 0.1.0”).</span></label>
+    <label class="check"><input type="checkbox"><span>Pressed <kbd>Esc</kbd> once mid-run to stop Claude, then redirected it with a follow-up prompt.</span></label>
+    <label class="check"><input type="checkbox"><span>Typed a steering correction <em>without</em> pressing Esc while a tool was running.</span></label>
+    <label class="check"><input type="checkbox"><span>Ran <code>/help</code> and found one command you didn't know.</span></label>
+    <label class="check"><input type="checkbox"><span>Asked “what files have I changed?” and read the full diff of every modified file.</span></label>
+    <label class="check"><input type="checkbox"><span>Committed with a descriptive message — or rewound with <kbd>Esc</kbd> <kbd>Esc</kbd> if the change wasn't worth keeping.</span></label>
+    <label class="check"><input type="checkbox"><span>Ran <code>/clear</code> before starting your next, unrelated task.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. Claude is mid-task and mostly on the right track, but you realize it should target the staging config, not production. The least disruptive correct move is:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Press Esc twice and rewind the session</button></li>
+        <li><button data-opt="b">Type “use the staging config, not production” and press Enter while it works</button></li>
+        <li><button data-opt="c">Run /clear and start over with a better prompt</button></li>
+        <li><button data-opt="d">Close the terminal</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Typing without Esc sends a steering message Claude reads as soon as the current action completes — no work lost, course corrected. Esc (stop) is for when the direction is wrong; rewind and /clear are for when the <em>session state</em> is wrong.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. You finish fixing a parser bug and want to ask Claude about an unrelated CSS layout problem. Per the best-practices guide, you should first:</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Just ask — more context always helps</button></li>
+        <li><button data-opt="b">Run /help to check CSS support</button></li>
+        <li><button data-opt="c">Run /clear so the CSS task starts with a clean context</button></li>
+        <li><button data-opt="d">Restart your computer</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Unrelated leftover context (parser files, test output) doesn't help the CSS task — it dilutes attention and can degrade output. “Use /clear frequently between tasks” is the guide's literal advice, and Week 2 explains the mechanism.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Claude reports “Done! All tests pass” after modifying four files. Per this course's working discipline, what comes before the commit?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — passing tests are sufficient</button></li>
+        <li><button data-opt="b">Ask Claude to re-run the tests a second time</button></li>
+        <li><button data-opt="c">Commit now, review later if something breaks</button></li>
+        <li><button data-opt="d">Review the diff of all four files and query anything you can't explain</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> Tests check behavior the tests cover; your review covers everything else — and the course's accountability policy (“can you account for it?”) requires you to be able to explain every line you commit. Review the diff, then commit.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. What's the difference between pressing <kbd>Esc</kbd> once and pressing <kbd>Esc</kbd> twice?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Once stops the current action, keeping context; twice opens the rewind menu to restore an earlier state</button></li>
+        <li><button data-opt="b">Once pauses; twice exits Claude Code</button></li>
+        <li><button data-opt="c">They're identical; the second press is ignored</button></li>
+        <li><button data-opt="d">Once undoes the last file edit; twice undoes two edits</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Single Esc is the interrupt: stop now, context preserved, awaiting instructions. Double Esc (or <code>/rewind</code>) opens checkpoints — restore conversation, code, or both to a previous point. Exit is <code>/exit</code> or Ctrl+D twice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/quickstart">Quickstart</a> — essential commands table, first prompts, git steps, beginner tips (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code works</a> — interrupt and steer, checkpoints, “it's a conversation”</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Best practices</a> — course-correct early, manage context, common failure patterns</li>
+      <li>Companion: “Mastering Claude Code in 30 Minutes” (Boris Cherny, Anthropic) — watch for the keybinding tour (Esc, Shift+Tab, <code>@</code>-mentions, <code>!</code> bash mode).</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m03b-first-project.html"><span class="dir">Previous · M03 lesson 2</span>First Project: Repo + /init</a>
+    <a class="next" href="m05-whose-decision.html"><span class="dir">Next · M05</span>Whose Decision Was It?</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 1 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

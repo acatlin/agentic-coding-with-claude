@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub Basics: Repo, Clone, Commit — Week 1 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 1</a> · Objective M06</span>
+  </div>
+</header>
+
+<main>
+  <h1>GitHub Basics: Repo, Clone, Commit</h1>
+  <p class="lede">Create a repository on GitHub, get it onto your machine, and make a first commit with a message a human (and an agent) can understand.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M06 · Git basics</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A1</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Create a GitHub repository, clone it locally, and make a first commit with a well-formed commit message.</p>
+  </div>
+
+  <div class="callout note">
+    <span class="label">How much Git does this course need?</span>
+    <p>Uneven Git backgrounds are expected and fine. Week 1 requires only <strong>clone, commit, and push</strong> — exactly this page. Branches, issues, and pull requests get their own dedicated week (Week 4), and nothing beyond branch/PR/issue mechanics is ever required. If you want extra practice, GitHub's free interactive courses at <a href="https://skills.github.com">skills.github.com</a> are the recommended optional remediation.</p>
+  </div>
+
+  <h2>The 60-second mental model</h2>
+  <ul>
+    <li>A <strong>repository</strong> (repo) is a project folder whose entire history Git tracks.</li>
+    <li><strong>GitHub</strong> hosts a copy of your repo online; your laptop holds a <strong>clone</strong> — a full local copy linked to it.</li>
+    <li>A <strong>commit</strong> is a saved snapshot of your changes with a message explaining them.</li>
+    <li><strong>Push</strong> uploads your local commits to GitHub; that's how graders (and teammates) see your work.</li>
+  </ul>
+  <p>For this course, the repo is more than storage: it's the workspace Claude Code operates in, the safety net beyond <a href="m01b-tools-permissions.html">checkpoints</a>, and the audit trail your process is graded on.</p>
+
+  <h2>Step 1 — Create the repository on GitHub</h2>
+  <p>Following GitHub's Hello World guide (sign in at <a href="https://github.com">github.com</a> first):</p>
+  <ol>
+    <li>Click the <strong>+</strong> icon in the upper-right corner of any GitHub page and select <strong>New repository</strong>.</li>
+    <li>Name it something meaningful — for A1, e.g. <code>wordcount-cli</code> (lowercase, hyphens, no spaces).</li>
+    <li>Add a brief description.</li>
+    <li>Choose <strong>Public</strong> or <strong>Private</strong> — for coursework, either works as long as your grader has access; check the assignment instructions.</li>
+    <li>Check <strong>Add a README file</strong> — this gives the repo an initial commit so it clones cleanly.</li>
+    <li>Click <strong>Create repository</strong>.</li>
+  </ol>
+
+  <h2>Step 2 — Clone it to your machine</h2>
+  <p>On the repository page, click the green <strong>Code</strong> button and copy the HTTPS URL. Then in your terminal:</p>
+  <pre><code><span class="prompt">$</span> git clone https://github.com/YOUR-USERNAME/wordcount-cli.git
+<span class="prompt">$</span> cd wordcount-cli</code></pre>
+  <p>The first time you push, GitHub will ask you to authenticate — modern Git for Windows/macOS pops up a browser login and remembers it. Now this folder is where you run <code>claude</code>, per <a href="m03b-first-project.html">objective M03</a>.</p>
+
+  <h2>Step 3 — Make a change and commit it</h2>
+  <p>Edit <code>README.md</code> — add a sentence about what the project will be. Then the three-command rhythm you'll use hundreds of times:</p>
+  <pre><code><span class="prompt">$</span> git status                        <span class="dim"># what changed?</span>
+<span class="prompt">$</span> git add README.md                 <span class="dim"># stage it</span>
+<span class="prompt">$</span> git commit -m "Describe the wordcount CLI project in README"</code></pre>
+
+  <h3>What makes a commit message “well-formed”?</h3>
+  <p>GitHub's guide says a commit message should “briefly describe the change” — the widely-followed conventions sharpen that:</p>
+  <ul>
+    <li><strong>Summary line ≈ 50 characters</strong>, capitalized, no trailing period.</li>
+    <li><strong>Imperative mood</strong> — write what the commit <em>does</em>: “Add input validation,” not “Added…” or “misc fixes.”</li>
+    <li><strong>Say what and why, not how</strong> — the diff already shows how.</li>
+  </ul>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>❌ Not this</th><th>✅ This</th></tr></thead>
+      <tbody>
+        <tr><td><code>stuff</code></td><td><code>Add wordcount CLI skeleton with argparse</code></td></tr>
+        <tr><td><code>fixed it</code></td><td><code>Exclude trailing newline from character count</code></td></tr>
+        <tr><td><code>changes from claude session</code></td><td><code>Add unit tests for empty-file edge case</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout tip">
+    <span class="label">Why agents care about your history</span>
+    <p>Commit messages aren't just for humans anymore. Claude Code reads your recent commit history as part of its project context, and the best-practices guide suggests prompts like “look through the git history and summarize how this API came to be.” A well-formed history is context you get for free in every future session — written once, read by every agent and grader after.</p>
+  </div>
+
+  <h2>Step 4 — Push</h2>
+  <pre><code><span class="prompt">$</span> git push</code></pre>
+  <p>Refresh the repository page on GitHub: your commit and updated README should be there. That round trip — edit locally, commit, push, verify on GitHub — is the full Week 1 Git loop. (You can also do all of this conversationally: <a href="m04-session-controls.html">objective M04</a> showed Claude committing for you. The mechanics underneath are identical, which is why you learn them by hand once.)</p>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>This is Assignment A1's backbone — do it for real:</p>
+    <label class="check"><input type="checkbox"><span>Created a new GitHub repository with a meaningful name, description, and a README.</span></label>
+    <label class="check"><input type="checkbox"><span>Cloned it with <code>git clone</code> and <code>cd</code>'d into the folder.</span></label>
+    <label class="check"><input type="checkbox"><span>Edited README.md and confirmed <code>git status</code> shows the change.</span></label>
+    <label class="check"><input type="checkbox"><span>Staged and committed with an imperative, ~50-character summary line.</span></label>
+    <label class="check"><input type="checkbox"><span>Pushed and verified the commit appears on GitHub.</span></label>
+    <label class="check"><input type="checkbox"><span>Read the commit on GitHub's Code tab and confirmed the message makes sense out of context.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. Your teammate edited files on their laptop, but the changes don't appear on GitHub. Assuming they committed, what step is missing?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">git clone</button></li>
+        <li><button data-opt="b">git push</button></li>
+        <li><button data-opt="c">git status</button></li>
+        <li><button data-opt="d">Creating a new repository</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Commits are local snapshots; <code>git push</code> is what uploads them to GitHub. Clone copies down, push sends up, status just reports.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. Which is the best-formed commit message for a change that makes the CLI print an error for missing files?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a"><code>updates</code></button></li>
+        <li><button data-opt="b"><code>I changed wordcount.py so that when the file doesn't exist it now prints an error message instead of crashing with a traceback.</code></button></li>
+        <li><button data-opt="c"><code>Print friendly error when input file is missing</code></button></li>
+        <li><button data-opt="d"><code>fixed the bug claude found</code></button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Imperative, specific, about 45 characters, and meaningful without opening the diff. (B) has the right content but belongs in the message <em>body</em>, not a run-on summary line; (A) and (D) tell a future reader — or agent — nothing.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Beyond backup, why does a clean commit history particularly matter when you work with an agent?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">GitHub ranks repositories by message quality</button></li>
+        <li><button data-opt="b">Git refuses vague messages</button></li>
+        <li><button data-opt="c">It doesn't — agents only read code</button></li>
+        <li><button data-opt="d">Claude Code sees your recent history as context, and good messages make that context useful</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The docs list git state — including recent commit history — among what Claude can access, and best practices recommends pointing Claude at history to answer “why” questions. Every well-formed message is future context for free.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Why did you check “Add a README file” when creating the repository?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">It gives the repo an initial commit, so it clones cleanly and you can commit against it right away</button></li>
+        <li><button data-opt="b">GitHub requires a README on all repositories</button></li>
+        <li><button data-opt="c">Claude Code cannot start without a README</button></li>
+        <li><button data-opt="d">It automatically generates documentation from your code</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> A repo needs at least one commit to have a branch you can clone and build on; initializing with a README provides it (and A1 requires a README anyway). Neither GitHub nor Claude Code mandates one.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://docs.github.com/en/get-started/start-your-journey/hello-world">GitHub Docs: Hello World</a> — repository creation steps and commit flow (primary grounding; its branch/PR sections return in Week 4)</li>
+      <li><a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code works</a> — git state as agent context</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Best practices</a> — pointing Claude at git history</li>
+      <li>Optional practice: <a href="https://skills.github.com">GitHub Skills</a> interactive courses</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m05-whose-decision.html"><span class="dir">Previous · M05</span>Whose Decision Was It?</a>
+    <a class="next" href="index.html"><span class="dir">Finish</span>Back to Week 1 hub</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 1 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

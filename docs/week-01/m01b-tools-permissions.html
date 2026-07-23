@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools &amp; Permissions — Week 1 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 1</a> · Objective M01 · Lesson 2 of 2</span>
+  </div>
+</header>
+
+<main>
+  <h1>Tools &amp; Permissions</h1>
+  <p class="lede">The loop acts on your machine through tools — and a permission system decides which actions need your sign-off.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M01 · Foundations</span>
+      <span class="chip bloom">Bloom: Understand</span>
+      <span class="chip assessed">Assessed by: Quiz 1</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Explain the agentic loop and how Claude Code uses tools to read files, run commands, and edit code. <span class="dim"><a href="m01a-agentic-loop.html">Lesson 1</a> covered the loop; this lesson covers the tools that power it and the permissions that keep you in control.</span></p>
+  </div>
+
+  <h2>Tools are what make it agentic</h2>
+  <p>The official docs put it plainly: <em>“Without tools, Claude can only respond with text. With tools, Claude can act.”</em> Every step of the agentic loop — gathering context, taking action, verifying — happens through a tool call, and every tool call returns information that feeds back into the loop.</p>
+  <p>The built-in tools fall into five categories:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Category</th><th>What Claude can do with it</th><th>Loop phase it usually serves</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>File operations</strong></td><td>Read files, edit code, create new files, rename and reorganize</td><td>Context + action</td></tr>
+        <tr><td><strong>Search</strong></td><td>Find files by pattern, search content with regex, explore codebases</td><td>Context</td></tr>
+        <tr><td><strong>Execution</strong></td><td>Run shell commands, start servers, run tests, use git</td><td>Action + verify</td></tr>
+        <tr><td><strong>Web</strong></td><td>Search the web, fetch documentation, look up error messages</td><td>Context</td></tr>
+        <tr><td><strong>Code intelligence</strong></td><td>See type errors after edits, jump to definitions, find references (via plugins)</td><td>Verify</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Claude <em>chooses</em> which tools to use based on your prompt and what it learns along the way — you never call a tool yourself. Beyond these five, there are orchestration tools (spawning subagents, asking you questions); those arrive in Week 8.</p>
+
+  <h2>What Claude can access</h2>
+  <p>When you run <code>claude</code> in a project directory, the tools give Claude access to:</p>
+  <ul>
+    <li><strong>Your project</strong> — files in that directory and its subdirectories (elsewhere only with your permission)</li>
+    <li><strong>Your terminal</strong> — any command you could run: build tools, git, package managers, scripts</li>
+    <li><strong>Your git state</strong> — current branch, uncommitted changes, recent history</li>
+    <li><strong>Your <code>CLAUDE.md</code> and memory</strong> — persistent project instructions (the star of Week 2)</li>
+  </ul>
+  <p>This whole-project access is precisely what separates Claude Code from inline autocomplete that sees only the current file — a distinction <a href="m02-ai-labor.html">objective M02</a> examines closely.</p>
+
+  <h2>Permissions: agency with a leash</h2>
+  <p>An agent that can run any command you could run needs guardrails. Claude Code's rule of thumb: <strong>reading is free, changing things needs permission.</strong> By default, Claude Code requests approval for actions that might modify your system — file edits, shell commands, and the like — while reads and searches proceed freely.</p>
+  <p>How often you're asked depends on your <strong>permission mode</strong>. Press <kbd>Shift</kbd>+<kbd>Tab</kbd> in a session to cycle through them:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Mode</th><th>Behavior</th><th>When it fits</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Manual</strong> (default)</td><td>Claude asks before file edits and shell commands</td><td>Learning the tool (this course's default), unfamiliar or risky work</td></tr>
+        <tr><td><strong>Accept edits</strong></td><td>File edits and common filesystem commands auto-approve; other commands still ask</td><td>You trust the direction and want fewer interruptions</td></tr>
+        <tr><td><strong>Plan</strong></td><td>Claude explores and proposes a plan without editing your source files</td><td>Scoping work before committing to it (formalized in Week 5)</td></tr>
+        <tr><td><strong>Auto</strong></td><td>A background safety check evaluates each action and blocks risky ones</td><td>Longer unattended runs (Week 8 territory)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>You can also <strong>allowlist</strong> specific trusted commands (like <code>npm test</code> or <code>git status</code>) in <code>.claude/settings.json</code> so Claude never has to ask about those. The best-practices guide frames the trade-off honestly: default prompting is safe but tedious — “after the tenth approval you're not really reviewing anymore, you're just clicking through” — so the goal is to reduce interruptions <em>without</em> giving up control where it matters.</p>
+
+  <div class="callout note">
+    <span class="label">Safety net: checkpoints</span>
+    <p>Permissions control what Claude may do; <strong>checkpoints</strong> let you undo what it did. Before editing a file, Claude Code snapshots it, and pressing <kbd>Esc</kbd> <kbd>Esc</kbd> rewinds to a previous state. But checkpoints only cover Claude's file edits — actions with external side effects (databases, deployments, pushed commits) can't be rewound, which is exactly why commands get the permission prompt.</p>
+  </div>
+
+  <div class="callout tip">
+    <span class="label">Course connection</span>
+    <p>On a Pro budget with short scoped sessions, the default Manual mode is your friend for Weeks 1–4: every prompt is a chance to see what the agent intends before it acts. Choosing permission modes deliberately is itself a mastery objective in Week 5 (M26).</p>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+    <p>Click an answer to check it.</p>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. In a default-mode session, which of these will Claude Code typically do <em>without</em> asking you first?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Edit <code>src/auth.js</code> to fix a bug</button></li>
+        <li><button data-opt="b">Search the codebase and read <code>src/auth.js</code></button></li>
+        <li><button data-opt="c">Run <code>npm install</code></button></li>
+        <li><button data-opt="d">Delete an obsolete test file</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> Reading and searching gather context and don't modify your system, so they proceed freely. Edits, deletions, and shell commands can change things, so default (Manual) mode asks first.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. You want Claude to investigate a bug and propose an approach, but you're not ready to let it touch any source files. Which permission mode fits best?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Accept edits</button></li>
+        <li><button data-opt="b">Auto</button></li>
+        <li><button data-opt="c">Plan</button></li>
+        <li><button data-opt="d">Manual, but typing “don't edit anything” in every prompt</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Plan mode is built for exactly this: Claude explores and proposes a plan without editing source files. Option D sort of works but relies on instructions instead of an enforced mode — the mode is the guarantee.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Claude Code asks permission before running <code>git push</code>, but pressing Esc-Esc can undo a file edit without asking anyone. What explains the difference?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Git commands are always more dangerous than file edits</button></li>
+        <li><button data-opt="b">File edits aren't tracked, so there's nothing to protect</button></li>
+        <li><button data-opt="c">The permission system only covers network operations</button></li>
+        <li><button data-opt="d">File edits are checkpointed and reversible; a push has external effects that can't be rewound</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> Claude snapshots files before editing them, so edits can be rewound locally. Actions that affect remote systems can't be checkpointed — which is why commands with external side effects sit behind the permission prompt.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Your test command <code>npm test</code> is safe and you run it constantly, but Claude asks for approval every time. What's the intended remedy?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Allowlist <code>npm test</code> in <code>.claude/settings.json</code></button></li>
+        <li><button data-opt="b">Switch permanently to Auto mode for all work</button></li>
+        <li><button data-opt="c">Stop using tests during agent sessions</button></li>
+        <li><button data-opt="d">Run the tests yourself in another terminal</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Allowlists exist precisely for trusted, frequently-used commands: approve once in settings, and Claude stops asking — while everything else still prompts. Mode changes (B) are a blunter instrument than a one-command allowlist.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">5. Which statement about tools is closest to how the documentation describes Claude Code?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">You select which tool Claude should use for each step</button></li>
+        <li><button data-opt="b">Tools run only at the end, after Claude finishes reasoning</button></li>
+        <li><button data-opt="c">Claude chooses tools as it goes; each result informs its next decision</button></li>
+        <li><button data-opt="d">Tools are optional add-ons; the core product is chat</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Tool choice is the model's job, made step by step: “Each tool use gives Claude new information that informs the next step. This is the agentic loop in action.” Without tools there is no agent — just text.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code works</a> — tool categories, what Claude can access, permission modes, checkpoints (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Best practices for Claude Code</a> — “Configure permissions”: auto mode, allowlists, sandboxing</li>
+      <li><a href="https://code.claude.com/docs/en/quickstart">Quickstart</a> — permission prompts on your first code change; <kbd>Shift</kbd>+<kbd>Tab</kbd> mode cycling</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m01a-agentic-loop.html"><span class="dir">Previous · M01 lesson 1</span>The Agentic Loop</a>
+    <a class="next" href="m02-ai-labor.html"><span class="dir">Next · M02</span>What Is AI Labor?</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 1 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

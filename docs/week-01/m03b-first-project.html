@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>First Project: Repo + /init — Week 1 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 1</a> · Objective M03 · Lesson 2 of 2</span>
+  </div>
+</header>
+
+<main>
+  <h1>First Project: Repo + <code>/init</code></h1>
+  <p class="lede">Point Claude Code at a real Git repository, let it introduce itself to your project, and generate the CLAUDE.md file that every future session will read.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M03 · Setup</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A1</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Install Claude Code, authenticate with a Claude Pro account, and initialize a project with <code>/init</code> inside a Git repository. <span class="dim"><a href="m03a-install-authenticate.html">Lesson 1</a> covered install + authenticate; this lesson gets you initialized in a real repo.</span></p>
+  </div>
+
+  <h2>Why a Git repository first?</h2>
+  <p>Assignment A1 says: create a GitHub repository, <em>then</em> run <code>/init</code>. The order isn't arbitrary. Claude Code is built to work with git — the docs list “your git state: current branch, uncommitted changes, and recent commit history” among the things Claude can see. A repo gives your session three things:</p>
+  <ul>
+    <li><strong>A boundary.</strong> Running <code>claude</code> in the repo directory scopes the agent to your project.</li>
+    <li><strong>A safety net beyond checkpoints.</strong> Claude's file snapshots help mid-session, but the docs are explicit that checkpointing “isn't a replacement for git.” Commits are your durable undo.</li>
+    <li><strong>An audit trail.</strong> The course grades process artifacts — commits are evidence of how you worked.</li>
+  </ul>
+  <p>If you haven't made your GitHub repository yet, do <a href="m06-github-basics.html">objective M06</a> first and come back — this lesson assumes you have a cloned repo on disk.</p>
+
+  <h2>Step 1 — Start a session inside the repo</h2>
+  <pre><code><span class="prompt">$</span> cd path/to/your-repo
+<span class="prompt">$</span> claude</code></pre>
+  <p>You'll see the Claude Code prompt with the version, current model, and working directory shown above it — confirm the directory is your repo, not your home folder. (An agent pointed at the wrong directory is the Week 1 version of a context problem; Week 2 makes this a theme.)</p>
+
+  <h2>Step 2 — Let Claude read the project</h2>
+  <p>Before initializing anything, try the Quickstart's opening move — ask questions:</p>
+  <pre><code><span class="dim">&gt;</span> what does this project do?
+<span class="dim">&gt;</span> explain the folder structure</code></pre>
+  <p>Claude analyzes your files and answers. The docs make the key point: <em>“Claude Code reads your project files as needed. You don't have to manually add context.”</em> Even in a nearly-empty starter repo this is worth 60 seconds — you're watching the gather-context phase of <a href="m01a-agentic-loop.html">the agentic loop</a> run on your own code.</p>
+
+  <h2>Step 3 — Run <code>/init</code></h2>
+  <pre><code><span class="dim">&gt;</span> /init</code></pre>
+  <p>What it does, per the best-practices guide: <code>/init</code> <strong>analyzes your codebase</strong> — detecting build systems, test frameworks, and code patterns — and <strong>generates a starter <code>CLAUDE.md</code> file</strong>, giving you “a solid foundation to refine.”</p>
+  <p>And what is CLAUDE.md? The docs' definition: <em>“a special file that Claude reads at the start of every conversation,”</em> holding things like build commands, code style, and workflow rules — “persistent context it can't infer from code alone.” Every session you start in this repo, forever, begins by reading this file.</p>
+
+  <div class="callout note">
+    <span class="label">Don't over-invest yet</span>
+    <p>In a brand-new repo, <code>/init</code> will produce something short — there's little to detect. That's fine. Week 2 (objective M09) is entirely about crafting a lean CLAUDE.md and justifying every line. Today's goal is just that the file exists, you've read it, and you understand when it gets loaded.</p>
+  </div>
+
+  <h2>Step 4 — Review and commit it</h2>
+  <p>Open the generated <code>CLAUDE.md</code> and read every line — Week 1's habit-in-training is <em>review what the agent produced before you keep it</em>. Delete anything that's wrong or obvious. Then make it permanent; you can even have Claude do the commit:</p>
+  <pre><code><span class="dim">&gt;</span> commit CLAUDE.md with a descriptive message</code></pre>
+  <p>The best-practices guide recommends checking CLAUDE.md into git “so your team can contribute” — in this course, so your grader can see it. You'll approve a permission prompt for the git command: that's the <a href="m01b-tools-permissions.html">permission system</a> doing its job on a state-changing action.</p>
+
+  <div class="callout tip">
+    <span class="label">Sanity check</span>
+    <p>Start a fresh session (<code>/exit</code>, then <code>claude</code> again) and run <code>/context</code> — the best-practices guide uses this to confirm CLAUDE.md actually loaded. Seeing your file in the context listing closes the loop on what “read at the start of every conversation” means. If anything about your setup feels off, <code>/doctor</code> runs a configuration checkup.</p>
+  </div>
+
+  <section class="handson">
+    <h2>Hands-on checklist</h2>
+    <p>Do this in your Assignment A1 repository:</p>
+    <label class="check"><input type="checkbox"><span>Started <code>claude</code> inside the cloned repo; working directory shown above the prompt is correct.</span></label>
+    <label class="check"><input type="checkbox"><span>Asked at least one codebase question (“what does this project do?”) and read the answer.</span></label>
+    <label class="check"><input type="checkbox"><span>Ran <code>/init</code> and watched it generate <code>CLAUDE.md</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>Read the whole generated file and removed anything inaccurate.</span></label>
+    <label class="check"><input type="checkbox"><span>Committed <code>CLAUDE.md</code> (via Claude or by hand) with a descriptive message.</span></label>
+    <label class="check"><input type="checkbox"><span>In a fresh session, ran <code>/context</code> and confirmed CLAUDE.md is loaded.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. What does <code>/init</code> actually do?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Creates a new Git repository</button></li>
+        <li><button data-opt="b">Installs Claude Code's dependencies into the project</button></li>
+        <li><button data-opt="c">Analyzes the codebase and generates a starter CLAUDE.md</button></li>
+        <li><button data-opt="d">Resets the session's context window</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Per the docs, <code>/init</code> analyzes your codebase (build systems, test frameworks, patterns) and generates a starter CLAUDE.md to refine. Git init is git's job (A), and clearing context is <code>/clear</code> (D).</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. When does Claude read your CLAUDE.md?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Only when you mention it in a prompt</button></li>
+        <li><button data-opt="b">At the start of every conversation in that project</button></li>
+        <li><button data-opt="c">Once, at <code>/init</code> time</button></li>
+        <li><button data-opt="d">Whenever a file in the repo changes</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> The docs define it as “a special file that Claude reads at the start of every conversation” — that's what makes it the right home for persistent, always-relevant project rules, and why Week 2 cares so much about keeping it lean.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Why does the course insist Claude Code sessions happen inside a Git repository, even though checkpoints can already undo Claude's edits?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Claude Code refuses to start outside a repo</button></li>
+        <li><button data-opt="b">Checkpoints only work when git is present</button></li>
+        <li><button data-opt="c">Repos make sessions run faster</button></li>
+        <li><button data-opt="d">Checkpoints are session-scoped and limited; commits are the durable record and undo</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The docs warn that checkpointing only tracks Claude's file edits and “isn't a replacement for git.” Commits survive anything, cover everything, and double as the process evidence this course grades.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/quickstart">Quickstart</a> — starting a session, first questions, git steps (primary grounding)</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Best practices</a> — “Write an effective CLAUDE.md”: <code>/init</code>, <code>/context</code>, committing the file</li>
+      <li><a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code works</a> — what Claude accesses; checkpoint limits; <code>/init</code> and <code>/doctor</code></li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m03a-install-authenticate.html"><span class="dir">Previous · M03 lesson 1</span>Install &amp; Authenticate</a>
+    <a class="next" href="m04-session-controls.html"><span class="dir">Next · M04</span>Core Session Controls</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 1 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>
