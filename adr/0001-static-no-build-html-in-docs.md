@@ -1,0 +1,3 @@
+# Static no-build HTML served from docs/
+
+The course learning pages are hand-authored static HTML with one shared stylesheet and one small vanilla-JS file — no TypeScript, no framework, no build step — despite the repo owner's default convention of TypeScript for web builds. The pages are content, not an application: students and graders must be able to open them from a file:// URL or any static host with zero tooling, and a toolchain would add maintenance cost with no functional payoff. The site lives in `docs/` (rather than `site/`) so classic GitHub Pages can serve it from `main /docs` without an Actions workflow; as a consequence, ADRs live in `adr/` at the repo root instead of the conventional `docs/adr/`, which would be published with the site.
