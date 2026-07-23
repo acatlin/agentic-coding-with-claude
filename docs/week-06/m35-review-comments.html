@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writing Actionable PR Review Comments — Week 6 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 6</a> · Objective M35</span>
+  </div>
+</header>
+
+<main>
+  <h1>Writing Actionable PR Review Comments</h1>
+  <p class="lede">In A6, your review comments have an unusual property: they will be executed. Your partner reads them, then directs Claude to address them — so every comment you write is, in effect, a prompt with an extra hop in the middle. A comment that would make a human colleague walk over and ask &ldquo;what did you mean?&rdquo; makes an agent <em>guess</em>. This lesson gives you a five-part shape for comments that survive the hop, and the drafting discipline to produce them.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M35 · Collaboration</span>
+      <span class="chip bloom">Bloom: Create</span>
+      <span class="chip assessed">Assessed by: Assignment A6 (pair)</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Write structured, actionable PR review comments that a peer (or an agent) can act on without further clarification.</p>
+  </div>
+
+  <h2>1 · The standard: no round trip</h2>
+  <p>&ldquo;Actionable without further clarification&rdquo; is a testable property. Hand the comment to someone who wasn't in your head, and ask: can they (a) find the code you mean, (b) understand what's wrong with it, (c) know what change would satisfy you, and (d) tell how urgent it is? Fail any one and you've bought a round trip — a clarifying question, a wrong guess, or in the agent case, a plausible-looking fix to a problem you didn't raise.</p>
+  <p>You've now studied two reviewers that meet this standard, and both are templates. The machine reviewer's findings (M34) each carry a location, a severity, a one-sentence issue, and expandable reasoning — that anatomy is why they're act-on-able. And the review platforms you've used anchor feedback the same way: comments attached &ldquo;to specific lines,&rdquo; submitted as one batch, feeding an agent-iteration loop. Your handwritten comments should clear the bar the machine's do.</p>
+
+  <h2>2 · The five-part comment</h2>
+  <p>Every substantive comment in your A6 review carries these parts. Small comments compress parts into single clauses; none get dropped.</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Part</th><th>What it does</th><th>Failure when missing</th></tr>
+    <tr><td><strong>1 · Anchor</strong></td><td>Pins the comment to the exact place: inline on the line(s) in the PR, naming the file/function if the fix spans more than the anchored line</td><td>&ldquo;There's a bug in the validation somewhere&rdquo; — the reader searches, and may fix a different spot</td></tr>
+    <tr><td><strong>2 · Observation</strong></td><td>States what the code <em>does</em>, as a checkable claim — cite the behavior, not your reaction to it</td><td>&ldquo;This looks wrong&rdquo; — nothing to verify, nothing to dispute</td></tr>
+    <tr><td><strong>3 · Consequence</strong></td><td>Says why it matters: the input or state that produces the wrong outcome</td><td>The author can't rank it, so it's triaged by tone instead of impact</td></tr>
+    <tr><td><strong>4 · Request</strong></td><td>Names the change that would resolve the comment — concrete enough to act on, without dictating every keystroke</td><td>&ldquo;Please improve this&rdquo; — the fix satisfies the fixer, not the reviewer</td></tr>
+    <tr><td><strong>5 · Severity</strong></td><td>Blocking or not — borrow M34's vocabulary: 🔴 must fix before merge, 🟡 nit, non-blocking</td><td>Nits get treated as blockers and blockers as nits; the merge decision loses its evidence</td></tr>
+  </table>
+  </div>
+  <p>Assembled, on a line from M33's worked diff:</p>
+  <span class="code-label">inline comment on import_deck.py, line 9 (the json.loads call)</span>
+  <pre>🔴 <span class="dim">[blocking]</span> `json.loads(request.data)` is called with no error handling,
+and line 10 accesses `payload["cards"]` unguarded. A request with malformed
+JSON, or valid JSON without a "cards" key, crashes the endpoint with a 500.
+Wrap the parse and key access, and return a 400 with a message for both
+cases — `validate_deck()` in utils/validation.py already covers the
+missing-key check, so reuse it rather than re-checking here.</pre>
+  <p>Anchor (inline, plus the spillover line named), observation (no error handling — checkable), consequence (the exact inputs that 500), request (400s for both cases, via the existing validator), severity (🔴 blocking). An agent can act on this without asking anything; so could a colleague in another timezone. Note the request also heads off an M33 failure mode — pointing at <code>validate_deck()</code> prevents the fix from introducing redundant logic.</p>
+
+  <div class="callout note">
+    <span class="label">Hold yourself to the machine's verification bar</span>
+    <p>The Code Review docs let repos demand that &ldquo;behavior claims need a <code>file:line</code> citation in the source, not an inference from naming&rdquo; — because uncited claims cost &ldquo;the author a round trip.&rdquo; Apply that bar to your own part 2: if you can't cite the line that misbehaves, you have a suspicion, not an observation. Say so honestly: &ldquo;Question (non-blocking): does <code>save_card</code> handle duplicates? I couldn't find where that's checked.&rdquo; A labeled question is actionable; an unverified accusation isn't.</p>
+  </div>
+
+  <h2>3 · Review-level structure</h2>
+  <p>A set of good comments still needs an envelope — the author decides what to do <em>first</em> from the review's shape:</p>
+  <ul>
+    <li><strong>Batch, don't dribble.</strong> Submit comments as one review, not one-at-a-time — the platform-review model you saw in M33's source (&ldquo;submit batched feedback for agent iteration&rdquo;) exists because the author's fix session wants the whole list at once. For A6 this is literal: your partner will paste your review into one Claude session.</li>
+    <li><strong>Open with the tally.</strong> The docs' summary-shape advice: lead with the shape of the work — <code>&ldquo;2 blocking, 3 nits&rdquo;</code> — and when there's nothing blocking, say that first. The author wants to know the shape before the details.</li>
+    <li><strong>Cap your nits.</strong> A review that's 80% style comments buries its one real finding. State the pattern once (&ldquo;naming: camelCase in several new functions — matching snake_case throughout; flagging the first instance only&rdquo;) instead of anchoring twelve copies.</li>
+    <li><strong>Verified vs. relayed.</strong> If a comment originates from your <code>/code-review</code> run, you verified it before forwarding (M34's protocol) — so present it as yours. Anything you didn't verify stays a labeled question.</li>
+  </ul>
+
+  <h2>4 · Create it: drafting exercise</h2>
+  <p>Your review of a partner's PR surfaced three raw findings. Draft each as a five-part comment <em>before</em> revealing the model version — this is the Create-level work, and the reveal is a comparison, not an answer key.</p>
+  <ol>
+    <li>The new <code>exportDeck</code> function builds its CSV by string concatenation; card text containing commas or quotes will produce a corrupt file. There's a <code>csv</code> module in the standard library.</li>
+    <li>The PR renames <code>deck.py</code> to <code>deck_manager.py</code>. Nothing in the task required it; ten files' imports changed as a result.</li>
+    <li>You suspect the new import endpoint doesn't check deck size limits, but you haven't found where limits are enforced for other endpoints either.</li>
+  </ol>
+  <div class="q" data-answer="a">
+    <p class="q-text">Compare your drafts: which set below handles all three correctly?</p>
+    <ol class="q-opts" type="A">
+      <li><button data-opt="a">(1) 🔴 on the concat lines: cites the corrupting inputs, requests the stdlib <code>csv</code> writer. (2) 🔴 scope comment on the rename: unrequested, ten-file blast radius, request revert-or-split into its own PR. (3) Non-blocking labeled question: &ldquo;where are size limits enforced? I couldn't find it for this or sibling endpoints&rdquo;</button></li>
+      <li><button data-opt="b">(1) &ldquo;CSV generation seems fragile — consider hardening.&rdquo; (2) &ldquo;Interesting rename!&rdquo; (3) 🔴 &ldquo;Missing size-limit validation&rdquo;</button></li>
+      <li><button data-opt="c">All three as 🔴 blocking — reviews should be strict</button></li>
+      <li><button data-opt="d">(1) and (2) as written in A, but drop (3) entirely — never comment without proof</button></li>
+    </ol>
+    <div class="q-why" hidden>
+      <p><strong>A.</strong> (1) has all five parts: anchor, checkable observation, the exact corrupting inputs, a concrete request, severity. (2) is the M32 move — an unrequested rename is a scope finding; its <em>existence</em> is the observation, and &ldquo;revert or split&rdquo; is the standard request for it. (3) is the verification bar honestly applied: you have a suspicion, so it ships as a labeled non-blocking question — which is still actionable, because &ldquo;answer this&rdquo; is an action. B fails part 2 twice (&ldquo;seems fragile&rdquo; is a reaction) and violates the bar in (3) by asserting &ldquo;missing&rdquo; without a citation. C erases the severity signal — when everything blocks, nothing does. D over-corrects: the fix for an unverified claim is labeling, not silence; your unasked question becomes the author's production incident.</p>
+    </div>
+  </div>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. Which comment is actionable without clarification, per the four-question test?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">&ldquo;The error handling in this PR needs work.&rdquo;</button></li>
+        <li><button data-opt="b">&ldquo;Line 42: change <code>x</code> to <code>y</code>.&rdquo;</button></li>
+        <li><button data-opt="c">&ldquo;🟡 (non-blocking) <code>retry()</code> at line 42 retries on every exception, including <code>AuthError</code> — a bad token gets retried five times, adding ~10s before the user sees the failure. Limit retries to <code>TransientError</code> like <code>fetch_deck()</code> does at sync.py:88.&rdquo;</button></li>
+        <li><button data-opt="d">&ldquo;This retry logic is not how I would have done it — see my branch for the right approach.&rdquo;</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Findable (line 42, <code>retry()</code>), checkable (retries on every exception — go look), consequential (the 10s user-facing delay), requested (narrow to <code>TransientError</code>, with an in-repo precedent cited), ranked (🟡 non-blocking). B looks precise but fails question (b) — no observation or consequence means the author can't tell <em>why</em>, so they can't generalize the fix or push back. A fails (a), (c), (d) at once. D anchors nothing and requests archaeology; &ldquo;read my branch&rdquo; is a round trip by construction.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. Why does the &ldquo;agent will execute this&rdquo; framing raise the bar on part 4 (the request) specifically?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Agents can't read code, so requests must contain the full patch</button></li>
+        <li><button data-opt="b">A human who finds your request ambiguous asks; an agent produces <em>a</em> plausible resolution of the ambiguity and presents it confidently — so an underspecified request doesn't fail loudly, it fails as finished-looking code fixing a adjacent-but-different problem, which then costs another full review cycle to catch</button></li>
+        <li><button data-opt="c">It doesn't — agents and humans need identical comments</button></li>
+        <li><button data-opt="d">Agents only accept comments in a machine-readable schema</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> The failure mode shifts from &ldquo;question&rdquo; to &ldquo;confident wrong fix&rdquo; — Week 6's whole lesson in miniature, since you then have to <em>review</em> the misfix. That's also why part 2's checkable observation matters doubly: it's the acceptance criterion the author's agent session can verify against. A overshoots — the request names the destination (&ldquo;return 400 for both cases&rdquo;), not every keystroke; dictating the patch wastes the agent's ability to fit the fix to the codebase. D confuses actionable structure with a file format.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Your review found one likely-serious concurrency issue and fourteen naming inconsistencies. How do you structure the submitted review?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Fifteen inline comments, in file order</button></li>
+        <li><button data-opt="b">Only the concurrency issue — nits are beneath review</button></li>
+        <li><button data-opt="c">The fourteen nits now; the concurrency issue in a follow-up review once you're certain</button></li>
+        <li><button data-opt="d">One batched review opening &ldquo;1 blocking, naming nits noted as a pattern&rdquo;: the 🔴 concurrency comment in full five-part form, one 🟡 comment stating the naming pattern with a single anchored example — the summary gives the shape first, and the nit cap keeps the signal finding from drowning</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> Three review-level rules at once: batch (one review, one fix session), tally first (the author learns &ldquo;one thing really matters&rdquo; before reading anything), cap nits (state the pattern once — fourteen anchors for one pattern is noise wearing precision's clothes). A is technically complete and practically unreadable — the 🔴 is comment nine of fifteen. B discards true information; non-blocking ≠ not worth saying. C inverts the priorities: the blocking finding is precisely the one that can't wait, and &ldquo;once I'm certain&rdquo; is what the labeled-question form is for.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. Your partner responds to your 🔴 CSV comment: their Claude session swapped in the <code>csv</code> module, tests pass, thread resolved. A6 grades your <em>role as reviewer</em>. What's left for you to do?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Verify the resolution against your own comment: read the fix's diff, confirm the corrupting inputs from your consequence clause now round-trip correctly, and check the fix didn't introduce its own failure modes — the comment defined the acceptance criterion, so you're the one who can certify it's met</button></li>
+        <li><button data-opt="b">Nothing — resolution is the author's call</button></li>
+        <li><button data-opt="c">Re-review the entire PR from scratch on principle</button></li>
+        <li><button data-opt="d">Ask for a screenshot of the tests passing</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> A well-formed comment contains its own acceptance test — the consequence clause names the inputs that failed, so verifying means checking exactly those. This closes A6's loop: review given, response received, resolution <em>verified</em> — and the fix is itself AI-generated code, so M33's taxonomy applies to it too (the classic miss: the fix handles commas but the new <code>csv</code> import shadows an existing symbol). B abandons the reviewer role one step early; the machine reviewer you studied auto-resolves threads only <em>after re-checking the push</em>, and you're held to the same standard. C over-scopes — the delta since your review is the review surface. D verifies a claim nobody disputed; green tests were never the observation.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li>Course exercise — the five-part comment shape and A6's reviewer/author protocol are course-defined (primary source per the objectives workbook)</li>
+      <li><a href="https://code.claude.com/docs/en/code-review">code.claude.com — Code Review</a> — the finding anatomy (severity + location + issue + reasoning) this lesson's schema mirrors; the verification bar (&ldquo;behavior claims need a <code>file:line</code> citation&rdquo;); summary-shape and nit-cap guidance from the REVIEW.md patterns</li>
+      <li><a href="https://docs.warp.dev/guides/agent-workflows/how-to-review-ai-generated-code/">Warp — How to review AI-generated code</a> — inline comments anchored to specific lines, batched feedback for agent iteration, and the retest-after-fixes loop that question 4 applies</li>
+      <li><a href="m34-code-review.html">M34 — Running /code-review</a> — where machine findings come from and the verified-vs-noise protocol that decides what you forward under your own name</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m34-code-review.html"><span class="dir">Previous · M34</span>Running /code-review and Interpreting Findings</a>
+    <a class="next" href="m36-owning-your-code.html"><span class="dir">Next · M36</span>Owning Your Code: Proportionate Review Depth</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 6 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

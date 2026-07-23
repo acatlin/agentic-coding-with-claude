@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading /diff: Full-Diff and Per-Turn Views — Week 6 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 6</a> · Objective M31</span>
+  </div>
+</header>
+
+<main>
+  <h1>Reading /diff: Full-Diff and Per-Turn Views</h1>
+  <p class="lede">Week 5 ended every workflow the same way: review the diff before you commit. This lesson gives that step its instrument. <code>/diff</code> opens an interactive panel inside Claude Code with two views of what changed — everything uncommitted, and each conversation turn's changes replayed one at a time. The habit this week builds: after every task, <code>/diff</code> before commit, both views, no exceptions.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M31 · Review</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A6</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Run /diff after a task and read both the full-diff and per-turn views before committing.</p>
+  </div>
+
+  <h2>1 · Why a diff panel inside the session</h2>
+  <p>You already know <code>git diff HEAD</code> from the terminal. What <code>/diff</code> adds is <em>where</em> and <em>when</em> the review happens: an interactive panel right in the session, at the moment the task finishes — no switching to another terminal, no losing the conversation that produced the changes. After Claude modifies several files in a run, one command puts every change in front of you before you decide anything about committing.</p>
+  <p>That placement matters because the review this course keeps asking for is review <em>against the conversation</em>: did the changes match what you asked for in each turn? A raw git diff can't answer that — it has no idea where turn 2 ended and turn 3 began. <code>/diff</code> can, because it has the conversation.</p>
+
+  <h2>2 · The two views, two sources of truth</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>View</th><th>Where the data comes from</th><th>What it shows</th></tr>
+    <tr><td><strong>Current</strong> (full diff)</td><td>Git — the result of <code>git diff HEAD</code></td><td>All uncommitted changes in the working directory, whoever made them</td></tr>
+    <tr><td><strong>Per-turn</strong></td><td>The conversation itself — reconstructed from each turn's tool-call records</td><td>What Claude changed in each individual turn, in order</td></tr>
+  </table>
+  </div>
+  <p>The distinction to internalize is the <em>data source</em>. The current view is a git perspective: it runs real git commands under the hood (with safeguards — files over 1&nbsp;MB are skipped, changes beyond 400 lines are truncated, and a 5-second timeout protects the session). The per-turn view doesn't consult git at all: it rebuilds each turn's edits from the conversation's tool-call records, so it is, in the author's words, &ldquo;unaffected by git state — even if you manually modified files or ran <code>git add</code> in between.&rdquo;</p>
+  <div class="callout note">
+    <span class="label">Why two sources instead of one</span>
+    <p>Each view answers a question the other can't. <em>Current:</em> &ldquo;what exactly will this commit contain?&rdquo; — including your own hand edits. <em>Per-turn:</em> &ldquo;what did the agent do at each step, and did each step match what I asked?&rdquo; — even after you've edited or staged files and blurred the git picture. Full-diff review without per-turn review misses <em>how</em> the change was built; per-turn without full-diff misses what the commit will actually say.</p>
+  </div>
+
+  <h2>3 · Driving the panel</h2>
+  <ul>
+    <li><strong>Arrow keys</strong> switch between the two sources and move through the file list.</li>
+    <li><strong>Enter</strong> opens the detailed diff for a file — additions in green, removals in red, with word-level highlighting so a one-token change doesn't hide inside a rewritten line.</li>
+    <li><strong>Escape</strong> closes the panel and returns you to the conversation.</li>
+  </ul>
+  <p>Reading order that works: current view first, <em>file list only</em> — is the set of touched files what you expected? Then per-turn, turn by turn, pairing each turn's diff with what you asked in that turn. Then back to any file whose changes surprised you, Enter, and read the lines.</p>
+
+  <h2>4 · The habit, and what per-turn replay buys you</h2>
+  <p>The source post's recommendation is one sentence long: &ldquo;After every task Claude Code completes, run <code>/diff</code> before committing.&rdquo; Not for big tasks; for every task. The author frames it as plain &ldquo;good engineering,&rdquo; resting on the principle this whole week orbits: &ldquo;understanding the changes is what it means to truly own your code&rdquo; — M36 takes that sentence apart in detail.</p>
+  <p>Per-turn replay is the underrated half of the habit. When a run took eight turns and touched five files, the full diff shows you the destination but not the route. Stepping through per-turn diffs — ideally alongside the conversation history — lets you <em>replay</em> the agent's approach: which turn introduced the helper, which turn's fix caused the follow-up fix, where a course correction actually landed. Next week's failure-mode hunting (M33) gets much easier when you can see which turn each suspicious change arrived in.</p>
+  <div class="callout warn">
+    <span class="label">The habit fails silently</span>
+    <p>Nothing forces you to run <code>/diff</code>. Skipping it doesn't error; it just converts &ldquo;I reviewed the changes&rdquo; into &ldquo;the changes looked done.&rdquo; A6 grades the review you actually performed — your partner's PR will contain things only a deliberate diff read catches.</p>
+  </div>
+
+  <section class="handson">
+    <h2>Hands-on: both views on a real task</h2>
+    <label class="check"><input type="checkbox"><span>In a scratch repo, gave Claude a small multi-file task (e.g. &ldquo;add a <code>--verbose</code> flag and document it in the README&rdquo;), let it finish, and ran <code>/diff</code> before doing anything else.</span></label>
+    <label class="check"><input type="checkbox"><span>In the current view, read the file list first and confirmed the touched-file set matched the task — then opened one file with Enter and found the word-level highlighting.</span></label>
+    <label class="check"><input type="checkbox"><span>Switched to the per-turn view with the arrow keys and stepped through each turn, matching each turn's changes to what you asked for in that turn.</span></label>
+    <label class="check"><input type="checkbox"><span>Hand-edited one changed file (add a comment), ran <code>/diff</code> again, and confirmed: your edit appears in the current view but no per-turn diff changed — the two sources of truth, demonstrated.</span></label>
+    <label class="check"><input type="checkbox"><span>Only after both views: committed. Wrote one sentence in your A6 notes on what per-turn showed that the full diff didn't.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. Mid-task, you hand-fixed a typo in <code>utils.py</code> and ran <code>git add</code> on it. The task finishes and you run <code>/diff</code>. What do the two views show for that typo fix?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Both views show it — they render the same data two ways</button></li>
+        <li><button data-opt="b">The current view shows it (git's uncommitted-changes perspective includes your edits); no per-turn diff contains it, because per-turn is reconstructed from Claude's tool calls and is unaffected by git state</button></li>
+        <li><button data-opt="c">Neither view — <code>git add</code> removed it from the diff</button></li>
+        <li><button data-opt="d">Only per-turn — the current view skips hand edits</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> This is the data-source distinction doing work. Current = <code>git diff HEAD</code>, which reports all uncommitted changes regardless of author or staging. Per-turn = the conversation's tool-call records, which contain only what Claude did. C is a common git misread — staged changes are still uncommitted and still in <code>diff HEAD</code>. A and D each collapse the two sources into one.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. An eight-turn run produced a correct-looking full diff, but one file contains a helper you never asked for. Which /diff move most directly tells you where it came from?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Re-read the full diff more slowly</button></li>
+        <li><button data-opt="b">Close the panel and run <code>git log</code></button></li>
+        <li><button data-opt="c">Switch to the per-turn view and step through turns until the helper first appears, then read that turn's request and reasoning in the conversation history</button></li>
+        <li><button data-opt="d">Commit, then bisect later if it breaks</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Attribution is exactly what per-turn replay is for: it localizes a change to the turn that made it, and pairing it with the conversation shows <em>why</em> the agent added it. A keeps staring at the view that can't answer &ldquo;when.&rdquo; B looks at commits — these changes aren't committed yet. D is the anti-habit: the review point is before the commit, not after the incident.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. A classmate says: &ldquo;I skim the full diff when the task was big, and skip /diff for small tasks — a one-file change doesn't need a panel.&rdquo; What does the assigned workflow actually prescribe?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">That's the prescription — review effort should scale with diff size</button></li>
+        <li><button data-opt="b">/diff only matters for multi-file changes, so the skim half is wrong but the skip half is right</button></li>
+        <li><button data-opt="c">Replace /diff with re-running the tests</button></li>
+        <li><button data-opt="d">Run /diff after every completed task, before committing — the habit is unconditional, because &ldquo;small task&rdquo; is a claim about what you asked for, not a verified fact about what changed</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> &ldquo;After every task Claude Code completes, run <code>/diff</code> before committing&rdquo; has no size clause. The reason isn't ritual: the tasks where the diff surprises you are precisely the ones you didn't predict — you can't pre-classify them as &ldquo;small.&rdquo; A confuses review <em>depth</em> (which M36 does scale) with whether the look happens at all. C substitutes behavior verification for change review; Week 6's point is you need both.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. In the current view you notice a 600-line generated file shows only part of its changes. What's the right interpretation?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">The panel truncates changes beyond 400 lines (and skips files over 1&nbsp;MB) to protect the session — for that file, drop to <code>git diff HEAD -- path/to/file</code> in the terminal for the full picture</button></li>
+        <li><button data-opt="b">The remaining lines are unchanged</button></li>
+        <li><button data-opt="c">Git failed; restart the session</button></li>
+        <li><button data-opt="d">The per-turn view will always show the missing lines</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The current view runs real git commands with guardrails: &gt;1&nbsp;MB files skipped, &gt;400-line changes truncated, 5-second timeout. The panel is a review instrument, not the only one — when you hit its limits, the underlying git command has no such cap. B is exactly the unsafe assumption truncation invites. D isn't guaranteed — per-turn shows what Claude changed per turn, not a fuller render of a giant diff.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://blog.vincentqiao.com/en/posts/claude-code-diff/">Vincent Qiao — Claude Code /diff</a> — the two views and their data sources, git safeguards, navigation keys, the after-every-task habit, and the ownership principle (primary grounding)</li>
+      <li><a href="https://codeongrass.com/blog/how-to-review-ai-generated-code-faster-than-you-can-read/">codeongrass — four-checkpoint review workflow</a> — the diff gate this habit implements; <a href="m32-four-checkpoints.html">M32</a> covers the terminal-side variants (<code>--stat</code>, directory-scoped, <code>--word-diff</code>)</li>
+      <li>Companion video: <a href="https://www.youtube.com/watch?v=3T6CATN2BNE">How To Run In-Terminal Code Reviews with Claude Code (YouTube)</a> — watch for the moment the reviewer switches from &ldquo;does it work&rdquo; to &ldquo;what changed,&rdquo; and how the panel keeps them in the session</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="index.html"><span class="dir">Week 6 hub</span>Review: Owning the Diff</a>
+    <a class="next" href="m32-four-checkpoints.html"><span class="dir">Next · M32</span>The Four-Checkpoint Review Workflow</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 6 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

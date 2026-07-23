@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Four-Checkpoint Review Workflow — Week 6 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 6</a> · Objective M32</span>
+  </div>
+</header>
+
+<main>
+  <h1>The Four-Checkpoint Review Workflow</h1>
+  <p class="lede">&ldquo;Stop trying to read every line an AI agent writes. Use four checkpoints instead.&rdquo; That's the whole thesis. Agents produce code faster than you can read it — so instead of one heroic line-by-line review at the end, you place four cheap gates around the run: bound the scope before, approve tool calls during, gate on the diff after, and verify with tests before merge. Each gate catches what the previous one structurally can't.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M32 · Review</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Quiz 6 · Assignment A6</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Apply the four-checkpoint review workflow: scope bounds before, approval gates during, diff gate after, tests before merge.</p>
+  </div>
+
+  <h2>1 · Checkpoint 1 — Scope bounds, before the run</h2>
+  <p>Before the agent touches anything, declare what it may touch. Two mechanisms you already own from earlier weeks:</p>
+  <ul>
+    <li><strong>In the prompt:</strong> explicit scope directives — which files and directories are allowed, which are forbidden, and standing prohibitions like &ldquo;no dependency changes, no removing exports, no edits outside <code>src/flashcards/</code>.&rdquo;</li>
+    <li><strong>In <code>CLAUDE.md</code>:</strong> the scope rules that apply to <em>every</em> run in this repo, so you stop retyping them (Week 2's lean-CLAUDE.md discipline, now doing review work).</li>
+  </ul>
+  <p>Why this is a <em>review</em> checkpoint and not just prompting hygiene: declared scope converts diff reading from an open-ended search into a checklist. &ldquo;If the diff shows edits outside the declared scope, that's an immediate flag&rdquo; — you don't have to judge whether the out-of-scope edit is good code; its existence is the finding. Out-of-scope changes are the hardest class to catch later, because nothing in the diff marks them as unrequested except your memory of the request.</p>
+
+  <h2>2 · Checkpoint 2 — Approval gates, during the run</h2>
+  <p>This is Week 5's default permission mode reframed as a review instrument: the agent pauses before each consequential tool call — file writes, bash commands, deletions — and waits for you. Two things make the gate more than a click-through:</p>
+  <ul>
+    <li><strong>Approve with a comment.</strong> Approving a file write with &ldquo;use the existing <code>parseDate</code> utility instead&rdquo; steers the run without aborting it — mid-flight course correction with the session's context intact (M30's toolkit, applied at the gate).</li>
+    <li><strong>Know your red flags.</strong> Deny-and-ask when you see: file writes outside the declared scope, package installations or git commits you didn't request, unexpected deletions or directory reorganizations.</li>
+  </ul>
+  <p>The author's claim for this gate: &ldquo;This workflow guarantees me being in the loop, fully understanding the changes, spotting issues early.&rdquo; The cost is interruptions — which is why M26 taught you to loosen this gate deliberately (acceptEdits, auto) when other gates are strong. The checkpoints trade off: less supervision during the run means the diff gate and the test gate carry more weight, which is M36's proportionality argument.</p>
+  <div class="callout note">
+    <span class="label">Checkpoints 1+2 are why you can skip line-by-line reading</span>
+    <p>The workflow's speed doesn't come from reviewing less — it comes from having <em>already reviewed</em> scope and high-impact operations by the time the diff exists. What's left for the diff gate is a bounded question, not an archaeology dig.</p>
+  </div>
+
+  <h2>3 · Checkpoint 3 — The diff gate, after every session</h2>
+  <p>Immediately after the agent finishes: <code>git diff HEAD</code> — or M31's <code>/diff</code> panel, which renders the same git perspective in-session. The gate is a structured two-minute pass answering four questions, in order:</p>
+  <ol>
+    <li><strong>Did the agent stay within declared scope?</strong> (Checkpoint 1 wrote this checklist for you.)</li>
+    <li><strong>Are there unexpected structural changes?</strong> New files, moved directories, reorganized modules you didn't ask for.</li>
+    <li><strong>Does the logic match expectations?</strong> Skim the substantive hunks against what you asked.</li>
+    <li><strong>Is the diff size reasonable for the task?</strong> &ldquo;More than 200 lines for a &lsquo;small fix&rsquo; is a warning sign.&rdquo;</li>
+  </ol>
+  <p>Work coarse-to-fine with git's own tools: <code>git diff HEAD --stat</code> first for the file-level shape, <code>git diff HEAD -- src/auth/</code> to scope into a directory that concerns you, <code>git diff HEAD --word-diff</code> for small targeted changes. And when the gate fails, recovery is cheap <em>because nothing is committed yet</em>: <code>git checkout -- &lt;file&gt;</code> reverts one file, <code>git restore .</code> reverts everything.</p>
+
+  <h2>4 · Checkpoint 4 — Tests, before merge</h2>
+  <p>The last gate turns the test suite into the specification, not just an afterthought. The pattern:</p>
+  <ol>
+    <li>Confirm tests exist and pass <em>before</em> the agent session — a red baseline makes &ldquo;did the agent break it&rdquo; unanswerable.</li>
+    <li>Run the agent against that documented expected behavior.</li>
+    <li>Verify tests still pass after completion.</li>
+    <li>Review test changes as carefully as implementation changes.</li>
+    <li>Run the <em>full</em> suite, catching regressions in adjacent modules the diff gate didn't flag.</li>
+  </ol>
+  <p>Step 4 is the one that separates this gate from &ldquo;CI is green.&rdquo; The documented pitfalls are all test-shaped: tests that verify the agent's implementation rather than the intended behavior; new code that arrived with no tests at all; mocked functions creating false confidence. An agent that edits a failing assertion until it passes produces the same green checkmark as an agent that fixed the bug — only reading the test diff tells you which happened. Tests are still &ldquo;the fastest path to behavioral confidence,&rdquo; but only if the tests themselves survived review.</p>
+
+  <h2>5 · The workflow as a system</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Checkpoint</th><th>When</th><th>Catches</th><th>Cost when skipped</th></tr>
+    <tr><td>1 · Scope bounds</td><td>Before</td><td>Out-of-scope edits — flagged by existence, not judgment</td><td>Diff review becomes open-ended archaeology</td></tr>
+    <tr><td>2 · Approval gates</td><td>During</td><td>High-impact operations; direction errors while cheap</td><td>Surprises discovered post-hoc, rework instead of redirect</td></tr>
+    <tr><td>3 · Diff gate</td><td>After</td><td>Structural surprises, scope drift, unreasonable size</td><td>You commit changes you never saw</td></tr>
+    <tr><td>4 · Tests</td><td>Before merge</td><td>Behavioral regressions; doctored tests (if you read the test diff)</td><td>&ldquo;Looks right&rdquo; ships; adjacent modules break</td></tr>
+  </table>
+  </div>
+  <p>The success indicator, per the source: you can answer &ldquo;what did the agent touch?&rdquo; without opening git, you catch issues before merge, and you review unfamiliar code the way you'd review a junior engineer's PR — which is precisely the posture A6 asks you to take with your partner's work.</p>
+
+  <section class="handson">
+    <h2>Hands-on: run all four gates once</h2>
+    <label class="check"><input type="checkbox"><span>Added a scope section to a scratch repo's <code>CLAUDE.md</code>: allowed directories, plus &ldquo;no dependency changes, no removing exports.&rdquo;</span></label>
+    <label class="check"><input type="checkbox"><span>Confirmed the test suite is green <em>before</em> starting the run — checkpoint 4 begins before checkpoint 1's run does.</span></label>
+    <label class="check"><input type="checkbox"><span>Ran a small task in default (Manual) mode; at one approval prompt, approved with a steering comment instead of a bare yes.</span></label>
+    <label class="check"><input type="checkbox"><span>At the diff gate: <code>git diff HEAD --stat</code> first, then the full diff, answering the four questions out loud (scope? structure? logic? size?).</span></label>
+    <label class="check"><input type="checkbox"><span>Read the test diff separately and wrote one sentence: do the tests verify intended behavior, or the implementation the agent happened to write?</span></label>
+    <label class="check"><input type="checkbox"><span>Ran the full suite, then committed. Noted in your A6 notes which checkpoint felt redundant — then check that instinct against question 4 below.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. You asked for a &ldquo;small fix&rdquo; to a date-formatting bug. The diff gate shows 340 changed lines across six files, including a new <code>utils/dates/</code> directory. Tests are green. What does the workflow say?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Green tests mean merge — checkpoint 4 is the final authority</button></li>
+        <li><button data-opt="b">Read all 340 lines carefully before deciding</button></li>
+        <li><button data-opt="c">Two diff-gate questions already failed — size is far past the ~200-line warning threshold for a small fix, and the new directory is an unexpected structural change — so investigate or revert (<code>git restore .</code> is cheap precisely because nothing is committed)</button></li>
+        <li><button data-opt="d">Commit now, refactor the extra changes later</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The gate's questions are answerable from the <code>--stat</code> view alone — that's what makes it a two-minute pass. A treats the checkpoints as substitutes when they're serial: green tests don't validate scope (nothing tested the new directory's necessity). B is the line-by-line reading the workflow exists to replace — the coarse signals already made the decision. D commits changes that failed the gate, converting a free <code>git restore</code> into future rework.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. Why does the workflow insist scope bounds are declared <em>before</em> the run, when the diff gate could catch out-of-scope edits after?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">It can't — the diff gate only shows in-scope files</button></li>
+        <li><button data-opt="b">Declared scope turns the diff review into a checklist with an objective failure condition — an edit outside the declared scope is &ldquo;an immediate flag&rdquo; by existence alone — whereas without the declaration, every edit must be judged on its merits from memory of what you asked</button></li>
+        <li><button data-opt="c">Because CLAUDE.md files are read-only during a run</button></li>
+        <li><button data-opt="d">Scope bounds make the other three checkpoints optional</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> The pre-declaration doesn't prevent drift by magic — agents can still edit the wrong file. It changes the <em>review economics</em>: detection becomes mechanical (&ldquo;is this path in the allowed list?&rdquo;), which is why out-of-scope changes go from hardest-to-catch to easiest. A is false; the diff shows everything that changed. D inverts the design — the checkpoints are complementary, each catching what the others structurally miss.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. During a run, Claude requests approval to run <code>npm install left-pad</code>. Your task was &ldquo;fix the header alignment in the settings page.&rdquo; Which checkpoint is firing, and what's the right move?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Checkpoint 3 — note it for diff review and approve</button></li>
+        <li><button data-opt="b">Checkpoint 4 — approve and let the tests decide</button></li>
+        <li><button data-opt="c">Checkpoint 2 — approve; installs are routine</button></li>
+        <li><button data-opt="d">Checkpoint 2 — an unrequested package installation is a listed red flag; deny or question it now, while the correction costs a sentence, rather than discovering a dependency change at the diff or, worse, after merge</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> Package installs, unrequested git commits, and unexpected deletions are the named deny-and-ask triggers for the approval gate — high-impact operations whose whole point of surfacing mid-run is that they're cheapest to stop there. A and B defer to later gates that handle this class worse: a dependency change survives the diff gate looking like one lockfile hunk, and tests won't flag an extra package at all. C is the tenth-approval click-through reflex this gate degrades into when you stop reading.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. A classmate proposes: &ldquo;Checkpoint 4 makes 1–3 redundant — if the full suite passes, the code is right, so scope bounds and diff reading are ceremony.&rdquo; Evaluate against the documented pitfalls.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Wrong: the pitfall list is exactly the set of green-suite failures — tests rewritten to match the implementation, new code with no tests, mocks giving false confidence — and none of scope drift, unrequested dependencies, or structural reorganization is test-visible; that's why test <em>changes</em> get reviewed &ldquo;as carefully as implementation changes&rdquo;</button></li>
+        <li><button data-opt="b">Right: behavior is all that matters, and tests measure behavior</button></li>
+        <li><button data-opt="c">Wrong, but only because some projects lack tests</button></li>
+        <li><button data-opt="d">Right, provided coverage is above 80%</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> A green suite certifies &ldquo;the code satisfies the tests as they now exist&rdquo; — and the agent may have edited the tests. The classmate's argument silently assumes the specification survived the run unmodified, which is precisely what checkpoint 4's step-4 review checks. B and D also miss that entire finding classes (scope, structure, dependencies) live outside behavior. C concedes the conclusion for the wrong reason — the argument fails even with excellent tests.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://codeongrass.com/blog/how-to-review-ai-generated-code-faster-than-you-can-read/">codeongrass — How to review AI-generated code faster than you can read</a> — all four checkpoints, the red-flag lists, the four diff-gate questions, the 200-line warning sign, the test-first pattern and its pitfalls (primary grounding)</li>
+      <li><a href="m31-diff-views.html">M31 — Reading /diff</a> — the in-session instrument for checkpoint 3's git perspective</li>
+      <li><a href="https://code.claude.com/docs/en/permission-modes">code.claude.com — Permission modes</a> — the mechanism behind checkpoint 2 (default mode's per-action prompts) and the deliberate loosening M26 taught</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m31-diff-views.html"><span class="dir">Previous · M31</span>Reading /diff: Full-Diff and Per-Turn Views</a>
+    <a class="next" href="m33-failure-modes.html"><span class="dir">Next · M33</span>Six Failure Modes of AI-Generated Code</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 6 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

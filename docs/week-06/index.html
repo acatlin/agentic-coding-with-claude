@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 6 — Review: Owning the Diff · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb">Week 6 hub</span>
+  </div>
+</header>
+
+<main>
+  <h1>Week 6 — Review: Owning the Diff</h1>
+  <p class="lede">Week 5 taught the agent to write production code; this week teaches you to <em>own</em> what it wrote. The instruments: /diff's two views run after every task, four checkpoints that replace line-by-line reading, a six-mode taxonomy of how AI code characteristically fails, and /code-review's multi-agent findings read critically. Then the pair work — structured review comments a partner's agent can execute — and the principle underneath it all: understanding the changes is what it means to own your code, at a depth proportionate to how little you supervised the run.</p>
+
+  <p><strong>Estimated total time:</strong> 3.5&ndash;4.5 hours (readings/videos + quiz + assignment + meeting). These pages cover the same ground as the assigned readings — use them as your primary lesson text, and the linked sources to go deeper.</p>
+
+  <h2>This week's learning pages</h2>
+  <p>Six mastery objectives, six lessons, in recommended order:</p>
+
+  <ul class="card-grid">
+    <li class="card">
+      <div class="meta"><span class="chip">M31</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m31-diff-views.html">Reading /diff: Full-Diff and Per-Turn Views</a>
+      <p>The in-session diff panel: git's uncommitted-changes view vs. per-turn replay from the conversation, navigation, and the after-every-task-before-commit habit.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M32</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m32-four-checkpoints.html">The Four-Checkpoint Review Workflow</a>
+      <p>Scope bounds before, approval gates during, the diff gate's four questions after, tests before merge — and why the gates together beat reading every line.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M33</span><span class="chip bloom">Analyze</span></div>
+      <a class="title" href="m33-failure-modes.html">Six Failure Modes of AI-Generated Code</a>
+      <p>Hallucinated imports, redundant logic, architectural drift, security gaps, style drift, happy-path-only handling — causes, diff tells, and a worked five-failure diff.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M34</span><span class="chip bloom">Apply</span></div>
+      <a class="title" href="m34-code-review.html">Running /code-review and Interpreting Findings</a>
+      <p>Scopes and targets, the multi-agent pipeline's verification step, severity tags, extended reasoning — and the protocol separating verified issues from noise.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M35</span><span class="chip bloom">Create</span></div>
+      <a class="title" href="m35-review-comments.html">Writing Actionable PR Review Comments</a>
+      <p>The five-part comment (anchor, observation, consequence, request, severity), the verification bar, batching and nit caps — comments an agent can execute.</p>
+    </li>
+    <li class="card">
+      <div class="meta"><span class="chip">M36</span><span class="chip bloom">Evaluate</span></div>
+      <a class="title" href="m36-owning-your-code.html">Owning Your Code: Proportionate Review Depth</a>
+      <p>Why understanding — not approval or authorship — is what ownership means, and sizing review depth to how little of the run you supervised.</p>
+    </li>
+  </ul>
+
+  <div class="callout note">
+    <span class="label">Suggested path</span>
+    <p>Read in order — the week is one argument built in layers. <a href="m31-diff-views.html">M31</a> gives you the instrument and <a href="m32-four-checkpoints.html">M32</a> the workflow around it; <a href="m33-failure-modes.html">M33</a> loads the checklist that A6 names, so do its worked diff carefully. <a href="m34-code-review.html">M34</a> and <a href="m35-review-comments.html">M35</a> are A6's two halves — machine findings in, structured comments out; draft M35's exercise before peeking. Finish with <a href="m36-owning-your-code.html">M36</a> before the quiz: it's the judgment lesson the other five instrument.</p>
+  </div>
+
+  <h2>How this week is assessed</h2>
+  <ul>
+    <li><strong>Quiz 6</strong> (25 MCQs): the four checkpoints; the failure-mode taxonomy; interpreting /code-review findings; proportionate verification. Every lesson's self-check is written in the quiz's application-over-recall style.</li>
+    <li><strong>Assignment A6</strong> (15 pts, pairs): review your partner's Week 5 PR against the failure-mode checklist and leave structured, actionable comments. Your partner then directs Claude to address them and merges. Both roles are graded: quality of review given, and quality of response to review received.</li>
+    <li><strong>Meeting 6:</strong> bring your A6 review — expect discussion of which failure modes you found, which findings you judged noise, and how you sized your review depth.</li>
+  </ul>
+
+  <h2>Assigned sources for Week 6</h2>
+  <p>The lessons above are grounded in these; read or watch the originals to go deeper.</p>
+  <ul>
+    <li><a href="https://code.claude.com/docs/en/code-review">code.claude.com — Code Review</a> — the /code-review command and the managed multi-agent review: pipeline, verification step, severity levels, customization</li>
+    <li><a href="https://blog.vincentqiao.com/en/posts/claude-code-diff/">Vincent Qiao — Claude Code /diff</a> — the two views, their separate data sources, and the per-turn review habit</li>
+    <li><a href="https://docs.warp.dev/guides/agent-workflows/how-to-review-ai-generated-code/">Warp — How to review AI-generated code</a> — the failure-mode taxonomy the A6 checklist is built from</li>
+    <li><a href="https://codeongrass.com/blog/how-to-review-ai-generated-code-faster-than-you-can-read/">codeongrass — How to review AI-generated code faster than you can read</a> — the four-checkpoint workflow: scope → gates → diff → tests</li>
+    <li>Companion videos (community; verified titles at build time): <a href="https://www.youtube.com/watch?v=3T6CATN2BNE">How To Run In-Terminal Code Reviews with Claude Code</a> — pairs with M31/M34's local command; and <a href="https://www.youtube.com/watch?v=H2M7aB_nc-o">Testing Claude Code Review So You Don't Have To</a> — a test-drive of the PR review feature; watch for which findings get accepted vs. challenged</li>
+    <li>Companion: <a href="https://anthropic.skilljar.com/claude-code-in-action">Anthropic Academy — Claude Code in Action</a> (login required) — the <em>Verify</em> module pairs with M36's proportionality rule</li>
+  </ul>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 6 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+</body>
+</html>

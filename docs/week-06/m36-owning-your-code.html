@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Owning Your Code: Proportionate Review Depth — Week 6 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 6</a> · Objective M36</span>
+  </div>
+</header>
+
+<main>
+  <h1>Owning Your Code: Proportionate Review Depth</h1>
+  <p class="lede">The week's tools are on the bench: /diff, four checkpoints, a failure-mode taxonomy, a machine reviewer, a comment schema. This closing lesson is the principle that decides how hard to use them. It has two halves: <em>why</em> understanding the changes is what ownership means, and a sizing rule — review depth proportionate to how little the run was supervised. The quiz tests whether you can defend both, and apply the rule to cases.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M36 · Judgment</span>
+      <span class="chip bloom">Bloom: Evaluate</span>
+      <span class="chip assessed">Assessed by: Quiz 6</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Explain why &ldquo;understanding the changes is what it means to own your code,&rdquo; and what review depth is proportionate to how little a run was supervised.</p>
+  </div>
+
+  <h2>1 · What the ownership claim actually claims</h2>
+  <p>Qiao's line — &ldquo;understanding the changes is what it means to truly own your code&rdquo; — is a definition, not a slogan. Unpack it by asking what ownership consists of when an agent did the typing:</p>
+  <ul>
+    <li><strong>Not authorship.</strong> You didn't write the lines, and the course has never pretended you did — Week 1 split decisions from typing, and typing was always the agent's share.</li>
+    <li><strong>Not approval.</strong> Clicking merge transfers responsibility to you whether or not you understood what you merged. Approval without understanding is <em>liability</em>, not ownership.</li>
+    <li><strong>Understanding.</strong> The thing that survives: when this code breaks at 2 a.m., when a teammate asks why it does X, when next month's feature has to modify it — the person who can answer is the person who owns it. Understanding is the only part of ownership that can't be delegated to the agent, because it's the part that <em>supervises</em> the agent.</li>
+  </ul>
+  <p>This is why the week's habits are framed as ownership practices rather than defect hunts. Most /diff runs find nothing wrong — and aren't wasted, because the reading itself is what converts &ldquo;the agent's changes&rdquo; into &ldquo;my changes.&rdquo; The defect catch rate is the bonus; the understanding is the product.</p>
+  <div class="callout note">
+    <span class="label">The blame test</span>
+    <p>A one-line check of whether you own a change: if it ships a bug, is &ldquo;the AI wrote that part&rdquo; a sentence you'd say? If yes, you merged code you don't own. Nobody downstream — your user, your teammate, A6's grader — accepts the agent as a responsible party. The name on the merge is the owner; understanding is how the name gets earned.</p>
+  </div>
+
+  <h2>2 · The proportionality rule</h2>
+  <p>Understanding every change doesn't mean reviewing every change identically — the week already taught you otherwise. M32's thesis was &ldquo;stop trying to read every line&rdquo; <em>because the checkpoints supervised the run as it happened</em>. That &ldquo;because&rdquo; is the rule:</p>
+  <p><strong>Review depth after the run should be proportionate to how little supervision happened during it.</strong></p>
+  <p>Supervision and post-hoc review are the same commodity — your informed attention — delivered at different times. Every gate a change passed while it was being made (a plan you approved, a tool call you read before allowing, a failing test you watched go green, a scope bound you declared) is understanding already banked. Post-hoc review's job is to cover the gap between the understanding you have and the understanding ownership requires. Small gap, light review; no supervision, the review <em>is</em> the supervision, arriving late.</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>How the run went</th><th>Understanding already banked</th><th>Proportionate review</th></tr>
+    <tr><td>Manual mode, you read every tool call; plan approved; watched red go green (M27)</td><td>High — you effectively co-watched the whole run</td><td>Diff-gate pass: /diff both views, the four questions, confirm the touched-file set</td></tr>
+    <tr><td>acceptEdits on an approved plan; you glanced at progress</td><td>Plan bounds the <em>what</em>; the <em>how</em> is unreviewed</td><td>Full diff read against the plan, M33 scan on the hunks, test diff read separately</td></tr>
+    <tr><td>Long auto-mode run; you were at lunch</td><td>Scope bounds and CLAUDE.md only</td><td>Everything: per-turn replay to reconstruct the route, full M33 checklist, /code-review pass, reproduce the key behavior yourself (M25b's evidence habit)</td></tr>
+    <tr><td>Overnight unattended run, weak scope bounds</td><td>Almost none</td><td>Maximum depth — and treat the diff as a stranger's PR, because epistemically it is one</td></tr>
+  </table>
+  </div>
+  <p>Note what the rule does <em>not</em> say: it never reaches zero. The floor is M31's unconditional habit — every task gets its /diff before commit — because &ldquo;how much supervision happened&rdquo; is itself a claim the diff verifies. The rule scales the depth above that floor.</p>
+
+  <h2>3 · Defending the rule (this is the Evaluate skill)</h2>
+  <p>The quiz won't ask you to recite the rule; it will hand you an argument against it and ask what's wrong. The three you'll meet:</p>
+  <ul>
+    <li><strong>&ldquo;Tests passed, so deep review is redundant.&rdquo;</strong> Tests certify behavior the tests describe — and M32's pitfall list showed the tests themselves are part of the diff. Green answers &ldquo;does it work on the covered cases,&rdquo; not &ldquo;do I understand it&rdquo; — and the 2 a.m. page arrives on an uncovered case.</li>
+    <li><strong>&ldquo;The machine reviewer looked, so I don't have to.&rdquo;</strong> M34's findings are verified <em>claims about defects</em>. Ownership needs understanding of the whole change, including the 95% no finding touched. The reviewer deepens your review; it can't substitute for it, because its output was never &ldquo;you now understand this.&rdquo;</li>
+    <li><strong>&ldquo;Proportionality is just laziness with a rule attached.&rdquo;</strong> Backwards: the rule <em>raises</em> the requirement exactly where corners get cut in practice — the long unattended runs that produce the most code with the least oversight. What it trims is double-paying attention on runs you already supervised. Fixed-depth review, by contrast, is mis-calibrated in both directions at once.</li>
+  </ul>
+
+  <h2>4 · Worked judgments</h2>
+  <p><strong>Case 1.</strong> Twenty-minute manual-mode session, plan approved, you read each edit as it happened, suite green. Classmate says: &ldquo;now do a full line-by-line review with the M33 checklist.&rdquo; <em>Judgment: over-proportioned.</em> The understanding is already banked — you watched it being built. The diff-gate pass (both /diff views, four questions) closes the gap; a second full read re-buys what you own. The real risk in this case is skipping the floor, not skimping on depth.</p>
+  <p><strong>Case 2.</strong> Auto-mode ran ninety minutes while you were in a meeting; diff is +840/−210 across 14 files; tests green; you skim the stat view and merge. <em>Judgment: under-proportioned, badly.</em> Banked understanding is one scope declaration. Green tests don't close an 840-line comprehension gap (and the test diff itself was part of the unsupervised output). Proportionate here is the table's third row — per-turn replay, full checklist, machine pass, reproduce the behavior — and if that costs more time than supervising would have, that's the rule teaching you something about when to use auto mode.</p>
+  <p><strong>Case 3.</strong> Your partner's A6 PR: their run, their supervision, your review. <em>Judgment: your banked understanding is zero by construction — reviewer depth doesn't inherit the author's supervision.</em> That's why A6 hands you the full instrument set (checklist, /code-review, comment schema) for a PR the author may have supervised closely. Ownership isn't transitive; each owner earns their own understanding.</p>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+    <p>Evaluate-level: judge the argument, then compare your rationale with the model answer.</p>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. A classmate: &ldquo;Ownership means I approved the merge. Understanding is nice-to-have — responsibility is about who clicked the button.&rdquo; What's the strongest correction?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Right: approval and ownership are the same thing</button></li>
+        <li><button data-opt="b">Wrong, because agents can't be blamed legally</button></li>
+        <li><button data-opt="c">The claim collapses two things the 2 a.m. test separates: clicking merge transfers <em>responsibility</em> unconditionally, but only understanding delivers the <em>capability</em> that responsibility presumes — debugging it, explaining it, changing it safely. Approval without understanding is accepting the liability while declining the means to discharge it</button></li>
+        <li><button data-opt="d">Wrong: true ownership requires having typed the code yourself</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> This is the definitional move in Qiao's line: ownership isn't the ceremony (approval) or the labor (typing) — it's the state of understanding that makes the responsibility dischargeable. The classmate is half-right, which is what makes it seductive: the button <em>does</em> assign responsibility; it just doesn't equip you for it. D fails Week 1's decision/typing split — authorship was never the criterion. B changes the subject to legal fictions; the test is practical (who can fix it), not juridical.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">2. Same session type, two runs: (i) manual mode, every tool call read, plan approved; (ii) same task re-run in auto mode, unwatched, while you reviewed (i). Identical final diffs. Does the proportionality rule really prescribe different review depths for byte-identical diffs?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">No — identical artifacts warrant identical review; anything else is superstition</button></li>
+        <li><button data-opt="b">Yes — the rule prices the reviewer's <em>understanding gap</em>, not the artifact: after (i) you've already read every change in context once, so the diff gate merely confirms; after (ii) the same bytes are unread by you, and the review must build from zero the understanding that (i) banked during the run</button></li>
+        <li><button data-opt="c">Yes, but only because auto mode produces subtler bugs</button></li>
+        <li><button data-opt="d">No — the rule applies only when diffs differ</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> The cleanest way to see that the rule is epistemic, not artifact-based: review depth is a function of what <em>you know</em>, and supervision is how knowing got prepaid in (i). A has the right instinct for defect-hunting but the wrong target — the review's product is understanding, and understanding isn't a property of the bytes. C smuggles in a defect-rate claim the setup explicitly cancels (identical diffs). The same logic explains Case 3: a PR closely supervised <em>by its author</em> still meets a zero-knowledge reviewer.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. &ldquo;Since /code-review runs a verification step and I don't, the rational policy is: machine review at max effort on every PR, human review abolished.&rdquo; Evaluate.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Sound — verified findings beat unverified human impressions</button></li>
+        <li><button data-opt="b">Unsound only because the machine review costs money</button></li>
+        <li><button data-opt="c">Sound for small PRs, unsound for large ones</button></li>
+        <li><button data-opt="d">Unsound at the root: the machine's output is a list of defect claims, and a defect list — however well verified — is not understanding of the change. Every finding could be true and acted on, and the owner still couldn't answer &ldquo;why is it built this way&rdquo; or safely modify it next month. The reviewer deepens the human review the proportionality rule sizes; nothing in its output can substitute for the part of ownership that isn't delegable</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The argument's error is a category mistake — comparing the machine's defect-finding against the human's defect-finding and concluding the human is dominated, when the human review was never (only) hunting defects: it was earning ownership. On defects alone the machine <em>is</em> a strong complement (that was M34). B concedes the principle and haggles the price. C makes size the variable when the variable is what the human understands — which is why the rule keys on supervision, not line count alone.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">4. End of A6, your partner reflects: &ldquo;Honestly, my deepest understanding of my own PR came from responding to your review — re-reading my diff to answer your comments taught me things merging wouldn't have.&rdquo; What does this observation get right about the week's design?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">It names the mechanism the whole week runs on: every instrument — /diff's replay, the four questions, the checklist scan, comment-writing, comment-answering — is a forcing function that converts &ldquo;the agent's changes&rdquo; into understood changes; A6 grades both roles because reviewing and defending a diff are the two halves of the same ownership-building act</button></li>
+        <li><button data-opt="b">It shows review is only valuable when someone else does it to you</button></li>
+        <li><button data-opt="c">It's a sign the original run was botched — well-supervised runs leave nothing to learn</button></li>
+        <li><button data-opt="d">It's a pleasant side effect, unrelated to the review's real (defect-finding) purpose</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> The partner has independently discovered why the ownership principle is the week's <em>first</em> lesson conceptually and its last page pedagogically: the tools are attention-structuring devices, and structured attention is how understanding gets built. Answering a five-part comment forces exactly the re-reading that ownership required anyway. B and D both reduce review to defect yield — the view section 1 spent the lesson dismantling (most /diff runs find nothing and are still not wasted). C would make understanding-gaps a scandal; the proportionality rule treats them as the normal quantity review exists to close.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://blog.vincentqiao.com/en/posts/claude-code-diff/">Vincent Qiao — Claude Code /diff</a> — the ownership principle (&ldquo;understanding the changes is what it means to truly own your code&rdquo;) and the after-every-task habit that is this lesson's review floor (primary grounding)</li>
+      <li><a href="https://codeongrass.com/blog/how-to-review-ai-generated-code-faster-than-you-can-read/">codeongrass — four-checkpoint review workflow</a> — supervision-during-the-run as banked review: the &ldquo;stop reading every line&rdquo; argument whose <em>because</em>-clause this lesson generalizes into the proportionality rule</li>
+      <li>Companion: <a href="https://anthropic.skilljar.com/claude-code-in-action">Anthropic Academy — Claude Code in Action</a> (login required) — the <em>Verify</em> module is this lesson's assigned companion: watch for how each verification technique is matched to how much of the run went unwatched, and for the evidence-over-assertion habit M25b introduced</li>
+      <li><a href="m32-four-checkpoints.html">M32</a> · <a href="m34-code-review.html">M34</a> — the instruments whose depth of use this lesson's rule calibrates</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m35-review-comments.html"><span class="dir">Previous · M35</span>Writing Actionable PR Review Comments</a>
+    <a class="next" href="index.html"><span class="dir">Week 6 hub</span>Review: Owning the Diff</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 6 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Six Failure Modes of AI-Generated Code — Week 6 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 6</a> · Objective M33</span>
+  </div>
+</header>
+
+<main>
+  <h1>Six Failure Modes of AI-Generated Code</h1>
+  <p class="lede">M32 told you <em>when</em> to look at a diff; this lesson tells you <em>what to look for</em>. AI-generated code doesn't fail randomly — it fails in recognizable, recurring patterns, each with a cause rooted in how models generate code. Learn the six and diff review stops being &ldquo;read everything and hope&rdquo; and becomes a targeted scan. This taxonomy is the checklist A6 asks you to review your partner's PR against.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M33 · Review</span>
+      <span class="chip bloom">Bloom: Analyze</span>
+      <span class="chip assessed">Assessed by: Assignment A6</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Identify common AI code failure modes in a real diff: hallucinated imports, redundant logic, architectural drift, security gaps, style drift, happy-path-only error handling.</p>
+  </div>
+
+  <h2>1 · The taxonomy</h2>
+  <p>Each failure mode below has three parts worth memorizing together: what it is, <em>why models produce it</em> (the cause tells you where to look), and how to spot it in a diff.</p>
+
+  <div class="table-wrap">
+  <table>
+    <tr><th>Failure mode</th><th>What it is</th><th>Why it happens</th><th>Spot it by</th></tr>
+    <tr><td><strong>1 · Hallucinated imports</strong></td><td>&ldquo;Referencing packages or modules that don't exist in your project&rdquo;</td><td>Models generate plausible-seeming dependency references without verifying they're available</td><td>Scanning every import line in the diff; verifying each package against <code>package.json</code> / the dependency manifest</td></tr>
+    <tr><td><strong>2 · Redundant logic</strong></td><td>&ldquo;Duplicating existing functionality instead of reusing it&rdquo; — e.g. a new auth handler when one exists</td><td>The agent lacks full-codebase context and regenerates solutions already present</td><td>Comparing each new function against the existing codebase; watching for near-duplicate patterns</td></tr>
+    <tr><td><strong>3 · Architectural drift</strong></td><td>&ldquo;Adding new patterns instead of following existing ones, or restructuring code in ways that conflict&rdquo; — e.g. introducing MVC into a functional codebase</td><td>Models default to <em>common</em> patterns rather than learning project-specific conventions</td><td>Reviewing file organization, module structure, and design patterns against the project's established ones</td></tr>
+    <tr><td><strong>4 · Security gaps</strong></td><td>&ldquo;Hardcoded credentials, missing input validation, or overly permissive permissions&rdquo;</td><td>Models prioritize functionality over security practice</td><td>Close reading of anything touching authentication, credential handling, or permission scoping</td></tr>
+    <tr><td><strong>5 · Style drift</strong></td><td>&ldquo;Ignoring your project's conventions for naming, error handling, or file structure&rdquo; — e.g. camelCase in a snake_case project</td><td>Training data reflects countless styles; without project guidelines, the agent picks one</td><td>Checking naming, error patterns, and structure against neighboring existing code</td></tr>
+    <tr><td><strong>6 · Happy-path-only error handling</strong></td><td>&ldquo;Happy-path code that crashes on edge cases&rdquo; — e.g. processing an array without validating length or type</td><td>Models focus on the success scenario, not the failure conditions</td><td>Hunting for missing try/catch, null checks, and edge-case handling around every new code path</td></tr>
+  </table>
+  </div>
+
+  <div class="callout note">
+    <span class="label">The causes cluster into two families</span>
+    <p>Modes 2, 3, and 5 share a cause: <em>the agent doesn't know your project</em> — it regenerates, restructures, or restyles because your conventions weren't in its context. (This is why Week 2's CLAUDE.md and Week 5's explore-first discipline are <em>preventions</em> for this family.) Modes 1, 4, and 6 share a different cause: <em>plausibility over verification</em> — the code looks like working code because looking-like is what generation optimizes. Prevention can shrink the first family; only review catches the second reliably.</p>
+  </div>
+
+  <h2>2 · Where to aim first</h2>
+  <p>The source's review guidance concentrates attention on &ldquo;areas where agents are most likely to make mistakes: imports, error handling, and anything that touches security or authentication&rdquo; — modes 1, 6, and 4, the plausibility family. Those are also the three that hurt most in production, which is not a coincidence: they're the ones neither the compiler nor a casual skim reliably flags.</p>
+  <p>The condensed checklist, verbatim from the source — this is the &ldquo;failure-mode checklist&rdquo; A6 names:</p>
+  <div class="callout tip">
+    <span class="label">The A6 review checklist</span>
+    <p>&ldquo;Check that imports resolve, new code doesn't duplicate existing functionality, credentials aren't hardcoded, error handling covers failure cases, style matches your project, tests still pass, and the agent only changed what was asked.&rdquo;</p>
+  </div>
+  <p>Note the last two items reach outside this lesson's taxonomy: &ldquo;tests still pass&rdquo; is M32's checkpoint 4, and &ldquo;only changed what was asked&rdquo; is checkpoint 1's scope bound. The checklist is the whole week in one sentence.</p>
+
+  <h2>3 · Worked analysis: one diff, several failures</h2>
+  <p>Your flashcards project (Python, snake_case, has <code>utils/validation.py</code> with a working <code>validate_deck()</code>, credentials via environment variables). You asked Claude to &ldquo;add a JSON deck-import endpoint.&rdquo; The diff includes this new file:</p>
+  <span class="code-label">import_deck.py (new file, excerpt)</span>
+  <pre>import json
+import flask
+from deck_tools import parse_manifest        <span class="dim"># ← line A</span>
+
+API_KEY = "sk-flashcards-prod-8f3ab2"        <span class="dim"># ← line B</span>
+
+def importDeck(request):                     <span class="dim"># ← line C</span>
+    payload = json.loads(request.data)       <span class="dim"># ← line D</span>
+    for card in payload["cards"]:            <span class="dim"># ← line D</span>
+        front, back = card["front"], card["back"]
+        save_card(front, back)
+
+def check_deck_format(payload):              <span class="dim"># ← line E</span>
+    return "cards" in payload and isinstance(payload["cards"], list)</pre>
+  <p>Walk the taxonomy against the marked lines:</p>
+  <ul>
+    <li><strong>Line A — hallucinated import.</strong> There is no <code>deck_tools</code> package in this project or its manifest. The import <em>reads</em> plausibly — that's the failure mode's signature. Verification is mechanical: is it in the dependency manifest or the repo? No → finding.</li>
+    <li><strong>Line B — security gap.</strong> A hardcoded credential, in a project whose convention is environment variables. Two findings in one line, actually: the secret itself, and the ignored convention.</li>
+    <li><strong>Line C — style drift.</strong> <code>importDeck</code> is camelCase in a snake_case codebase. Trivial to fix, but its real value to a reviewer is as a <em>signal</em>: the agent wasn't imitating neighboring code, so read the rest with that prior.</li>
+    <li><strong>Line D — happy-path-only.</strong> <code>json.loads</code> on raw request data with no error handling, then unguarded key access. Malformed JSON or a missing <code>"cards"</code> key crashes the endpoint. The success path is complete; the failure paths don't exist.</li>
+    <li><strong>Line E — redundant logic.</strong> <code>check_deck_format()</code> re-implements a narrower version of the existing <code>validate_deck()</code>. It's not wrong — it's <em>duplicate</em>, and it will drift from the real validator over time. You only catch this one by knowing (or grepping) the codebase; nothing in the diff itself is suspicious.</li>
+  </ul>
+  <p>One diff, five of six modes. What it's missing is architectural drift — and noticing an <em>absence</em> is part of the skill: this file follows the project's flat-module structure, so mode 3 gets a clean pass. A finding list that says &ldquo;checked, clean&rdquo; for some modes is more trustworthy than one that only lists hits.</p>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+    <p>Analyze-level: each question gives you diff evidence; classify the failure mode or judge the reasoning.</p>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">1. A diff adds <code>from retry_helpers import with_backoff</code>. Your reviewer instinct fires. What's the <em>fastest conclusive</em> check, and which failure mode is it testing for?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Read the function that uses it — testing happy-path handling</button></li>
+        <li><button data-opt="b">Check naming conventions — testing style drift</button></li>
+        <li><button data-opt="c">Look for <code>retry_helpers</code> in the project and its dependency manifest — testing for a hallucinated import, where existence is the entire question and the check is mechanical</button></li>
+        <li><button data-opt="d">Run the full test suite — imports are covered by tests</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> Hallucinated imports are the one mode whose detection needs zero judgment: the package is in the manifest/repo or it isn't. That's why &ldquo;scan the import lines&rdquo; is the recommended first pass — maximum findings per minute. D often <em>would</em> catch it, but slower and only if tests exercise that module; the point of the taxonomy is knowing the direct check. A and B test real modes but not the one an import line raises.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">2. In a codebase of plain functions and modules, the agent's diff introduces a <code>BaseImporter</code> abstract class, a factory, and a <code>registry/</code> directory to support the one importer you asked for. Every line is individually well-written. Classify it.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Architectural drift — the agent imposed a common pattern (class hierarchy + factory) instead of following the project's established functional structure; the tell is that no single line is wrong, the <em>shape</em> is</button></li>
+        <li><button data-opt="b">Redundant logic — the class duplicates the function</button></li>
+        <li><button data-opt="c">Style drift — classes are a naming convention</button></li>
+        <li><button data-opt="d">No failure — well-written code is never a finding</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> This is the mode's textbook form — &ldquo;adding new patterns instead of following existing ones&rdquo; — and its documented cause: models default to patterns common in training data (OO scaffolding) over project-specific convention. It's caught by reviewing structure against the project, never by line-reading, which is why it slips past reviewers who only read hunks. B requires an existing counterpart; there isn't one. C trivializes it — this is structure, not naming. D is the trap: quality of lines and fitness of shape are independent axes.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">3. Why does the taxonomy's <em>cause</em> column matter to a reviewer, not just the failure list itself?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">It doesn't — causes are for model researchers</button></li>
+        <li><button data-opt="b">It lets you skip review when the cause doesn't apply</button></li>
+        <li><button data-opt="c">It proves AI code is worse than human code</button></li>
+        <li><button data-opt="d">Causes predict <em>where to look</em> and <em>what prevents what</em>: context-starvation modes (redundant logic, architectural drift, style drift) shrink when CLAUDE.md and explore-first put your conventions in context, while plausibility modes (hallucinated imports, security gaps, happy-path) survive good prompting and must be caught by review</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> The cause column converts a flat checklist into a strategy: it explains the source's advice to concentrate on imports, error handling, and security/auth (the plausibility family — nothing upstream reliably stops them), and it connects Week 2 and Week 5's disciplines to review as <em>prevention</em> for the context family. B draws the wrong inference — causes tell you what review must still catch, not what review can skip. C isn't a claim the taxonomy makes; human code fails too, just in different patterns.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">4. From the worked diff: a classmate's review flagged lines A–D but called <code>check_deck_format()</code> (line E) &ldquo;fine — it's correct and tested.&rdquo; What did their review process miss, structurally?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — correct and tested is the bar</button></li>
+        <li><button data-opt="b">Redundant logic can't be detected by reading the diff in isolation — the function is only wrong <em>relative to</em> the existing <code>validate_deck()</code> — so a review that never compares new functions against the codebase will systematically miss this mode while catching all the others</button></li>
+        <li><button data-opt="c">They should have run the linter</button></li>
+        <li><button data-opt="d">Line E is actually a security gap</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A</strong> is the seduction, <strong>B</strong> the answer. Redundant logic is the mode whose evidence lives <em>outside the diff</em>: nothing in <code>check_deck_format()</code> is suspicious; the finding is the existence of <code>validate_deck()</code> elsewhere. The documented detection — &ldquo;compare new functions against the existing codebase&rdquo; — is a different physical action than reading hunks, which is why a hunks-only reviewer misses it every time while feeling thorough. C: linters check style, not duplication-of-intent. D misclassifies; validation weakness would be mode 6's territory, and the deeper issue is the duplicate will drift from the maintained validator.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://docs.warp.dev/guides/agent-workflows/how-to-review-ai-generated-code/">Warp — How to review AI-generated code</a> — the six failure modes with definitions, causes, and detection; the focus areas (imports, error handling, security/auth); the condensed checklist (primary grounding)</li>
+      <li><a href="m32-four-checkpoints.html">M32 — The Four-Checkpoint Review Workflow</a> — the gates this taxonomy plugs into: the checklist's last two items are checkpoints 4 and 1</li>
+      <li><a href="https://code.claude.com/docs/en/code-review">code.claude.com — Code Review</a> — the machine counterpart: <a href="m34-code-review.html">M34</a>'s multi-agent review hunts overlapping classes of issue, with a verification step this lesson's manual scan lacks</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m32-four-checkpoints.html"><span class="dir">Previous · M32</span>The Four-Checkpoint Review Workflow</a>
+    <a class="next" href="m34-code-review.html"><span class="dir">Next · M34</span>Running /code-review and Interpreting Findings</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 6 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

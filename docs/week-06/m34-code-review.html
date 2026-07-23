@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Running /code-review and Interpreting Findings — Week 6 · Agentic Coding with Claude</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="course" href="../index.html">Agentic Coding with Claude</a>
+    <span class="crumb"><a href="index.html">Week 6</a> · Objective M34</span>
+  </div>
+</header>
+
+<main>
+  <h1>Running /code-review and Interpreting Findings</h1>
+  <p class="lede">You've now built the manual review skill: checkpoints, diff views, a failure-mode checklist. This lesson adds the machine reviewer — <code>/code-review</code> runs a multi-agent analysis of your diff and reports findings with severity tags. The Apply skill has two halves: invoking it on the right scope, and reading its output the way you'd read any reviewer's — findings are claims to evaluate, not orders to follow.</p>
+
+  <div class="obj-banner">
+    <div class="chips">
+      <span class="chip">M34 · Review</span>
+      <span class="chip bloom">Bloom: Apply</span>
+      <span class="chip assessed">Assessed by: Assignment A6</span>
+    </div>
+    <p class="statement"><em>Objective:</em> Use /code-review on a PR and interpret multi-agent findings, distinguishing verified issues from noise.</p>
+  </div>
+
+  <h2>1 · Running it locally</h2>
+  <p>In any Claude Code session, <code>/code-review</code> reviews a diff right in your terminal — no setup, no GitHub App. It reports correctness bugs plus reuse, simplification, and efficiency cleanups. What it reviews:</p>
+  <ul>
+    <li><strong>Default scope:</strong> your branch's commits ahead of its upstream, plus any uncommitted changes in the working tree — i.e., &ldquo;the work on this branch,&rdquo; which is usually what you want before opening a PR.</li>
+    <li><strong>Explicit targets:</strong> pass a file path, a <strong>PR number</strong> (the A6 case: reviewing your partner's PR), a branch name, or a ref range like <code>main...my-feature</code> — the ref-range form reviews the committed diff that a PR from <code>my-feature</code> into <code>main</code> would contain.</li>
+    <li><strong>Output flags:</strong> <code>--comment</code> posts the findings as inline PR comments; <code>--fix</code> applies the findings to your working tree after the review.</li>
+  </ul>
+  <p>Two knobs shape the findings themselves. The command follows your <code>CLAUDE.md</code> like any session, so your project conventions inform what gets flagged. And <em>effort level</em> trades coverage against confidence: lower effort levels &ldquo;return fewer, higher-confidence findings, while <code>high</code> through <code>max</code> give broader coverage and may include uncertain findings.&rdquo; That sentence matters for interpretation — at high effort, the tool is <em>telling you</em> some findings may be noise.</p>
+  <div class="callout note">
+    <span class="label">One name, two products</span>
+    <p>The same docs page describes the managed <strong>Code Review</strong> service: a GitHub App (Team/Enterprise research preview) that reviews PRs automatically and posts inline comments. The mechanism below is shared; setup, <code>@claude review</code> triggers, and <code>REVIEW.md</code> customization belong to the managed service. For A6 you'll use the local command — but read the finding format from the managed docs, because that's the interpretive skill both share. (There's also <code>/code-review ultra</code>, which runs a deeper cloud review; it needs claude.ai auth and falls back to a local review when unavailable.)</p>
+  </div>
+
+  <h2>2 · What &ldquo;multi-agent&rdquo; buys: the verification step</h2>
+  <p>When a review runs, &ldquo;multiple agents analyze the diff and surrounding code in parallel&hellip; Each agent looks for a different class of issue, then a <em>verification step</em> checks candidates against actual code behavior to filter out false positives. The results are deduplicated, ranked by severity,&rdquo; and reported. Read that pipeline as three review properties:</p>
+  <ul>
+    <li><strong>Specialized finders</strong> — parallel agents each hunting one class of issue (compare your M33 taxonomy: a per-mode scan, mechanized).</li>
+    <li><strong>Adversarial verification</strong> — candidate findings are checked against what the code actually does before being reported. A finding that survives is a <em>verified claim</em>, not a pattern match.</li>
+    <li><strong>Dedup and ranking</strong> — so one root cause doesn't arrive as five comments, and severity ordering tells you where to start.</li>
+  </ul>
+  <p>Findings come tagged with severity, and the tags are load-bearing:</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Marker</th><th>Severity</th><th>Meaning</th></tr>
+    <tr><td>🔴</td><td>Important</td><td>A bug that should be fixed before merging</td></tr>
+    <tr><td>🟡</td><td>Nit</td><td>A minor issue, worth fixing but not blocking</td></tr>
+    <tr><td>🟣</td><td>Pre-existing</td><td>A bug that exists in the codebase but was not introduced by this PR</td></tr>
+  </table>
+  </div>
+  <p>Each finding also carries a collapsible <strong>extended reasoning</strong> section — &ldquo;why Claude flagged the issue and how it verified the problem.&rdquo; And deliberately, findings &ldquo;don't approve or block your PR&rdquo;: the managed check run always completes neutral. The reviewer advises; the human merges. That's Week 1's whose-decision line, drawn in infrastructure.</p>
+
+  <h2>3 · Interpreting findings: verified vs. noise</h2>
+  <p>&ldquo;Distinguishing verified issues from noise&rdquo; is a reading protocol, not a vibe. For each finding, in order:</p>
+  <ol>
+    <li><strong>Severity first.</strong> Triage 🔴 before 🟡; treat 🟣 as information about the codebase, not about this PR (it's real, but it isn't your partner's diff's fault — file an issue rather than blocking the merge).</li>
+    <li><strong>Open the extended reasoning.</strong> The verification evidence is the difference between &ldquo;a model said so&rdquo; and &ldquo;here's the code path that breaks.&rdquo; A finding whose reasoning cites specific lines and traces actual behavior is verified; one that reasons from a name or a resemblance (&ldquo;this function is probably called with null&rdquo;) is a candidate the verifier should have caught — treat it as noise until you confirm it yourself.</li>
+    <li><strong>Reproduce the Important ones.</strong> For a 🔴, the reasoning should let you construct the failing case. If you can't, that's your answer.</li>
+    <li><strong>Close the loop.</strong> On the managed service every comment carries 👍/👎 buttons — rate findings (👍 useful, 👎 wrong or noisy; reactions tune the reviewer and don't trigger re-reviews). To act on a finding, fix the code and push — replying to the comment doesn't prompt Claude to respond.</li>
+  </ol>
+  <div class="callout warn">
+    <span class="label">Two symmetric failure postures</span>
+    <p><em>Accept-everything</em> turns the tool into an authority and imports its false positives straight into your codebase — worst with <code>--fix</code>, which applies findings you haven't read. <em>Dismiss-as-noise</em> spends the tool's $0 of your attention and misses the verified 🔴 sitting in position one. The protocol above is the middle: the machine proposes with evidence; you judge on the evidence. Your M33 taxonomy is the judging instrument — most findings land in a mode you can now evaluate.</p>
+  </div>
+
+  <h2>4 · Where it sits in your A6 workflow</h2>
+  <p>For the pair exercise: run <code>/code-review &lt;PR#&gt;</code> on your partner's PR <em>after</em> your own manual pass against the M33 checklist, not before. Two reasons. Anchoring: read the machine's findings first and you'll review its list instead of the diff. Coverage: the modes the machine hunts overlap yours but aren't identical — your knowledge of the project's intent (checkpoint 1's scope, the PRD) is evidence no reviewing agent has. Then merge the two lists: machine findings you verified, plus your own findings, become the structured comments M35 teaches you to write.</p>
+
+  <section class="handson">
+    <h2>Hands-on: one review, fully interpreted</h2>
+    <label class="check"><input type="checkbox"><span>On a branch with real changes (a Week 5 PR branch works), ran bare <code>/code-review</code> and confirmed the scope it reported matches &ldquo;commits ahead of upstream + uncommitted changes.&rdquo;</span></label>
+    <label class="check"><input type="checkbox"><span>Ran it again against an explicit target — a PR number or <code>main...&lt;branch&gt;</code> ref range — and noted the scope difference.</span></label>
+    <label class="check"><input type="checkbox"><span>For every finding: recorded severity, opened the reasoning, and labeled it <em>verified</em> (evidence traces actual behavior) or <em>unproven</em> (pattern-match reasoning) before deciding anything.</span></label>
+    <label class="check"><input type="checkbox"><span>For one 🔴 (or the top finding), constructed the failing case from the reasoning — or wrote down that you couldn't, and what that means.</span></label>
+    <label class="check"><input type="checkbox"><span>Classified each finding against the M33 taxonomy — which modes did the machine catch, and which (redundant logic vs. your codebase, scope drift vs. your intent) would only your manual pass have caught?</span></label>
+    <label class="check"><input type="checkbox"><span>Fixed what you accepted, re-ran the review, and confirmed the accepted findings cleared. Kept the verified/unproven tally for your A6 notes.</span></label>
+  </section>
+
+  <section class="selfcheck">
+    <h2>Self-check</h2>
+
+    <div class="q" data-answer="b">
+      <p class="q-text">1. Your partner's PR is #14. You want the machine review before writing your comments, without touching your own working tree's state. Which invocation matches the documented behavior?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Bare <code>/code-review</code> — it always finds the open PR</button></li>
+        <li><button data-opt="b"><code>/code-review 14</code> — a PR number is an explicit target; bare <code>/code-review</code> would instead review <em>your</em> branch's commits ahead of upstream plus your uncommitted changes</button></li>
+        <li><button data-opt="c"><code>/code-review --fix 14</code> — reviewing and fixing is faster</button></li>
+        <li><button data-opt="d">You can't review a PR locally without the GitHub App</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>B.</strong> The default scope is defined relative to <em>your</em> branch and working tree; someone else's PR needs the explicit target (PR number, branch, or ref range). C does the opposite of &ldquo;without touching state&rdquo; — <code>--fix</code> applies findings to your working tree, and for A6 the whole point is that the <em>author</em> directs the fixes after reading your comments. D confuses the two products: the GitHub App is the managed service; the local command needs no installation.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="c">
+      <p class="q-text">2. A review returns a 🟣 finding: a race condition in <code>session.ts</code>, in code your partner's PR never touched. How does a good reviewer handle it?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Demand the PR fix it — a bug is a bug</button></li>
+        <li><button data-opt="b">Dismiss it — pre-existing means unverified</button></li>
+        <li><button data-opt="c">Keep it out of the PR's blocking feedback — the tag means the bug exists but &ldquo;was not introduced by this PR&rdquo; — and route it to the backlog as its own issue; it's real information about the codebase, wrongly aimed if aimed at this diff</button></li>
+        <li><button data-opt="d">Re-run the review until the tag changes</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>C.</strong> The severity taxonomy encodes <em>attribution</em>, not just size: 🟣 answers &ldquo;whose diff caused this?&rdquo; with &ldquo;not this one.&rdquo; Blocking your partner's merge on it punishes them for the machine's wider gaze (A), while discarding it throws away a verified finding (B) — the Week 4 move is a tracer-bullet issue in the backlog. D treats the reviewer as a slot machine; the tag reflects git history, which re-rolling won't change.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="a">
+      <p class="q-text">3. Two 🔴 findings. #1's reasoning: &ldquo;<code>parseExpiry</code> returns 0 on malformed input (line 88), and line 142's refresh path treats 0 as &lsquo;never expires&rsquo; — a token with a corrupted expiry stays valid forever.&rdquo; #2's reasoning: &ldquo;<code>deleteAccount</code> is a destructive operation and likely lacks confirmation-flow handling.&rdquo; Apply the protocol.</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">#1 is verified — it traces a concrete code path across cited lines and hands you the failing case (corrupted expiry) to reproduce. #2 is unproven — &ldquo;likely lacks&rdquo; reasons from the function's <em>name</em>, not its behavior; check the code yourself before it earns a comment</button></li>
+        <li><button data-opt="b">Both are 🔴, so both go verbatim into your review comments</button></li>
+        <li><button data-opt="c">#2 first — destructive operations always outrank token bugs</button></li>
+        <li><button data-opt="d">Neither counts until you've read every line of both files</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>A.</strong> Same severity tag, opposite evidentiary standing — which is exactly why the protocol says open the reasoning rather than trust the marker. #1 has the shape verification produces: lines, mechanism, consequence. #2 has the shape a finder produces <em>before</em> verification — an inference from naming that the pipeline's verifier is supposed to filter and sometimes doesn't. B forwards the machine's noise under your name (M35 will hold you to better). C invents a priority rule from topic rather than evidence. D over-corrects: the reasoning sections exist precisely so review effort can be targeted.</p>
+      </div>
+    </div>
+
+    <div class="q" data-answer="d">
+      <p class="q-text">4. A teammate: &ldquo;I run <code>/code-review</code> at max effort and auto-apply with <code>--fix</code>. More findings caught, zero review time — strictly better.&rdquo; What does the documentation say that breaks this?</p>
+      <ol class="q-opts" type="A">
+        <li><button data-opt="a">Nothing — that's the intended workflow</button></li>
+        <li><button data-opt="b">Max effort is only for Enterprise plans</button></li>
+        <li><button data-opt="c"><code>--fix</code> only works with the GitHub App</button></li>
+        <li><button data-opt="d">The two flags interact badly by design: <code>high</code> through <code>max</code> &ldquo;may include uncertain findings,&rdquo; and <code>--fix</code> applies findings to the working tree — so the configuration maximizes noise and then auto-applies it, deleting exactly the judgment step (read the reasoning, verify, then act) that makes the tool safe</button></li>
+      </ol>
+      <div class="q-why" hidden>
+        <p><strong>D.</strong> Each flag is fine alone: max effort with a human filter is broad coverage; <code>--fix</code> on a low-effort, high-confidence run is a reasonable shortcut. Together they wire the noisiest output directly to your files. The deeper error is the metric — &ldquo;zero review time&rdquo; counts the reviewing you skipped as savings, when unreviewed machine edits are unreviewed edits (M36: verification proportional to supervision — auto-applied fixes got none). B and C are invented restrictions.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>Sources for this lesson</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/code-review">code.claude.com — Code Review</a> — the local command's scope, targets, <code>--comment</code>/<code>--fix</code>, effort levels; the multi-agent pipeline and verification step; severity levels; extended reasoning; rating findings (primary grounding)</li>
+      <li><a href="m33-failure-modes.html">M33 — Six Failure Modes of AI-Generated Code</a> — the taxonomy you judge findings against, and the manual pass that runs before the machine's</li>
+      <li>Companion video: <a href="https://www.youtube.com/watch?v=H2M7aB_nc-o">Testing Claude Code Review So You Don't Have To (YouTube)</a> — a community test-drive of the PR review feature; watch for which findings the reviewer accepts vs. pushes back on, and whether they open the reasoning before deciding</li>
+    </ul>
+  </section>
+
+  <nav class="pager">
+    <a href="m33-failure-modes.html"><span class="dir">Previous · M33</span>Six Failure Modes of AI-Generated Code</a>
+    <a class="next" href="m35-review-comments.html"><span class="dir">Next · M35</span>Writing Actionable PR Review Comments</a>
+  </nav>
+</main>
+
+<footer class="site-footer">
+  <div class="inner">Agentic Coding with Claude — Week 6 learning pages. Source links verified 2026-07-23.</div>
+</footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>
